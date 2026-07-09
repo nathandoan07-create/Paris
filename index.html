@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Toits de Paris — Feu d'artifice du 14 juillet depuis les toits</title>
+  <meta name="description" content="Réservez une place sur un toit privé avec vue sur la Tour Eiffel pour le feu d'artifice du 14 juillet. Zones limitées, accueil sur place, paiement sécurisé." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJ2n2/26MZ0lTMk1MdxWk9d4c9d6c=" crossorigin=""></script>
+
+  <style>
+    :root {
+      --night: #0B0E1A;
+      --night-2: #10152A;
+      --surface: rgba(24, 30, 54, 0.72);
+      --surface-solid: #161C33;
+      --border: rgba(201, 162, 75, 0.22);
+      --border-soft: rgba(255, 255, 255, 0.08);
+      --gold: #C9A24B;
+      --gold-bright: #E7C878;
+      --rose: #F472B6;
+      --fg: #F5F3EC;
+      --muted: #9AA3B2;
+      --muted-2: #6B7488;
+      --success: #34D399;
+      --danger: #F87171;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --space-1: 8px; --space-2: 16px; --space-3: 24px; --space-4: 32px; --space-5: 48px; --space-6: 72px;
+      --maxw: 1180px;
+      --shadow: 0 20px 60px rgba(0,0,0,0.45);
+      --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(1200px 600px at 78% -8%, rgba(201,162,75,0.14), transparent 60%),
+        radial-gradient(900px 500px at 10% 4%, rgba(244,114,182,0.10), transparent 55%),
+        linear-gradient(180deg, var(--night) 0%, var(--night-2) 100%);
+      color: var(--fg);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100dvh;
+    }
+    h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 600; line-height: 1.15; margin: 0; }
+    p { margin: 0; }
+    a { color: inherit; }
+    img { max-width: 100%; display: block; }
+
+    .container { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 var(--space-3); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      font: inherit; font-weight: 600; cursor: pointer;
+      border-radius: 999px; padding: 14px 26px; border: 1px solid transparent;
+      min-height: 48px; transition: transform .18s var(--ease), background .18s var(--ease), box-shadow .18s var(--ease);
+      text-decoration: none; white-space: nowrap;
+    }
+    .btn:focus-visible { outline: 3px solid var(--gold-bright); outline-offset: 2px; }
+    .btn-primary { background: linear-gradient(135deg, var(--gold-bright), var(--gold)); color: #201704; box-shadow: 0 10px 30px rgba(201,162,75,0.35); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 38px rgba(201,162,75,0.45); }
+    .btn-ghost { background: rgba(255,255,255,0.04); color: var(--fg); border-color: var(--border-soft); }
+    .btn-ghost:hover { background: rgba(255,255,255,0.09); transform: translateY(-1px); }
+    .btn[disabled] { opacity: .5; cursor: not-allowed; transform: none !important; box-shadow: none; }
+    .btn-block { width: 100%; }
+
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--gold-bright); font-weight: 600;
+    }
+    .eyebrow::before { content:""; width: 22px; height: 1px; background: var(--gold); display:inline-block; }
+
+    /* Header */
+    header.site {
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      background: rgba(11,14,26,0.72);
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .nav { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; letter-spacing: .01em; }
+    .brand .spark { width: 26px; height: 26px; color: var(--gold-bright); }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 15px; transition: color .15s var(--ease); }
+    .nav-links a:hover { color: var(--fg); }
+    .nav .btn { padding: 10px 20px; min-height: 42px; }
+    @media (max-width: 820px) { .nav-links { display: none; } }
+
+    /* Hero */
+    .hero { position: relative; padding: var(--space-6) 0 var(--space-5); overflow: hidden; }
+    .hero-fx { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    .hero .container { position: relative; z-index: 1; }
+    .hero-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: var(--space-5); align-items: center; }
+    @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; gap: var(--space-4); } }
+    .hero h1 { font-size: clamp(2.4rem, 6vw, 4rem); }
+    .hero h1 .accent { color: var(--gold-bright); font-style: italic; }
+    .hero .lead { color: var(--muted); font-size: clamp(1.05rem, 2.4vw, 1.2rem); margin-top: var(--space-3); max-width: 52ch; }
+    .hero-cta { display: flex; gap: 14px; margin-top: var(--space-4); flex-wrap: wrap; }
+    .hero-meta { display: flex; gap: var(--space-4); margin-top: var(--space-4); flex-wrap: wrap; }
+    .hero-meta .item { display: flex; flex-direction: column; }
+    .hero-meta .num { font-family: 'Playfair Display', serif; font-size: 1.7rem; color: var(--fg); }
+    .hero-meta .lbl { font-size: 13px; color: var(--muted-2); text-transform: uppercase; letter-spacing: .08em; }
+
+    .hero-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 24px; padding: var(--space-4); box-shadow: var(--shadow);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    }
+    .hero-card .date-badge {
+      display: inline-flex; align-items: center; gap: 10px; padding: 8px 16px; border-radius: 999px;
+      background: rgba(244,114,182,0.12); border: 1px solid rgba(244,114,182,0.3); color: #FBCFE8;
+      font-size: 14px; font-weight: 600;
+    }
+    .countdown { display: flex; gap: 12px; margin-top: var(--space-3); }
+    .countdown .unit { flex: 1; text-align: center; background: rgba(0,0,0,0.28); border: 1px solid var(--border-soft); border-radius: var(--radius-sm); padding: 14px 6px; }
+    .countdown .unit b { font-family: 'Playfair Display', serif; font-size: 1.8rem; display: block; font-variant-numeric: tabular-nums; }
+    .countdown .unit span { font-size: 11px; color: var(--muted-2); text-transform: uppercase; letter-spacing: .08em; }
+    .hero-card ul { list-style: none; padding: 0; margin: var(--space-3) 0 0; display: grid; gap: 12px; }
+    .hero-card li { display: flex; gap: 12px; align-items: flex-start; color: var(--muted); font-size: 15px; }
+    .hero-card li svg { color: var(--gold-bright); flex-shrink: 0; margin-top: 2px; }
+
+    /* Section shells */
+    section { padding: var(--space-6) 0; }
+    .section-head { max-width: 640px; margin-bottom: var(--space-4); }
+    .section-head h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-top: var(--space-2); }
+    .section-head p { color: var(--muted); margin-top: var(--space-2); font-size: 1.05rem; }
+
+    /* Map + zones */
+    #zones { padding-top: var(--space-4); }
+    .explorer { display: grid; grid-template-columns: 1fr 380px; gap: var(--space-3); align-items: start; }
+    @media (max-width: 960px) { .explorer { grid-template-columns: 1fr; } }
+    #map { height: 520px; width: 100%; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); z-index: 1; }
+    @media (max-width: 960px) { #map { height: 380px; } }
+    .leaflet-container { background: #0a0d18; font-family: inherit; }
+    .leaflet-popup-content-wrapper { background: var(--surface-solid); color: var(--fg); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+    .leaflet-popup-tip { background: var(--surface-solid); }
+    .leaflet-popup-content { margin: 14px 16px; }
+    .leaflet-popup-content b { font-family: 'Playfair Display', serif; }
+
+    .zone-list { display: flex; flex-direction: column; gap: 14px; max-height: 520px; overflow-y: auto; padding-right: 4px; }
+    @media (max-width: 960px) { .zone-list { max-height: none; } }
+    .zone-card {
+      text-align: left; width: 100%; cursor: pointer; font: inherit; color: inherit;
+      background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius);
+      padding: 16px; transition: border-color .18s var(--ease), transform .18s var(--ease), background .18s var(--ease);
+      display: block;
+    }
+    .zone-card:hover { transform: translateY(-2px); border-color: var(--border); }
+    .zone-card:focus-visible { outline: 3px solid var(--gold-bright); outline-offset: 2px; }
+    .zone-card.active { border-color: var(--gold); background: rgba(201,162,75,0.08); box-shadow: 0 0 0 1px var(--gold) inset; }
+    .zone-card .top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+    .zone-card h3 { font-size: 1.15rem; }
+    .zone-card .price { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--gold-bright); white-space: nowrap; }
+    .zone-card .price small { font-size: .8rem; color: var(--muted-2); font-family: 'Inter'; }
+    .zone-card .desc { color: var(--muted); font-size: 14px; margin-top: 6px; }
+    .zone-card .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .tag { font-size: 12px; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-soft); color: var(--muted); display: inline-flex; align-items:center; gap:6px; }
+    .tag.view { color: var(--gold-bright); border-color: var(--border); }
+    .tag.soldout { color: var(--danger); border-color: rgba(248,113,113,.4); }
+    .stars { color: var(--gold-bright); letter-spacing: 2px; }
+
+    /* Trust */
+    .trust-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3); }
+    @media (max-width: 900px) { .trust-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 520px) { .trust-grid { grid-template-columns: 1fr; } }
+    .trust-item { background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: var(--space-3); }
+    .trust-item .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: rgba(201,162,75,0.12); color: var(--gold-bright); margin-bottom: 14px; }
+    .trust-item h3 { font-size: 1.1rem; margin-bottom: 6px; }
+    .trust-item p { color: var(--muted); font-size: 14px; }
+
+    /* Steps */
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); counter-reset: step; }
+    @media (max-width: 780px) { .steps { grid-template-columns: 1fr; } }
+    .step { position: relative; padding-top: var(--space-2); }
+    .step .n { font-family: 'Playfair Display', serif; font-size: 2.4rem; color: var(--gold); opacity: .8; }
+    .step h3 { font-size: 1.2rem; margin: 8px 0; }
+    .step p { color: var(--muted); font-size: 15px; }
+
+    /* FAQ */
+    .faq { max-width: 760px; margin: 0 auto; }
+    details { border: 1px solid var(--border-soft); border-radius: var(--radius-sm); padding: 4px 18px; margin-bottom: 12px; background: var(--surface); }
+    details[open] { border-color: var(--border); }
+    summary { cursor: pointer; padding: 14px 0; font-weight: 600; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; color: var(--gold-bright); font-size: 1.4rem; transition: transform .2s var(--ease); }
+    details[open] summary::after { transform: rotate(45deg); }
+    details p { color: var(--muted); padding: 0 0 16px; font-size: 15px; }
+
+    /* Footer */
+    footer.site { border-top: 1px solid var(--border-soft); padding: var(--space-5) 0 var(--space-4); color: var(--muted); }
+    .foot-grid { display: flex; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
+    footer .brand { color: var(--fg); margin-bottom: 10px; }
+    footer small { color: var(--muted-2); font-size: 13px; }
+    .foot-legal { max-width: 520px; font-size: 13px; line-height: 1.6; }
+
+    /* Modal */
+    .modal-scrim {
+      position: fixed; inset: 0; z-index: 1000; background: rgba(5,7,14,0.7);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center; padding: var(--space-2);
+    }
+    .modal-scrim.open { display: flex; }
+    .modal {
+      width: 100%; max-width: 460px; background: var(--surface-solid); border: 1px solid var(--border);
+      border-radius: 20px; box-shadow: var(--shadow); max-height: 92dvh; overflow-y: auto;
+      animation: pop .25s var(--ease);
+    }
+    @keyframes pop { from { transform: translateY(14px) scale(.98); opacity: 0; } to { transform: none; opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .modal { animation: none; } * { scroll-behavior: auto; } }
+    .modal-head { display: flex; justify-content: space-between; align-items: flex-start; padding: var(--space-3) var(--space-3) 0; }
+    .modal-head h3 { font-size: 1.4rem; }
+    .modal-close { background: rgba(255,255,255,0.06); border: none; color: var(--fg); width: 38px; height: 38px; border-radius: 10px; cursor: pointer; font-size: 18px; display: grid; place-items: center; }
+    .modal-close:hover { background: rgba(255,255,255,0.12); }
+    .modal-body { padding: var(--space-3); }
+    .summary-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-soft); font-size: 15px; }
+    .summary-row.total { border-bottom: none; font-size: 1.15rem; padding-top: 16px; }
+    .summary-row.total b { font-family: 'Playfair Display', serif; color: var(--gold-bright); }
+    .field { margin-top: 16px; }
+    .field label { display: block; font-size: 14px; margin-bottom: 6px; color: var(--muted); }
+    .field label .req { color: var(--rose); }
+    .field input, .field select {
+      width: 100%; font: inherit; color: var(--fg); background: rgba(0,0,0,0.28);
+      border: 1px solid var(--border-soft); border-radius: var(--radius-sm); padding: 13px 14px; min-height: 48px;
+    }
+    .field input:focus, .field select:focus { outline: none; border-color: var(--gold); }
+    .field .err { color: var(--danger); font-size: 13px; margin-top: 6px; display: none; }
+    .field.invalid input { border-color: var(--danger); }
+    .field.invalid .err { display: block; }
+    .pay-note { display: flex; gap: 8px; align-items: center; color: var(--muted-2); font-size: 13px; margin-top: 16px; justify-content: center; }
+    .demo-banner { background: rgba(244,114,182,0.10); border: 1px solid rgba(244,114,182,0.3); color: #FBCFE8; font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); margin-bottom: var(--space-2); }
+
+    .confirm { text-align: center; padding: var(--space-3) 0; }
+    .confirm .check { width: 64px; height: 64px; border-radius: 50%; background: rgba(52,211,153,0.14); color: var(--success); display: grid; place-items: center; margin: 0 auto var(--space-2); }
+    .reveal { background: rgba(201,162,75,0.08); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; margin-top: var(--space-2); text-align: left; }
+    .reveal .lbl { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted-2); }
+    .reveal .val { font-family: 'Playfair Display', serif; font-size: 1.15rem; margin: 2px 0 12px; }
+    .reveal .code { font-family: ui-monospace, monospace; letter-spacing: 3px; color: var(--gold-bright); font-size: 1.3rem; }
+
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+    .skip { position: absolute; left: -999px; top: 8px; background: var(--gold); color: #201704; padding: 10px 16px; border-radius: 8px; z-index: 200; }
+    .skip:focus { left: 8px; }
+  </style>
+</head>
+<body>
+  <a href="#zones" class="skip">Aller aux zones</a>
+
+  <header class="site">
+    <div class="container nav">
+      <a href="#top" class="brand" aria-label="Toits de Paris, accueil">
+        <svg class="spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l4 4M15 15l4 4M19 5l-4 4M9 15l-4 4"/>
+        </svg>
+        Toits de Paris
+      </a>
+      <nav class="nav-links" aria-label="Navigation principale">
+        <a href="#zones">Les zones</a>
+        <a href="#how">Comment ça marche</a>
+        <a href="#trust">Sécurité</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <a href="#zones" class="btn btn-primary">Choisir ma zone</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero">
+      <canvas class="hero-fx" id="fx" aria-hidden="true"></canvas>
+      <div class="container hero-grid">
+        <div>
+          <span class="eyebrow">14 juillet · Nuit du feu d'artifice</span>
+          <h1 style="margin-top:16px">Le feu d'artifice<br><span class="accent">depuis les toits</span> de Paris</h1>
+          <p class="lead">Une place sur une terrasse privée face à la Tour Eiffel. Vue dégagée, jauge limitée, accueil sur place. Réservez votre zone — l'adresse exacte et l'accès vous sont remis après paiement.</p>
+          <div class="hero-cta">
+            <a href="#zones" class="btn btn-primary">
+              Voir les zones disponibles
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a href="#how" class="btn btn-ghost">Comment ça marche</a>
+          </div>
+          <div class="hero-meta">
+            <div class="item"><span class="num" id="spotsLeft">—</span><span class="lbl">Places restantes</span></div>
+            <div class="item"><span class="num">5</span><span class="lbl">Terrasses privées</span></div>
+            <div class="item"><span class="num">100%</span><span class="lbl">Accueil sur place</span></div>
+          </div>
+        </div>
+
+        <div class="hero-card">
+          <span class="date-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            Mardi 14 juillet · 23h00
+          </span>
+          <div class="countdown" id="countdown" aria-label="Compte à rebours avant l'événement">
+            <div class="unit"><b id="cd-d">–</b><span>jours</span></div>
+            <div class="unit"><b id="cd-h">–</b><span>heures</span></div>
+            <div class="unit"><b id="cd-m">–</b><span>min</span></div>
+            <div class="unit"><b id="cd-s">–</b><span>sec</span></div>
+          </div>
+          <ul>
+            <li>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+              Vue directe sur la Tour Eiffel et le feu d'artifice
+            </li>
+            <li>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+              Jauge strictement limitée par un hôte présent
+            </li>
+            <li>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+              Paiement sécurisé · adresse & accès envoyés après réservation
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZONES + MAP -->
+    <section id="zones">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Choisissez votre point de vue</span>
+          <h2>La carte des zones</h2>
+          <p>Chaque cercle représente une zone d'accueil autour d'une terrasse privée. Sélectionnez-la pour voir les détails, puis réservez. L'adresse précise reste masquée jusqu'au paiement.</p>
+        </div>
+        <div class="explorer">
+          <div id="map" role="application" aria-label="Carte des zones de terrasses autour de la Tour Eiffel"></div>
+          <div class="zone-list" id="zoneList" aria-label="Liste des zones disponibles"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW -->
+    <section id="how">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Simple et transparent</span>
+          <h2>Comment ça marche</h2>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <div class="n">01</div>
+            <h3>Choisissez une zone</h3>
+            <p>Sur la carte, sélectionnez la terrasse qui vous convient selon la vue, la jauge et le prix.</p>
+          </div>
+          <div class="step">
+            <div class="n">02</div>
+            <h3>Réservez en ligne</h3>
+            <p>Paiement sécurisé. Vous recevez aussitôt votre confirmation, l'adresse exacte et votre code d'accès.</p>
+          </div>
+          <div class="step">
+            <div class="n">03</div>
+            <h3>Présentez-vous le 14</h3>
+            <p>Un hôte vous accueille à l'entrée, vérifie votre réservation et vous installe sur la terrasse.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRUST -->
+    <section id="trust">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Réservez l'esprit tranquille</span>
+          <h2>Sécurité & confiance</h2>
+        </div>
+        <div class="trust-grid">
+          <div class="trust-item">
+            <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <h3>Terrasses autorisées</h3>
+            <p>Uniquement des toits privés dont nous avons le droit d'usage, jamais d'accès non autorisé.</p>
+          </div>
+          <div class="trust-item">
+            <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+            <h3>Jauge limitée</h3>
+            <p>Un nombre de places strict par terrasse, tenu par un hôte présent toute la soirée.</p>
+          </div>
+          <div class="trust-item">
+            <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+            <h3>Paiement sécurisé</h3>
+            <p>Transaction chiffrée. Adresse et code d'accès communiqués seulement après confirmation.</p>
+          </div>
+          <div class="trust-item">
+            <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg></div>
+            <h3>Assurance & assistance</h3>
+            <p>Responsabilité civile couverte et un contact hôte joignable en cas de besoin.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq">
+      <div class="container">
+        <div class="section-head" style="margin-inline:auto; text-align:center;">
+          <span class="eyebrow" style="justify-content:center; display:flex;">Questions fréquentes</span>
+          <h2>Bon à savoir</h2>
+        </div>
+        <div class="faq">
+          <details>
+            <summary>Quand est-ce que je reçois l'adresse exacte ?</summary>
+            <p>Immédiatement après le paiement : l'adresse précise, votre code d'accès et le nom de l'hôte apparaissent sur la page de confirmation et vous sont envoyés par e-mail.</p>
+          </details>
+          <details>
+            <summary>Est-ce légal ?</summary>
+            <p>Oui. Nous ne commercialisons que des terrasses privées dont nous avons le droit d'usage, avec un accueil sur place. Aucun accès à un immeuble tiers sans autorisation n'est proposé.</p>
+          </details>
+          <details>
+            <summary>Que se passe-t-il en cas d'intempéries ou d'annulation ?</summary>
+            <p>Si l'événement est annulé par les autorités, vous êtes intégralement remboursé. En cas de forte pluie, l'accueil est maintenu (prévoyez une tenue adaptée).</p>
+          </details>
+          <details>
+            <summary>Les enfants sont-ils admis ?</summary>
+            <p>Cela dépend de la terrasse. La jauge et les conditions (âge minimum, animaux) sont précisées sur chaque zone au moment de la réservation.</p>
+          </details>
+          <details>
+            <summary>Combien de places puis-je réserver ?</summary>
+            <p>Vous choisissez le nombre de places dans la limite des disponibilités de la zone sélectionnée.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site">
+    <div class="container foot-grid">
+      <div>
+        <div class="brand">
+          <svg class="spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" style="width:24px;height:24px;color:var(--gold-bright)"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l4 4M15 15l4 4M19 5l-4 4M9 15l-4 4"/></svg>
+          Toits de Paris
+        </div>
+        <p class="foot-legal">Réservation de places sur terrasses privées pour le feu d'artifice du 14 juillet. Nous ne proposons que des toits autorisés, avec accueil et jauge encadrés. L'accès à des immeubles sans autorisation est strictement exclu.</p>
+      </div>
+      <div>
+        <small>© <span id="year"></span> Toits de Paris — Mentions légales · CGV · Confidentialité<br>Contact hôte : bonjour@toitsdeparis.example</small>
+      </div>
+    </div>
+  </footer>
+
+  <!-- CHECKOUT MODAL -->
+  <div class="modal-scrim" id="scrim" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal" id="modal">
+      <div class="modal-head">
+        <h3 id="modalTitle">Réserver</h3>
+        <button class="modal-close" id="closeModal" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody"><!-- filled by JS --></div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    "use strict";
+
+    // --- Data: zones (approximate points; exact address hidden until purchase) ---
+    var EIFFEL = [48.8584, 2.2945];
+    var ZONES = [
+      { id: "trocadero", name: "Terrasse Trocadéro", lat: 48.8628, lng: 2.2870, radius: 120,
+        price: 240, capacity: 20, left: 6, stars: 5, view: "Vue frontale",
+        desc: "Le point de vue iconique, pile dans l'axe de la Tour. Terrasse haut de gamme, service inclus.",
+        tags: ["Champagne inclus", "Assises"], address: "Rooftop, 12 av. du Président Wilson, 75116", code: "TR-4821" },
+      { id: "chaillot", name: "Toit de Chaillot", lat: 48.8617, lng: 2.2935, radius: 100,
+        price: 180, capacity: 16, left: 3, stars: 5, view: "Vue dégagée",
+        desc: "Hauteur sur les jardins, panorama large sur l'esplanade et la Tour.",
+        tags: ["Bar sur place", "Debout & assis"], address: "Terrasse, 3 place du Trocadéro, 75116", code: "CH-1907" },
+      { id: "champdemars", name: "Balcon Champ-de-Mars", lat: 48.8556, lng: 2.2990, radius: 130,
+        price: 150, capacity: 24, left: 11, stars: 4, view: "Au pied de la Tour",
+        desc: "Au plus près du monument, ambiance festive, feu d'artifice à la verticale.",
+        tags: ["Ambiance festive", "Food truck"], address: "Rooftop, 28 av. de la Bourdonnais, 75007", code: "CM-3355" },
+      { id: "passy", name: "Terrasse Passy", lat: 48.8575, lng: 2.2820, radius: 110,
+        price: 130, capacity: 18, left: 0, stars: 4, view: "Vue latérale",
+        desc: "Ambiance intimiste côté Passy, vue latérale élégante sur la Tour illuminée.",
+        tags: ["Intimiste", "Couvertures fournies"], address: "Toit, 5 rue de l'Alboni, 75016", code: "PA-7742" },
+      { id: "birhakeim", name: "Rooftop Bir-Hakeim", lat: 48.8540, lng: 2.2880, radius: 115,
+        price: 165, capacity: 20, left: 5, stars: 4, view: "Vue pont & Tour",
+        desc: "Perspective originale avec le pont Bir-Hakeim et la Tour en toile de fond.",
+        tags: ["Photogénique", "DJ set"], address: "Terrasse, 2 bd de Grenelle, 75015", code: "BH-9014" }
+    ];
+
+    var euro = function (n) { return n.toLocaleString('fr-FR') + ' €'; };
+    var selected = null;
+
+    // --- Countdown to July 14, 23:00 (next occurrence) ---
+    (function countdown() {
+      var now = new Date();
+      var year = now.getFullYear();
+      var target = new Date(year, 6, 14, 23, 0, 0); // month 6 = July
+      if (target < now) target = new Date(year + 1, 6, 14, 23, 0, 0);
+      function tick() {
+        var diff = Math.max(0, target - new Date());
+        var s = Math.floor(diff / 1000);
+        var d = Math.floor(s / 86400); s -= d * 86400;
+        var h = Math.floor(s / 3600); s -= h * 3600;
+        var m = Math.floor(s / 60); s -= m * 60;
+        set('cd-d', d); set('cd-h', pad(h)); set('cd-m', pad(m)); set('cd-s', pad(s));
+      }
+      function pad(n){ return (n < 10 ? '0' : '') + n; }
+      function set(id, v){ var el = document.getElementById(id); if (el) el.textContent = v; }
+      tick(); setInterval(tick, 1000);
+    })();
+
+    // total spots left
+    document.getElementById('spotsLeft').textContent =
+      ZONES.reduce(function (a, z) { return a + z.left; }, 0);
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // --- Map (resilient: zone cards + checkout still work if Leaflet/tiles fail to load) ---
+    var map = null, circles = {};
+    try {
+    map = L.map('map', { scrollWheelZoom: false, zoomControl: true }).setView([48.8590, 2.2905], 14);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom: 19, subdomains: 'abcd'
+    }).addTo(map);
+
+    // Eiffel marker
+    var eiffelIcon = L.divIcon({
+      className: '', iconSize: [40, 40], iconAnchor: [20, 20],
+      html: '<div style="width:40px;height:40px;display:grid;place-items:center;color:#E7C878;filter:drop-shadow(0 0 8px rgba(231,200,120,.6))">'
+        + '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2 6 4 14h-3l-1-5h-4l-1 5H6l4-14 2-6z"/></svg></div>'
+    });
+    L.marker(EIFFEL, { icon: eiffelIcon, keyboard: false })
+      .addTo(map).bindTooltip('Tour Eiffel', { direction: 'top' });
+
+    // Deterministic seeded RNG so the offset is fixed per zone (doesn't jump on reload)
+    function hashStr(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+    function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+    // Displayed circle is centered so the REAL address (z.lat,z.lng, hidden) sits at a random
+    // off-center position inside the circle — the exact building can't be guessed pre-purchase.
+    function displayCenter(z) {
+      var rng = mulberry32(hashStr(z.id));
+      var ang = rng() * Math.PI * 2;
+      var dist = z.radius * (0.35 + rng() * 0.4); // 35%–75% of the radius away from the address
+      var dLat = (dist * Math.cos(ang)) / 111320;
+      var dLng = (dist * Math.sin(ang)) / (111320 * Math.cos(z.lat * Math.PI / 180));
+      return [z.lat + dLat, z.lng + dLng];
+    }
+
+    ZONES.forEach(function (z) {
+      var sold = z.left <= 0;
+      z.center = displayCenter(z);
+      var c = L.circle(z.center, {
+        radius: z.radius,
+        color: sold ? '#6B7488' : '#C9A24B',
+        weight: 2, fillColor: sold ? '#6B7488' : '#E7C878', fillOpacity: 0.18
+      }).addTo(map);
+      c.bindPopup('<b>' + z.name + '</b><br>' + (sold ? 'Complet' : euro(z.price) + ' · ' + z.left + ' places'));
+      c.on('click', function () { selectZone(z.id, true); });
+      circles[z.id] = c;
+    });
+    } catch (err) {
+      var mapEl = document.getElementById('map');
+      if (mapEl) { mapEl.style.display = 'grid'; mapEl.style.placeItems = 'center'; mapEl.style.padding = '24px'; mapEl.style.textAlign = 'center'; mapEl.style.color = 'var(--muted)'; mapEl.textContent = 'Carte momentanément indisponible — sélectionnez une zone dans la liste ci-contre.'; }
+    }
+
+    // --- Zone cards ---
+    var list = document.getElementById('zoneList');
+    ZONES.forEach(function (z) {
+      var sold = z.left <= 0;
+      var card = document.createElement('button');
+      card.className = 'zone-card';
+      card.id = 'card-' + z.id;
+      card.setAttribute('aria-pressed', 'false');
+      card.innerHTML =
+        '<div class="top"><h3>' + z.name + '</h3>'
+        + '<div class="price">' + (sold ? '<span class="tag soldout">Complet</span>' : euro(z.price) + ' <small>/ pers.</small>') + '</div></div>'
+        + '<div class="desc">' + z.desc + '</div>'
+        + '<div class="tags">'
+        + '<span class="tag view"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' + z.view + '</span>'
+        + '<span class="tag"><span class="stars">' + stars(z.stars) + '</span></span>'
+        + '<span class="tag">' + (sold ? 'Liste d\'attente' : z.left + ' places') + '</span>'
+        + z.tags.map(function (t) { return '<span class="tag">' + t + '</span>'; }).join('')
+        + '</div>';
+      card.addEventListener('click', function () { selectZone(z.id, true); });
+      list.appendChild(card);
+    });
+
+    function stars(n){ var s=''; for(var i=0;i<5;i++){ s += i<n ? '★' : '☆'; } return s; }
+
+    function selectZone(id, fly) {
+      selected = ZONES.filter(function (z) { return z.id === id; })[0];
+      ZONES.forEach(function (z) {
+        var card = document.getElementById('card-' + z.id);
+        var on = z.id === id;
+        card.classList.toggle('active', on);
+        card.setAttribute('aria-pressed', on ? 'true' : 'false');
+        if (circles[z.id]) circles[z.id].setStyle({ weight: on ? 4 : 2, fillOpacity: on ? 0.32 : 0.18 });
+      });
+      if (fly && map) { map.flyTo(selected.center || [selected.lat, selected.lng], 15, { duration: 0.6 }); if (circles[id]) circles[id].openPopup(); }
+      openCheckout(selected);
+    }
+
+    // --- Checkout modal ---
+    var scrim = document.getElementById('scrim');
+    var modalBody = document.getElementById('modalBody');
+    var modalTitle = document.getElementById('modalTitle');
+    var lastFocus = null;
+
+    function openCheckout(z) {
+      if (z.left <= 0) { renderWaitlist(z); }
+      else { renderCheckout(z, 1); }
+      lastFocus = document.activeElement;
+      scrim.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      var first = modalBody.querySelector('input, select, button');
+      if (first) first.focus();
+    }
+    function closeCheckout() {
+      scrim.classList.remove('open');
+      document.body.style.overflow = '';
+      if (lastFocus) lastFocus.focus();
+    }
+    document.getElementById('closeModal').addEventListener('click', closeCheckout);
+    scrim.addEventListener('click', function (e) { if (e.target === scrim) closeCheckout(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && scrim.classList.contains('open')) closeCheckout(); });
+
+    function renderCheckout(z, qty) {
+      modalTitle.textContent = z.name;
+      var total = z.price * qty;
+      var maxQty = Math.min(z.left, 8);
+      var opts = '';
+      for (var i = 1; i <= maxQty; i++) opts += '<option value="' + i + '"' + (i === qty ? ' selected' : '') + '>' + i + ' place' + (i > 1 ? 's' : '') + '</option>';
+      modalBody.innerHTML =
+        '<div class="demo-banner">Démo : le paiement n\'est pas encore actif. Branchez Stripe pour encaisser réellement (voir note dev).</div>'
+        + '<div class="field"><label for="qty">Nombre de places</label><select id="qty">' + opts + '</select></div>'
+        + '<div style="margin-top:16px">'
+        + row('Zone', z.name)
+        + row('Prix unitaire', euro(z.price))
+        + row('Places', String(qty))
+        + '<div class="summary-row total"><span>Total</span><b id="totalLine">' + euro(total) + '</b></div>'
+        + '</div>'
+        + '<form id="payForm" novalidate>'
+        + field('name', 'Nom complet', 'text', 'Jean Dupont', true)
+        + field('email', 'E-mail', 'email', 'vous@email.com', true)
+        + '<button type="submit" class="btn btn-primary btn-block" style="margin-top:20px">Payer ' + '<span id="payAmt">' + euro(total) + '</span></button>'
+        + '<div class="pay-note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Paiement chiffré · adresse & accès révélés juste après</div>'
+        + '</form>';
+
+      var qtySel = document.getElementById('qty');
+      qtySel.addEventListener('change', function () {
+        var q = parseInt(qtySel.value, 10);
+        var t = z.price * q;
+        document.querySelectorAll('.summary-row')[2].lastChild.textContent = String(q);
+        document.getElementById('totalLine').textContent = euro(t);
+        document.getElementById('payAmt').textContent = euro(t);
+      });
+
+      document.getElementById('payForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var ok = validate(['name', 'email']);
+        if (!ok) return;
+        // >>> Stripe Checkout would be triggered here (see dev note) <<<
+        renderConfirmation(z, parseInt(qtySel.value, 10));
+      });
+    }
+
+    function renderWaitlist(z) {
+      modalTitle.textContent = z.name + ' — Complet';
+      modalBody.innerHTML =
+        '<p style="color:var(--muted)">Cette terrasse est complète. Laissez votre e-mail : vous serez prévenu en cas de désistement.</p>'
+        + '<form id="wlForm" novalidate>'
+        + field('email', 'E-mail', 'email', 'vous@email.com', true)
+        + '<button type="submit" class="btn btn-primary btn-block" style="margin-top:16px">Me prévenir</button>'
+        + '</form>';
+      document.getElementById('wlForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (!validate(['email'])) return;
+        modalBody.innerHTML = '<div class="confirm"><div class="check"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg></div><h3>Vous êtes sur la liste</h3><p style="color:var(--muted);margin-top:8px">On vous écrit dès qu\'une place se libère sur ' + z.name + '.</p></div>';
+      });
+    }
+
+    function renderConfirmation(z, qty) {
+      modalTitle.textContent = 'Réservation confirmée';
+      modalBody.innerHTML =
+        '<div class="confirm">'
+        + '<div class="check"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>'
+        + '<h3>À dans les étoiles ✨</h3>'
+        + '<p style="color:var(--muted);margin-top:8px">' + qty + ' place' + (qty > 1 ? 's' : '') + ' sur <b>' + z.name + '</b>. Un e-mail de confirmation vient de vous être envoyé.</p>'
+        + '<div class="reveal">'
+        + '<div class="lbl">Adresse exacte</div><div class="val">' + z.address + '</div>'
+        + '<div class="lbl">Code d\'accès</div><div class="val code">' + z.code + '</div>'
+        + '<div class="lbl">Sur place</div><div class="val" style="font-size:1rem">Un hôte vous accueille dès 22h15. Présentez ce code.</div>'
+        + '</div>'
+        + '<button class="btn btn-ghost btn-block" style="margin-top:20px" id="doneBtn">Terminer</button>'
+        + '</div>';
+      document.getElementById('doneBtn').addEventListener('click', closeCheckout);
+    }
+
+    // helpers
+    function row(label, val) { return '<div class="summary-row"><span>' + label + '</span><span>' + val + '</span></div>'; }
+    function field(id, label, type, ph, req) {
+      return '<div class="field" id="f-' + id + '">'
+        + '<label for="' + id + '">' + label + (req ? ' <span class="req">*</span>' : '') + '</label>'
+        + '<input id="' + id + '" name="' + id + '" type="' + type + '" placeholder="' + ph + '"'
+        + (type === 'email' ? ' autocomplete="email"' : '') + (req ? ' required' : '') + ' />'
+        + '<div class="err">Champ requis ou invalide.</div></div>';
+    }
+    function validate(ids) {
+      var ok = true, firstBad = null;
+      ids.forEach(function (id) {
+        var input = document.getElementById(id);
+        var wrap = document.getElementById('f-' + id);
+        var bad = !input.value.trim() || (input.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value));
+        wrap.classList.toggle('invalid', bad);
+        if (bad) { ok = false; if (!firstBad) firstBad = input; }
+      });
+      if (firstBad) firstBad.focus();
+      return ok;
+    }
+
+    // focus trap
+    scrim.addEventListener('keydown', function (e) {
+      if (e.key !== 'Tab') return;
+      var f = scrim.querySelectorAll('button, input, select, a[href]');
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+  })();
+  </script>
+
+  <!-- Fireworks over the hero (July 14 vibe) -->
+  <script>
+  (function () {
+    "use strict";
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var canvas = document.getElementById('fx');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var hero = canvas.parentElement;
+    var W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var COLORS = ['#E7C878', '#C9A24B', '#F472B6', '#FBCFE8', '#FFFFFF', '#9EC5FF'];
+
+    function resize() {
+      W = hero.clientWidth; H = hero.clientHeight;
+      canvas.width = W * dpr; canvas.height = H * dpr;
+      canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    var rockets = [], sparks = [];
+    function rand(a, b) { return a + Math.random() * (b - a); }
+    function pick(a) { return a[(Math.random() * a.length) | 0]; }
+
+    function launch() {
+      rockets.push({
+        x: rand(W * 0.15, W * 0.85), y: H + 8,
+        vy: rand(-9.5, -7.5), vx: rand(-0.6, 0.6),
+        targetY: rand(H * 0.12, H * 0.5), color: pick(COLORS)
+      });
+    }
+    function explode(x, y, color) {
+      var n = 46 + (Math.random() * 26 | 0);
+      for (var i = 0; i < n; i++) {
+        var ang = (Math.PI * 2 * i) / n + rand(-0.08, 0.08);
+        var speed = rand(1.6, 5.2);
+        sparks.push({
+          x: x, y: y, vx: Math.cos(ang) * speed, vy: Math.sin(ang) * speed,
+          life: 1, decay: rand(0.010, 0.022),
+          color: Math.random() < 0.75 ? color : pick(COLORS), size: rand(1.4, 2.6)
+        });
+      }
+    }
+
+    var last = 0, acc = 0;
+    function frame(t) {
+      var dt = Math.min(48, t - last); last = t; acc += dt;
+      // fade trails
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = 'rgba(11,14,26,0.22)';
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'lighter';
+
+      if (acc > rand(650, 1100)) { acc = 0; launch(); if (Math.random() < 0.35) launch(); }
+
+      for (var i = rockets.length - 1; i >= 0; i--) {
+        var r = rockets[i];
+        r.x += r.vx; r.y += r.vy; r.vy += 0.06;
+        ctx.beginPath(); ctx.fillStyle = r.color;
+        ctx.arc(r.x, r.y, 2.2, 0, Math.PI * 2); ctx.fill();
+        if (r.vy >= 0 || r.y <= r.targetY) { explode(r.x, r.y, r.color); rockets.splice(i, 1); }
+      }
+      for (var j = sparks.length - 1; j >= 0; j--) {
+        var s = sparks[j];
+        s.x += s.vx; s.y += s.vy; s.vy += 0.045; s.vx *= 0.985; s.vy *= 0.985;
+        s.life -= s.decay;
+        if (s.life <= 0) { sparks.splice(j, 1); continue; }
+        ctx.globalAlpha = Math.max(0, s.life);
+        ctx.beginPath(); ctx.fillStyle = s.color;
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(frame);
+    }
+
+    if (!reduce) {
+      launch();
+      requestAnimationFrame(frame);
+    }
+  })();
+  </script>
+</body>
+</html>
