@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 4242;
 // On Render, RENDER_EXTERNAL_URL is provided automatically.
 const BASE_URL = process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || ('http://localhost:' + PORT);
 const CURRENCY = 'eur';
-const MAX_QTY = 8;
+const MAX_QTY = 3; // max 3 groups (= 3 sales) per rooftop
 
 const stripeKey = process.env.STRIPE_SECRET_KEY || '';
 const stripe = stripeKey ? require('stripe')(stripeKey) : null;
