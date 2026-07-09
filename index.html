@@ -164,6 +164,14 @@
     .zone-card:hover { transform: translateY(-2px); border-color: var(--border); }
     .zone-card:focus-visible { outline: 3px solid var(--gold-bright); outline-offset: 2px; }
     .zone-card.active { border-color: var(--gold); background: rgba(201,162,75,0.08); box-shadow: 0 0 0 1px var(--gold) inset; }
+    .pass-card { width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; display: block;
+      background: linear-gradient(135deg, rgba(201,162,75,0.18), rgba(244,114,182,0.10)); border: 1px solid var(--gold);
+      border-radius: var(--radius); padding: 16px; margin-bottom: 4px; transition: transform .18s var(--ease), box-shadow .18s var(--ease); }
+    .pass-card:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(201,162,75,0.25); }
+    .pass-card:focus-visible { outline: 3px solid var(--gold-bright); outline-offset: 2px; }
+    .pass-card .plabel { display: flex; align-items: center; gap: 8px; font-family: 'Playfair Display', serif; font-size: 1.15rem; }
+    .pass-card .pprice { font-family: 'Playfair Display', serif; color: var(--gold-bright); font-size: 1.35rem; }
+    .pass-badge { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: #201704; background: var(--gold-bright); padding: 3px 9px; border-radius: 999px; font-weight: 700; }
     .zone-card .top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
     .zone-card h3 { font-size: 1.15rem; }
     .zone-card .price { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--gold-bright); white-space: nowrap; }
@@ -456,6 +464,9 @@
     var euro = function (n) { return n.toLocaleString('fr-FR') + ' €'; };
     var selected = null;
 
+    // Pass intégral : un paiement débloque toutes les terrasses de la carte.
+    var PASS = { label: "Pass intégral", price: 390 }; // <-- prix du pass à ajuster ici
+
     // --- Countdown to July 14, 23:00 (next occurrence) ---
     (function countdown() {
       var now = new Date();
@@ -534,6 +545,19 @@
 
     // --- Zone cards ---
     var list = document.getElementById('zoneList');
+
+    // Pass intégral card (top of the list)
+    var passCard = document.createElement('button');
+    passCard.className = 'pass-card';
+    passCard.setAttribute('aria-label', 'Pass intégral, débloque toutes les terrasses');
+    passCard.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px">'
+      + '<span class="plabel"><span class="pass-badge">Pass</span> ' + PASS.label + '</span>'
+      + '<span class="pprice">' + euro(PASS.price) + '</span></div>'
+      + '<div class="desc" style="margin-top:8px">Débloque <b>toutes les terrasses</b> de la carte d\'un coup — l\'adresse et l\'accès de chaque toit de la soirée.</div>';
+    passCard.addEventListener('click', openPass);
+    list.appendChild(passCard);
+
     ZONES.forEach(function (z) {
       var sold = z.left <= 0, pending = z.status === 'pending';
       var card = document.createElement('button');
@@ -695,6 +719,60 @@
         + '</div>'
         + '<button class="btn btn-ghost btn-block" style="margin-top:20px" id="doneBtn">Terminer</button>'
         + '</div>';
+      document.getElementById('doneBtn').addEventListener('click', closeCheckout);
+    }
+
+    // --- Pass intégral ---
+    function openPass() {
+      renderPassCheckout();
+      lastFocus = document.activeElement;
+      scrim.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      var f = modalBody.querySelector('input, button');
+      if (f) f.focus();
+    }
+    function renderPassCheckout() {
+      modalTitle.textContent = PASS.label;
+      modalBody.innerHTML =
+        '<div class="demo-banner">Démo : le paiement n\'est pas encore actif. Branchez Stripe pour encaisser réellement (voir note dev).</div>'
+        + '<p style="color:var(--muted)">Un seul paiement pour débloquer <b>toutes les terrasses</b> de la carte et recevoir l\'adresse + l\'accès de chacune.</p>'
+        + '<div style="margin-top:16px">'
+        + row('Formule', PASS.label)
+        + row('Terrasses incluses', String(ZONES.filter(function (z) { return z.status !== 'pending'; }).length))
+        + '<div class="summary-row total"><span>Total</span><b>' + euro(PASS.price) + '</b></div></div>'
+        + '<form id="passForm" novalidate>'
+        + field('name', 'Nom complet', 'text', 'Jean Dupont', true)
+        + field('email', 'E-mail', 'email', 'vous@email.com', true)
+        + '<button type="submit" class="btn btn-primary btn-block" style="margin-top:20px">Payer ' + euro(PASS.price) + '</button>'
+        + '<div class="pay-note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Paiement chiffré · toutes les adresses révélées juste après</div>'
+        + '</form>';
+      document.getElementById('passForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (!validate(['name', 'email'])) return;
+        // >>> Stripe Checkout (pass) déclenché ici <<<
+        renderPassConfirmation();
+      });
+    }
+    function renderPassConfirmation() {
+      modalTitle.textContent = 'Pass intégral confirmé';
+      var items = ZONES.filter(function (z) { return z.status !== 'pending'; }).map(function (z) {
+        var acc = z.access.method === 'Accompagné'
+          ? 'Accès accompagné (hôte à l\'entrée)'
+          : (z.access.method === 'Clé' ? 'Clé ' : 'Code ') + z.access.value;
+        return '<div class="reveal" style="margin-top:10px">'
+          + '<div class="lbl">' + z.name + ' · ' + z.area + '</div>'
+          + '<div class="val" style="font-size:1rem">' + z.address + '</div>'
+          + '<div class="code" style="font-size:1rem">' + acc + '</div>'
+          + (z.access.note ? '<div class="lbl" style="margin-top:6px">' + z.access.note + '</div>' : '')
+          + '</div>';
+      }).join('');
+      modalBody.innerHTML =
+        '<div class="confirm">'
+        + '<div class="check"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>'
+        + '<h3>Toute la carte est à vous ✨</h3>'
+        + '<p style="color:var(--muted);margin-top:8px">Voici l\'adresse et l\'accès de chaque terrasse. Un e-mail récapitulatif vous a été envoyé.</p>'
+        + '</div>' + items
+        + '<button class="btn btn-ghost btn-block" style="margin-top:16px" id="doneBtn">Terminer</button>';
       document.getElementById('doneBtn').addEventListener('click', closeCheckout);
     }
 
