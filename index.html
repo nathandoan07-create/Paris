@@ -412,53 +412,55 @@
 
     // --- Data: zones (approximate points; exact address hidden until purchase) ---
     var EIFFEL = [48.8584, 2.2945];
-    // Real spots. Exact address is hidden until purchase; the map circle is randomly
-    // offset around it. access = { method: "Code"|"Clé", value, note }.
+    // PUBLIC data only (no exact address, no access code). The real address + code
+    // live server-side in server/zones.js and are revealed by /api/unlock after
+    // Stripe confirms the payment. This array can be overwritten at runtime by
+    // /api/zones (source of truth) — see the fetch below.
     var ZONES = [
       { id: "bosquet-ter", name: "Terrasse Bosquet", area: "Champ-de-Mars (7e)", lat: 48.8600, lng: 2.3022, radius: 120,
         price: 230, capacity: 20, left: 7, stars: 5, view: "Vue Tour Eiffel",
         desc: "Terrasse haut de gamme à deux pas du Champ-de-Mars, plein axe sur la Tour.",
-        tags: ["Assises"], address: "14 ter avenue Bosquet, 75007 Paris", access: { method: "Code", value: "7520", note: "" } },
+        tags: ["Assises"], access: { method: "Code", note: "" } },
       { id: "duvivier", name: "Toit École Militaire", area: "École Militaire (7e)", lat: 48.8567, lng: 2.3047, radius: 115,
         price: 210, capacity: 18, left: 6, stars: 5, view: "Vue Tour Eiffel",
         desc: "Au plus près de la Tour, feu d'artifice quasiment à la verticale.",
-        tags: ["Ambiance festive"], address: "7 rue Duvivier, 75007 Paris", access: { method: "Code", value: "1104", note: "" } },
+        tags: ["Ambiance festive"], access: { method: "Code", note: "" } },
       { id: "expo-10", name: "Terrasse Champ-de-Mars · I", area: "Gros-Caillou (7e)", lat: 48.8574, lng: 2.3038, radius: 110,
         price: 190, capacity: 16, left: 5, stars: 5, view: "Vue Tour Eiffel",
         desc: "Petite rue calme du 7e, vue dégagée sur l'esplanade et la Tour.",
-        tags: ["Couvertures fournies"], address: "10 rue de l'Exposition, 75007 Paris", access: { method: "Clé", value: "PTT T10", note: "" } },
+        tags: ["Couvertures fournies"], access: { method: "Clé", note: "" } },
       { id: "expo-16", name: "Terrasse Champ-de-Mars · II", area: "Gros-Caillou (7e)", lat: 48.8571, lng: 2.3033, radius: 110,
         price: 190, capacity: 14, left: 4, stars: 5, view: "Vue Tour Eiffel",
         desc: "Toit voisin, même vue superbe sur la Tour, jauge réduite.",
-        tags: ["Jauge réduite"], address: "16 rue de l'Exposition, 75007 Paris", access: { method: "Clé", value: "PTT T10", note: "" } },
+        tags: ["Jauge réduite"], access: { method: "Clé", note: "" } },
       { id: "grenelle-176", name: "Terrasse Gros-Caillou", area: "Gros-Caillou (7e)", lat: 48.8603, lng: 2.3038, radius: 115,
         price: 180, capacity: 16, left: 4, stars: 4, view: "Vue dégagée sur la Tour",
         desc: "Belle hauteur côté Grenelle, panorama large vers la Tour Eiffel.",
-        tags: ["Panorama"], address: "176 rue de Grenelle, 75007 Paris", access: { method: "Code", value: "7917", note: "" } },
+        tags: ["Panorama"], access: { method: "Code", note: "" } },
       { id: "brey", name: "Terrasse Étoile · I", area: "Étoile (17e)", lat: 48.8759, lng: 2.2962, radius: 115,
         price: 160, capacity: 16, left: 6, stars: 4, view: "Vue Arc de Triomphe & Tour",
         desc: "À deux pas de l'Étoile, panorama sur l'ouest parisien et le feu d'artifice.",
-        tags: ["Photogénique"], address: "5 rue Brey, 75017 Paris", access: { method: "Code", value: "7520", note: "" } },
+        tags: ["Photogénique"], access: { method: "Code", note: "" } },
       { id: "macmahon", name: "Terrasse Étoile · II", area: "Étoile (17e)", lat: 48.8748, lng: 2.2952, radius: 115,
         price: 150, capacity: 14, left: 5, stars: 4, view: "Vue sur l'Étoile",
         desc: "Toit sur l'avenue Mac-Mahon, vue dégagée vers l'Arc et la Tour au loin.",
-        tags: ["Vue ouest"], address: "1 avenue Mac-Mahon, 75017 Paris", access: { method: "Code", value: "7520", note: "Cadenas à enlever" } },
+        tags: ["Vue ouest"], access: { method: "Code", note: "Cadenas à enlever" } },
       { id: "duguay", name: "Toit Montparnasse", area: "Montparnasse (6e)", lat: 48.8466, lng: 2.3296, radius: 120,
         price: 140, capacity: 16, left: 5, stars: 4, view: "Vue vers la Tour Eiffel",
         desc: "Rive gauche, hauteur dégagée avec la Tour Eiffel en ligne de mire.",
-        tags: ["Calme"], address: "19 rue Duguay-Trouin, 75006 Paris", access: { method: "Code", value: "7520", note: "" } },
+        tags: ["Calme"], access: { method: "Code", note: "" } },
       { id: "bergere", name: "Toit Grands Boulevards", area: "Grands Boulevards (9e)", lat: 48.8722, lng: 2.3443, radius: 120,
         price: 120, capacity: 20, left: 9, stars: 4, view: "Panorama & feu au loin",
         desc: "Grand toit central, vue sur les toits de Paris et le ciel du feu d'artifice.",
-        tags: ["Central", "Ambiance festive"], address: "25 rue Bergère, 75009 Paris", access: { method: "Code", value: "1104", note: "" } },
+        tags: ["Central", "Ambiance festive"], access: { method: "Code", note: "" } },
       { id: "cretet", name: "Toit Pigalle", area: "Pigalle (9e)", lat: 48.8828, lng: 2.3388, radius: 120,
         price: 110, capacity: 18, left: 7, stars: 4, view: "Vue hauteurs de Paris",
         desc: "Sur les hauteurs du 9e, panorama ouvert sur la ville en fête.",
-        tags: ["Rooftop"], address: "3 rue Crétet, 75009 Paris", access: { method: "Code", value: "7520", note: "Deuxième porte à ouvrir" } },
+        tags: ["Rooftop"], access: { method: "Code", note: "Deuxième porte à ouvrir" } },
       { id: "grenelle-155", name: "Terrasse Gros-Caillou · II", area: "Gros-Caillou (7e)", lat: 48.8607, lng: 2.3060, radius: 115,
         price: 180, capacity: 16, left: 0, stars: 4, view: "Vue Tour Eiffel", status: "pending",
         desc: "Nouveau toit en cours de validation — bientôt disponible à la réservation.",
-        tags: ["Bientôt"], address: "155 rue de Grenelle, 75007 Paris", access: { method: "Code", value: "à confirmer", note: "Accès en cours de vérification" } }
+        tags: ["Bientôt"], access: { method: "Code", note: "Accès en cours de vérification" } }
     ];
 
     var euro = function (n) { return n.toLocaleString('fr-FR') + ' €'; };
@@ -632,6 +634,9 @@
     scrim.addEventListener('click', function (e) { if (e.target === scrim) closeCheckout(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && scrim.classList.contains('open')) closeCheckout(); });
 
+    var LOCK_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+    var PAY_ERR = '<div id="payErr" class="field invalid" style="margin-top:12px; display:none"><div class="err" style="display:block"></div></div>';
+
     function renderCheckout(z, qty) {
       modalTitle.textContent = z.name;
       var total = z.price * qty;
@@ -639,20 +644,16 @@
       var opts = '';
       for (var i = 1; i <= maxQty; i++) opts += '<option value="' + i + '"' + (i === qty ? ' selected' : '') + '>' + i + ' place' + (i > 1 ? 's' : '') + '</option>';
       modalBody.innerHTML =
-        '<div class="demo-banner">Démo : le paiement n\'est pas encore actif. Branchez Stripe pour encaisser réellement (voir note dev).</div>'
-        + '<div class="field"><label for="qty">Nombre de places</label><select id="qty">' + opts + '</select></div>'
+        '<div class="field"><label for="qty">Nombre de places</label><select id="qty">' + opts + '</select></div>'
         + '<div style="margin-top:16px">'
         + row('Zone', z.name)
         + row('Prix unitaire', euro(z.price))
         + row('Places', String(qty))
         + '<div class="summary-row total"><span>Total</span><b id="totalLine">' + euro(total) + '</b></div>'
         + '</div>'
-        + '<form id="payForm" novalidate>'
-        + field('name', 'Nom complet', 'text', 'Jean Dupont', true)
-        + field('email', 'E-mail', 'email', 'vous@email.com', true)
-        + '<button type="submit" class="btn btn-primary btn-block" style="margin-top:20px">Payer ' + '<span id="payAmt">' + euro(total) + '</span></button>'
-        + '<div class="pay-note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Paiement chiffré · adresse & accès révélés juste après</div>'
-        + '</form>';
+        + '<button id="payBtn" class="btn btn-primary btn-block" style="margin-top:20px">Payer <span id="payAmt">' + euro(total) + '</span></button>'
+        + PAY_ERR
+        + '<div class="pay-note">' + LOCK_SVG + ' Paiement sécurisé Stripe · adresse & accès révélés après paiement</div>';
 
       var qtySel = document.getElementById('qty');
       qtySel.addEventListener('change', function () {
@@ -662,14 +663,26 @@
         document.getElementById('totalLine').textContent = euro(t);
         document.getElementById('payAmt').textContent = euro(t);
       });
-
-      document.getElementById('payForm').addEventListener('submit', function (e) {
-        e.preventDefault();
-        var ok = validate(['name', 'email']);
-        if (!ok) return;
-        // >>> Stripe Checkout would be triggered here (see dev note) <<<
-        renderConfirmation(z, parseInt(qtySel.value, 10));
+      document.getElementById('payBtn').addEventListener('click', function () {
+        startCheckout({ type: 'zone', zoneId: z.id, qty: parseInt(qtySel.value, 10) }, this);
       });
+    }
+
+    // Create a Stripe Checkout Session on the server, then redirect to it.
+    function startCheckout(payload, btn) {
+      if (btn) { btn.dataset.label = btn.innerHTML; btn.disabled = true; btn.textContent = 'Redirection…'; }
+      fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+        .then(function (res) {
+          if (res.ok && res.d && res.d.url) { window.location.href = res.d.url; return; }
+          showPayError((res.d && res.d.error) || 'Paiement indisponible.', btn);
+        })
+        .catch(function () { showPayError('Serveur injoignable — lancez le backend (npm start).', btn); });
+    }
+    function showPayError(msg, btn) {
+      if (btn) { btn.disabled = false; if (btn.dataset.label) btn.innerHTML = btn.dataset.label; }
+      var box = document.getElementById('payErr');
+      if (box) { box.style.display = 'block'; box.querySelector('.err').textContent = msg; }
     }
 
     function renderWaitlist(z) {
@@ -702,26 +715,6 @@
       });
     }
 
-    function renderConfirmation(z, qty) {
-      modalTitle.textContent = 'Réservation confirmée';
-      modalBody.innerHTML =
-        '<div class="confirm">'
-        + '<div class="check"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>'
-        + '<h3>À dans les étoiles ✨</h3>'
-        + '<p style="color:var(--muted);margin-top:8px">' + qty + ' place' + (qty > 1 ? 's' : '') + ' sur <b>' + z.name + '</b>. Un e-mail de confirmation vient de vous être envoyé.</p>'
-        + '<div class="reveal">'
-        + '<div class="lbl">Adresse exacte</div><div class="val">' + z.address + '</div>'
-        + (z.access.method === 'Accompagné'
-            ? '<div class="lbl">Accès</div><div class="val" style="font-size:1rem">Accès accompagné — un hôte vous retrouve à l\'entrée et vous conduit sur le toit.</div>'
-            : '<div class="lbl">' + (z.access.method === 'Clé' ? 'Clé d\'accès' : 'Code d\'entrée') + '</div><div class="val code">' + z.access.value + '</div>')
-        + (z.access.note ? '<div class="lbl">À prévoir sur place</div><div class="val" style="font-size:1rem">' + z.access.note + '</div>' : '')
-        + '<div class="lbl">Sur place</div><div class="val" style="font-size:1rem">Un hôte vous accueille dès 22h15. Présentez votre confirmation.</div>'
-        + '</div>'
-        + '<button class="btn btn-ghost btn-block" style="margin-top:20px" id="doneBtn">Terminer</button>'
-        + '</div>';
-      document.getElementById('doneBtn').addEventListener('click', closeCheckout);
-    }
-
     // --- Pass intégral ---
     function openPass() {
       renderPassCheckout();
@@ -734,46 +727,17 @@
     function renderPassCheckout() {
       modalTitle.textContent = PASS.label;
       modalBody.innerHTML =
-        '<div class="demo-banner">Démo : le paiement n\'est pas encore actif. Branchez Stripe pour encaisser réellement (voir note dev).</div>'
-        + '<p style="color:var(--muted)">Un seul paiement pour débloquer <b>toutes les terrasses</b> de la carte et recevoir l\'adresse + l\'accès de chacune.</p>'
+        '<p style="color:var(--muted)">Un seul paiement pour débloquer <b>toutes les terrasses</b> de la carte et recevoir l\'adresse + l\'accès de chacune.</p>'
         + '<div style="margin-top:16px">'
         + row('Formule', PASS.label)
         + row('Terrasses incluses', String(ZONES.filter(function (z) { return z.status !== 'pending'; }).length))
         + '<div class="summary-row total"><span>Total</span><b>' + euro(PASS.price) + '</b></div></div>'
-        + '<form id="passForm" novalidate>'
-        + field('name', 'Nom complet', 'text', 'Jean Dupont', true)
-        + field('email', 'E-mail', 'email', 'vous@email.com', true)
-        + '<button type="submit" class="btn btn-primary btn-block" style="margin-top:20px">Payer ' + euro(PASS.price) + '</button>'
-        + '<div class="pay-note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Paiement chiffré · toutes les adresses révélées juste après</div>'
-        + '</form>';
-      document.getElementById('passForm').addEventListener('submit', function (e) {
-        e.preventDefault();
-        if (!validate(['name', 'email'])) return;
-        // >>> Stripe Checkout (pass) déclenché ici <<<
-        renderPassConfirmation();
+        + '<button id="payBtn" class="btn btn-primary btn-block" style="margin-top:20px">Payer ' + euro(PASS.price) + '</button>'
+        + PAY_ERR
+        + '<div class="pay-note">' + LOCK_SVG + ' Paiement sécurisé Stripe · toutes les adresses après paiement</div>';
+      document.getElementById('payBtn').addEventListener('click', function () {
+        startCheckout({ type: 'pass' }, this);
       });
-    }
-    function renderPassConfirmation() {
-      modalTitle.textContent = 'Pass intégral confirmé';
-      var items = ZONES.filter(function (z) { return z.status !== 'pending'; }).map(function (z) {
-        var acc = z.access.method === 'Accompagné'
-          ? 'Accès accompagné (hôte à l\'entrée)'
-          : (z.access.method === 'Clé' ? 'Clé ' : 'Code ') + z.access.value;
-        return '<div class="reveal" style="margin-top:10px">'
-          + '<div class="lbl">' + z.name + ' · ' + z.area + '</div>'
-          + '<div class="val" style="font-size:1rem">' + z.address + '</div>'
-          + '<div class="code" style="font-size:1rem">' + acc + '</div>'
-          + (z.access.note ? '<div class="lbl" style="margin-top:6px">' + z.access.note + '</div>' : '')
-          + '</div>';
-      }).join('');
-      modalBody.innerHTML =
-        '<div class="confirm">'
-        + '<div class="check"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>'
-        + '<h3>Toute la carte est à vous ✨</h3>'
-        + '<p style="color:var(--muted);margin-top:8px">Voici l\'adresse et l\'accès de chaque terrasse. Un e-mail récapitulatif vous a été envoyé.</p>'
-        + '</div>' + items
-        + '<button class="btn btn-ghost btn-block" style="margin-top:16px" id="doneBtn">Terminer</button>';
-      document.getElementById('doneBtn').addEventListener('click', closeCheckout);
     }
 
     // helpers

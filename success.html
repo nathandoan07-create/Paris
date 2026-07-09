@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Paname Roof — Votre réservation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --night:#0B0E1A; --night-2:#10152A; --surface-solid:#161C33; --border:rgba(201,162,75,0.22);
+      --border-soft:rgba(255,255,255,0.08); --gold:#C9A24B; --gold-bright:#E7C878; --fg:#F5F3EC; --muted:#9AA3B2; --muted-2:#6B7488; --success:#34D399; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100dvh; color:var(--fg); font-family:'Inter',system-ui,sans-serif; line-height:1.6;
+      background: radial-gradient(1000px 500px at 80% -10%, rgba(201,162,75,0.14), transparent 60%), linear-gradient(180deg,var(--night),var(--night-2));
+      display:flex; align-items:flex-start; justify-content:center; padding:32px 16px; -webkit-font-smoothing:antialiased; }
+    h1,h2,h3 { font-family:'Playfair Display',Georgia,serif; margin:0; font-weight:600; }
+    a { color:var(--gold-bright); }
+    .wrap { width:100%; max-width:560px; }
+    .card { background:var(--surface-solid); border:1px solid var(--border); border-radius:20px; padding:28px; box-shadow:0 20px 60px rgba(0,0,0,0.45); }
+    .brand { display:flex; align-items:center; gap:10px; font-family:'Playfair Display',serif; font-size:20px; margin-bottom:20px; }
+    .brand svg { color:var(--gold-bright); }
+    .check { width:64px; height:64px; border-radius:50%; background:rgba(52,211,153,0.14); color:var(--success); display:grid; place-items:center; margin:0 auto 16px; }
+    .center { text-align:center; }
+    .lead { color:var(--muted); margin-top:8px; }
+    .demo { background:rgba(244,114,182,0.10); border:1px solid rgba(244,114,182,0.3); color:#FBCFE8; font-size:13px; padding:10px 14px; border-radius:10px; margin-bottom:18px; text-align:center; }
+    .reveal { background:rgba(201,162,75,0.08); border:1px solid var(--border); border-radius:12px; padding:16px; margin-top:14px; text-align:left; }
+    .reveal .lbl { font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted-2); }
+    .reveal .val { font-family:'Playfair Display',serif; font-size:1.15rem; margin:2px 0 12px; }
+    .reveal .val:last-child { margin-bottom:0; }
+    .reveal .code { font-family:ui-monospace,monospace; letter-spacing:3px; color:var(--gold-bright); font-size:1.25rem; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; font:inherit; font-weight:600; cursor:pointer;
+      border-radius:999px; padding:13px 24px; min-height:48px; text-decoration:none; border:1px solid var(--border-soft);
+      background:rgba(255,255,255,0.04); color:var(--fg); width:100%; margin-top:20px; }
+    .btn:hover { background:rgba(255,255,255,0.09); }
+    .spinner { width:34px; height:34px; border-radius:50%; border:3px solid var(--border-soft); border-top-color:var(--gold-bright); margin:24px auto; animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .err { color:#F87171; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="brand">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l4 4M15 15l4 4M19 5l-4 4M9 15l-4 4"/></svg>
+        Paname Roof
+      </div>
+      <div id="content"><div class="spinner" role="status" aria-label="Chargement"></div></div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var params = new URLSearchParams(location.search);
+    var content = document.getElementById('content');
+    var qs = params.toString();
+
+    fetch('/api/unlock?' + qs).then(function (r) {
+      return r.json().then(function (d) { return { ok: r.ok, d: d }; });
+    }).then(function (res) {
+      if (!res.ok) { return fail(res.d && res.d.error ? res.d.error : 'Réservation introuvable.'); }
+      render(res.d);
+    }).catch(function () { fail('Connexion au serveur impossible.'); });
+
+    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' })[c]; }); }
+
+    function accessBlock(it) {
+      if (it.accessMethod === 'Accompagné') {
+        return '<div class="lbl">Accès</div><div class="val" style="font-size:1rem">Accès accompagné — un hôte vous retrouve à l\'entrée.</div>';
+      }
+      return '<div class="lbl">' + (it.accessMethod === 'Clé' ? 'Clé d\'accès' : 'Code d\'entrée') + '</div>'
+        + '<div class="val code">' + esc(it.accessValue) + '</div>';
+    }
+    function itemBlock(it) {
+      return '<div class="reveal">'
+        + '<div class="lbl">' + esc(it.name) + ' · ' + esc(it.area) + '</div>'
+        + '<div class="val">' + esc(it.address) + '</div>'
+        + accessBlock(it)
+        + (it.accessNote ? '<div class="lbl">À prévoir sur place</div><div class="val" style="font-size:1rem">' + esc(it.accessNote) + '</div>' : '')
+        + '</div>';
+    }
+
+    function render(d) {
+      var demo = d.demo ? '<div class="demo">Mode démo — aucun paiement réel. Configurez Stripe pour la vente réelle.</div>' : '';
+      var head = '<div class="center"><div class="check"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg></div>'
+        + '<h1>' + (d.type === 'pass' ? 'Toute la carte est à vous ✨' : 'À dans les étoiles ✨') + '</h1>'
+        + '<p class="lead">' + (d.type === 'pass'
+            ? 'Voici l\'adresse et l\'accès de chaque terrasse. Un hôte vous accueille dès 22h15.'
+            : 'Votre place est réservée. Un hôte vous accueille dès 22h15 — présentez votre e-mail de confirmation.') + '</p></div>';
+      var body = d.type === 'pass' ? d.items.map(itemBlock).join('') : itemBlock(d.item);
+      content.innerHTML = demo + head + body + '<a class="btn" href="/">Retour à l\'accueil</a>';
+    }
+    function fail(msg) {
+      content.innerHTML = '<div class="center"><h1>Oups</h1><p class="lead err">' + esc(msg) + '</p>'
+        + '<a class="btn" href="/">Retour à l\'accueil</a></div>';
+    }
+  })();
+  </script>
+</body>
+</html>
