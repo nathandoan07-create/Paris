@@ -12,10 +12,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
 
   <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-          integrity="sha256-20nQCchB9co0qIjJ2n2/26MZ0lTMk1MdxWk9d4c9d6c=" crossorigin=""></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
   <style>
     :root {
@@ -292,7 +290,7 @@
         <div>
           <span class="eyebrow">13 juillet · Nuit du feu d'artifice</span>
           <h1 style="margin-top:16px">Le feu d'artifice<br><span class="accent">depuis les toits</span> de Paris</h1>
-          <p class="lead">Une place sur une terrasse privée face à la Tour Eiffel. Vue dégagée, jauge limitée, accueil sur place. Réservez votre zone — l'adresse exacte et l'accès vous sont remis après paiement.</p>
+          <p class="lead">Une place sur les toits de Paris face à la Tour Eiffel ou autre lieu. Réservez votre zone !<br>L'adresse exacte et l'accès vous sont remis après paiement.</p>
           <div class="hero-cta">
             <a href="#zones" class="btn btn-primary">
               Voir les zones disponibles
@@ -302,8 +300,7 @@
           </div>
           <div class="hero-meta">
             <div class="item"><span class="num" id="spotsLeft">—</span><span class="lbl">Places restantes</span></div>
-            <div class="item"><span class="num" id="zoneCount">—</span><span class="lbl">Terrasses privées</span></div>
-            <div class="item"><span class="num">100%</span><span class="lbl">Accueil sur place</span></div>
+            <div class="item"><span class="num" id="zoneCount">—</span><span class="lbl">Toits privés</span></div>
           </div>
         </div>
 
@@ -325,10 +322,6 @@
             </li>
             <li>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-              Jauge strictement limitée par un hôte présent
-            </li>
-            <li>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
               Paiement sécurisé · adresse & accès envoyés après réservation
             </li>
           </ul>
@@ -342,10 +335,10 @@
         <div class="section-head">
           <span class="eyebrow">Choisissez votre point de vue</span>
           <h2>La carte des zones</h2>
-          <p>Chaque cercle représente une zone d'accueil autour d'une terrasse privée. Sélectionnez-la pour voir les détails, puis réservez. L'adresse précise reste masquée jusqu'au paiement.</p>
+          <p>Chaque cercle représente une zone d'accueil autour d'un toit privé. Sélectionnez-la pour voir les détails, puis réservez. L'adresse précise reste masquée jusqu'au paiement.</p>
         </div>
         <div class="explorer">
-          <div id="map" role="application" aria-label="Carte des zones de terrasses autour de la Tour Eiffel"></div>
+          <div id="map" role="application" aria-label="Carte des zones de toits autour de la Tour Eiffel"></div>
           <div class="zone-list" id="zoneList" aria-label="Liste des zones disponibles"></div>
         </div>
       </div>
@@ -362,7 +355,7 @@
           <div class="step">
             <div class="n">01</div>
             <h3>Choisissez une zone</h3>
-            <p>Sur la carte, sélectionnez la terrasse qui vous convient selon la vue, la jauge et le prix.</p>
+            <p>Sur la carte, sélectionnez le toit qui vous convient selon la vue, la jauge et le prix.</p>
           </div>
           <div class="step">
             <div class="n">02</div>
@@ -371,8 +364,7 @@
           </div>
           <div class="step">
             <div class="n">03</div>
-            <h3>Présentez-vous le 13</h3>
-            <p>Un hôte vous accueille à l'entrée, vérifie votre réservation et vous installe sur la terrasse.</p>
+            <h3>Venez profiter du feu d'artifice le 13 juillet</h3>
           </div>
         </div>
       </div>
@@ -387,7 +379,7 @@
           <svg class="spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" style="width:24px;height:24px;color:var(--gold-bright)"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l4 4M15 15l4 4M19 5l-4 4M9 15l-4 4"/></svg>
           Paname Roof
         </div>
-        <p class="foot-legal">Réservation de places sur terrasses privées pour le feu d'artifice du 13 juillet. Nous ne proposons que des toits autorisés, avec accueil et jauge encadrés. L'accès à des immeubles sans autorisation est strictement exclu.</p>
+        <p class="foot-legal">Réservation de spot avec vue sur Tour Eiffel ou autre pour le feu d'artifice du 13 juillet.</p>
       </div>
       <div>
         <small>© <span id="year"></span> Paname Roof — Mentions légales · CGV · Confidentialité<br>Contact hôte : bonjour@panameroof.example</small>
@@ -417,31 +409,31 @@
     // Stripe confirms the payment. This array can be overwritten at runtime by
     // /api/zones (source of truth) — see the fetch below.
     var ZONES = [
-      { id: "bosquet-ter", name: "Terrasse Bosquet", area: "Champ-de-Mars (7e)", lat: 48.8600, lng: 2.3022, radius: 120,
+      { id: "bosquet-ter", name: "ToitBosquet", area: "Champ-de-Mars (7e)", lat: 48.8600, lng: 2.3022, radius: 120,
         price: 230, capacity: 20, left: 7, stars: 5, view: "Vue Tour Eiffel",
-        desc: "Terrasse haut de gamme à deux pas du Champ-de-Mars, plein axe sur la Tour.",
+        desc: "Toithaut de gamme à deux pas du Champ-de-Mars, plein axe sur la Tour.",
         tags: ["Assises"], access: { method: "Code", note: "" } },
       { id: "duvivier", name: "Toit École Militaire", area: "École Militaire (7e)", lat: 48.8567, lng: 2.3047, radius: 115,
         price: 210, capacity: 18, left: 6, stars: 5, view: "Vue Tour Eiffel",
         desc: "Au plus près de la Tour, feu d'artifice quasiment à la verticale.",
         tags: ["Ambiance festive"], access: { method: "Code", note: "" } },
-      { id: "expo-10", name: "Terrasse Champ-de-Mars · I", area: "Gros-Caillou (7e)", lat: 48.8574, lng: 2.3038, radius: 110,
+      { id: "expo-10", name: "ToitChamp-de-Mars · I", area: "Gros-Caillou (7e)", lat: 48.8574, lng: 2.3038, radius: 110,
         price: 190, capacity: 16, left: 5, stars: 5, view: "Vue Tour Eiffel",
         desc: "Petite rue calme du 7e, vue dégagée sur l'esplanade et la Tour.",
         tags: ["Couvertures fournies"], access: { method: "Clé", note: "" } },
-      { id: "expo-16", name: "Terrasse Champ-de-Mars · II", area: "Gros-Caillou (7e)", lat: 48.8571, lng: 2.3033, radius: 110,
+      { id: "expo-16", name: "ToitChamp-de-Mars · II", area: "Gros-Caillou (7e)", lat: 48.8571, lng: 2.3033, radius: 110,
         price: 190, capacity: 14, left: 4, stars: 5, view: "Vue Tour Eiffel",
         desc: "Toit voisin, même vue superbe sur la Tour, jauge réduite.",
         tags: ["Jauge réduite"], access: { method: "Clé", note: "" } },
-      { id: "grenelle-176", name: "Terrasse Gros-Caillou", area: "Gros-Caillou (7e)", lat: 48.8603, lng: 2.3038, radius: 115,
+      { id: "grenelle-176", name: "ToitGros-Caillou", area: "Gros-Caillou (7e)", lat: 48.8603, lng: 2.3038, radius: 115,
         price: 180, capacity: 16, left: 4, stars: 4, view: "Vue dégagée sur la Tour",
         desc: "Belle hauteur côté Grenelle, panorama large vers la Tour Eiffel.",
         tags: ["Panorama"], access: { method: "Code", note: "" } },
-      { id: "brey", name: "Terrasse Étoile · I", area: "Étoile (17e)", lat: 48.8759, lng: 2.2962, radius: 115,
+      { id: "brey", name: "ToitÉtoile · I", area: "Étoile (17e)", lat: 48.8759, lng: 2.2962, radius: 115,
         price: 160, capacity: 16, left: 6, stars: 4, view: "Vue Arc de Triomphe & Tour",
         desc: "À deux pas de l'Étoile, panorama sur l'ouest parisien et le feu d'artifice.",
         tags: ["Photogénique"], access: { method: "Code", note: "" } },
-      { id: "macmahon", name: "Terrasse Étoile · II", area: "Étoile (17e)", lat: 48.8748, lng: 2.2952, radius: 115,
+      { id: "macmahon", name: "ToitÉtoile · II", area: "Étoile (17e)", lat: 48.8748, lng: 2.2952, radius: 115,
         price: 150, capacity: 14, left: 5, stars: 4, view: "Vue sur l'Étoile",
         desc: "Toit sur l'avenue Mac-Mahon, vue dégagée vers l'Arc et la Tour au loin.",
         tags: ["Vue ouest"], access: { method: "Code", note: "Cadenas à enlever" } },
@@ -457,7 +449,7 @@
         price: 110, capacity: 18, left: 7, stars: 4, view: "Vue hauteurs de Paris",
         desc: "Sur les hauteurs du 9e, panorama ouvert sur la ville en fête.",
         tags: ["Rooftop"], access: { method: "Code", note: "Deuxième porte à ouvrir" } },
-      { id: "grenelle-155", name: "Terrasse Gros-Caillou · II", area: "Gros-Caillou (7e)", lat: 48.8607, lng: 2.3060, radius: 115,
+      { id: "grenelle-155", name: "ToitGros-Caillou · II", area: "Gros-Caillou (7e)", lat: 48.8607, lng: 2.3060, radius: 115,
         price: 180, capacity: 16, left: 0, stars: 4, view: "Vue Tour Eiffel", status: "pending",
         desc: "Nouveau toit en cours de validation — bientôt disponible à la réservation.",
         tags: ["Bientôt"], access: { method: "Code", note: "Accès en cours de vérification" } }
@@ -466,7 +458,7 @@
     var euro = function (n) { return n.toLocaleString('fr-FR') + ' €'; };
     var selected = null;
 
-    // Pass intégral : un paiement débloque toutes les terrasses de la carte.
+    // Pass intégral : un paiement débloque tous les toits de la carte.
     var PASS = { label: "Pass intégral", price: 390 }; // <-- prix du pass à ajuster ici
 
     // --- Countdown to July 14, 23:00 (next occurrence) ---
@@ -551,12 +543,12 @@
     // Pass intégral card (top of the list)
     var passCard = document.createElement('button');
     passCard.className = 'pass-card';
-    passCard.setAttribute('aria-label', 'Pass intégral, débloque toutes les terrasses');
+    passCard.setAttribute('aria-label', 'Pass intégral, débloque tous les toits');
     passCard.innerHTML =
       '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px">'
       + '<span class="plabel"><span class="pass-badge">Pass</span> ' + PASS.label + '</span>'
       + '<span class="pprice">' + euro(PASS.price) + '</span></div>'
-      + '<div class="desc" style="margin-top:8px">Débloque <b>toutes les terrasses</b> de la carte d\'un coup — l\'adresse et l\'accès de chaque toit de la soirée.</div>';
+      + '<div class="desc" style="margin-top:8px">Débloque <b>tous les toits</b> de la carte d\'un coup — l\'adresse et l\'accès de chaque toit de la soirée.</div>';
     passCard.addEventListener('click', openPass);
     list.appendChild(passCard);
 
@@ -688,7 +680,7 @@
     function renderWaitlist(z) {
       modalTitle.textContent = z.name + ' — Complet';
       modalBody.innerHTML =
-        '<p style="color:var(--muted)">Cette terrasse est complète. Laissez votre e-mail : vous serez prévenu en cas de désistement.</p>'
+        '<p style="color:var(--muted)">Ce toit est complet. Laissez votre e-mail : vous serez prévenu en cas de désistement.</p>'
         + '<form id="wlForm" novalidate>'
         + field('email', 'E-mail', 'email', 'vous@email.com', true)
         + '<button type="submit" class="btn btn-primary btn-block" style="margin-top:16px">Me prévenir</button>'
@@ -703,7 +695,7 @@
     function renderPending(z) {
       modalTitle.textContent = z.name + ' — Bientôt';
       modalBody.innerHTML =
-        '<p style="color:var(--muted)">Cette terrasse est en cours de validation (accès en vérification). Laissez votre e-mail : vous serez prévenu dès son ouverture à la réservation.</p>'
+        '<p style="color:var(--muted)">Ce toit est en cours de validation (accès en vérification). Laissez votre e-mail : vous serez prévenu dès son ouverture à la réservation.</p>'
         + '<form id="wlForm" novalidate>'
         + field('email', 'E-mail', 'email', 'vous@email.com', true)
         + '<button type="submit" class="btn btn-primary btn-block" style="margin-top:16px">Me prévenir</button>'
@@ -727,10 +719,10 @@
     function renderPassCheckout() {
       modalTitle.textContent = PASS.label;
       modalBody.innerHTML =
-        '<p style="color:var(--muted)">Un seul paiement pour débloquer <b>toutes les terrasses</b> de la carte et recevoir l\'adresse + l\'accès de chacune.</p>'
+        '<p style="color:var(--muted)">Un seul paiement pour débloquer <b>tous les toits</b> de la carte et recevoir l\'adresse + l\'accès de chacune.</p>'
         + '<div style="margin-top:16px">'
         + row('Formule', PASS.label)
-        + row('Terrasses incluses', String(ZONES.filter(function (z) { return z.status !== 'pending'; }).length))
+        + row('Toits inclus', String(ZONES.filter(function (z) { return z.status !== 'pending'; }).length))
         + '<div class="summary-row total"><span>Total</span><b>' + euro(PASS.price) + '</b></div></div>'
         + '<button id="payBtn" class="btn btn-primary btn-block" style="margin-top:20px">Payer ' + euro(PASS.price) + '</button>'
         + PAY_ERR

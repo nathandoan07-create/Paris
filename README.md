@@ -1,6 +1,6 @@
 # Paname Roof
 
-Site de réservation de places sur des terrasses privées pour le feu d'artifice
+Site de réservation de places sur des toits privés pour le feu d'artifice
 du 13 juillet à Paris. Carte interactive, sélection de zone, **paiement Stripe**,
 et révélation de l'adresse + de l'accès **uniquement après paiement confirmé**.
 
@@ -50,7 +50,7 @@ présente, le mode démo est automatiquement désactivé et le paiement est exig
 ## Réglages rapides
 
 - **Prix du Pass intégral** : `server/zones.js` → `const PASS = { ... price: 390 }`.
-- **Prix / jauge / accès d'une terrasse** : `server/zones.js` (les mêmes champs
+- **Prix / jauge / accès d'un toit** : `server/zones.js` (les mêmes champs
   publics — nom, prix, vue… — sont dupliqués dans `index.html` pour l'affichage).
 
 ## Déploiement sur Render

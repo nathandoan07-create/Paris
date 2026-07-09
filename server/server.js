@@ -62,12 +62,12 @@ app.post('/api/checkout', async (req, res) => {
       line_items = [{
         quantity: 1,
         price_data: { currency: CURRENCY, unit_amount: PASS.price * 100,
-          product_data: { name: 'Paname Roof — ' + PASS.label, description: 'Accès à toutes les terrasses de la soirée' } }
+          product_data: { name: 'Paname Roof — ' + PASS.label, description: 'Accès à tous les toits de la soirée' } }
       }];
     } else if (type === 'zone') {
       const zone = findZone(req.body.zoneId);
-      if (!zone) return res.status(404).json({ error: 'Terrasse introuvable.' });
-      if (!isSellable(zone)) return res.status(409).json({ error: 'Cette terrasse n\'est pas disponible.' });
+      if (!zone) return res.status(404).json({ error: 'Toit introuvable.' });
+      if (!isSellable(zone)) return res.status(409).json({ error: 'Ce toit n\'est pas disponible.' });
       let qty = parseInt(req.body.qty, 10) || 1;
       qty = Math.max(1, Math.min(MAX_QTY, Math.min(zone.left, qty)));
       label = zone.name;
