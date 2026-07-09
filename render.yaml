@@ -1,0 +1,19 @@
+# Render Blueprint — deploys the Paname Roof Node server (which also serves the site).
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: paname-roof
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      # Set this in the Render dashboard (Environment tab). Use sk_test_... first, then sk_live_...
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      # Optional but recommended: from the Stripe webhook you create at /api/webhook (whsec_...)
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      # BASE_URL is auto-filled from RENDER_EXTERNAL_URL; no need to set it.

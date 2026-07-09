@@ -10,7 +10,8 @@ const { ZONES, PASS, publicZones, findZone, isSellable } = require('./zones');
 
 const app = express();
 const PORT = process.env.PORT || 4242;
-const BASE_URL = process.env.BASE_URL || ('http://localhost:' + PORT);
+// On Render, RENDER_EXTERNAL_URL is provided automatically.
+const BASE_URL = process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || ('http://localhost:' + PORT);
 const CURRENCY = 'eur';
 const MAX_QTY = 8;
 

@@ -53,6 +53,24 @@ présente, le mode démo est automatiquement désactivé et le paiement est exig
 - **Prix / jauge / accès d'une terrasse** : `server/zones.js` (les mêmes champs
   publics — nom, prix, vue… — sont dupliqués dans `index.html` pour l'affichage).
 
+## Déploiement sur Render
+
+Le repo contient un blueprint `render.yaml`. Étapes :
+
+1. Va sur https://render.com et connecte ton compte GitHub.
+2. **New → Blueprint**, choisis ce dépôt (`nathandoan07-create/Paris`), branche `claude/ui-ux-pro-skills-pilu8c`.
+3. Render détecte `render.yaml` et crée le service **paname-roof**.
+4. Dans **Environment**, ajoute la variable :
+   - `STRIPE_SECRET_KEY` = `sk_test_...` (puis `sk_live_...` en production).
+   - (option) `STRIPE_WEBHOOK_SECRET` = `whsec_...` une fois le webhook créé.
+5. **Deploy**. Ton site sera en ligne sur `https://paname-roof.onrender.com` (ou l'URL affichée).
+6. **Webhook Stripe** (recommandé) : Dashboard Stripe → Développeurs → Webhooks → *Add endpoint* →
+   URL `https://<ton-url>/api/webhook`, événement `checkout.session.completed`. Copie le
+   `whsec_...` dans la variable d'environnement Render, puis redéploie.
+
+> Le plan gratuit de Render met le service en veille après inactivité (premier chargement
+> un peu lent). Un plan payant supprime cette mise en veille.
+
 ## À faire ensuite
 
 - Envoi de l'e-mail de confirmation avec l'adresse (dans le webhook `checkout.session.completed`).
