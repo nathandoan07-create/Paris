@@ -450,12 +450,12 @@
         desc: "Sur les hauteurs du 9e, panorama ouvert sur la ville en fête.",
         tags: ["Rooftop"], access: { method: "Code", note: "Deuxième porte à ouvrir" } },
       { id: "grenelle-155", name: "Toit Gros-Caillou · II", area: "Gros-Caillou (7e)", lat: 48.8607, lng: 2.3060, radius: 115,
-        price: 22, capacity: 3, left: 0, stars: 4, view: "Vue Tour Eiffel", status: "pending",
-        desc: "Nouveau toit en cours de validation — bientôt disponible à la réservation.",
-        tags: ["Bientôt"], access: { method: "Code", note: "Accès en cours de vérification" } }
+        price: 15, capacity: 2, left: 2, stars: 5, view: "Meilleure vue Tour Eiffel",
+        desc: "Accès guidé le jour J.",
+        tags: ["Guidé"], access: { method: "Accompagné", note: "" } }
     ];
-    // Tarif selon le type d'accès : clé = 5 €, code = 10 €.
-    ZONES.forEach(function (z) { z.price = z.access.method === 'Clé' ? 5 : 10; });
+    // Tarif selon le type d'accès : clé = 5 €, guidé = 15 €, code = 10 €.
+    ZONES.forEach(function (z) { z.price = z.access.method === 'Clé' ? 5 : z.access.method === 'Accompagné' ? 15 : 10; });
 
     var euro = function (n) { return n.toLocaleString('fr-FR') + ' €'; };
     var selected = null;
@@ -577,7 +577,7 @@
     function stars(n){ var s=''; for(var i=0;i<5;i++){ s += i<n ? '★' : '☆'; } return s; }
     function accessLabel(a){
       if (a.method === 'Clé') return 'Accès par clé';
-      if (a.method === 'Accompagné') return 'Accès accompagné';
+      if (a.method === 'Accompagné') return 'Accès guidé le jour J';
       return 'Accès par code';
     }
     function accessTag(z){

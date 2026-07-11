@@ -46,13 +46,13 @@ const ZONES = [
     desc: "Sur les hauteurs du 9e, panorama ouvert sur la ville en fête.",
     tags: ["Rooftop"], address: "3 rue Crétet, 75009 Paris", access: { method: "Code", value: "7520", note: "Deuxième porte à ouvrir" } },
   { id: "grenelle-155", name: "Toit Gros-Caillou · II", area: "Gros-Caillou (7e)", lat: 48.8607, lng: 2.3060, radius: 115,
-    price: 22, capacity: 3, left: 0, stars: 4, view: "Vue Tour Eiffel", status: "pending",
-    desc: "Nouveau toit en cours de validation — bientôt disponible à la réservation.",
-    tags: ["Bientôt"], address: "155 rue de Grenelle, 75007 Paris", access: { method: "Code", value: "à confirmer", note: "Accès en cours de vérification" } }
+    price: 15, capacity: 2, left: 2, stars: 5, view: "Meilleure vue Tour Eiffel",
+    desc: "Accès guidé le jour J : un hôte vous conduit sur le toit. Le meilleur point de vue.",
+    tags: ["Guidé"], address: "155 rue de Grenelle, 75007 Paris", access: { method: "Accompagné", value: "", note: "" } }
 ];
 
-// Tarif selon le type d'accès : clé = 5 €, code = 10 €.
-ZONES.forEach(function (z) { z.price = z.access.method === 'Clé' ? 5 : 10; });
+// Tarif selon le type d'accès : clé = 5 €, guidé = 15 €, code = 10 €.
+ZONES.forEach(function (z) { z.price = z.access.method === 'Clé' ? 5 : z.access.method === 'Accompagné' ? 15 : 10; });
 
 // Pass intégral: one payment unlocks every bookable rooftop. Adjust the price here.
 const PASS = { id: "pass", label: "Pass intégral", price: 20 };
