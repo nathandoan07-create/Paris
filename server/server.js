@@ -7,7 +7,6 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const { ZONES, PASS, publicZones, findZone, isSellable } = require('./zones');
-const { sendConfirmation } = require('./email');
 
 const app = express();
 const PORT = process.env.PORT || 4242;
@@ -36,11 +35,7 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), (req, res) =
   }
   if (event.type === 'checkout.session.completed') {
     const s = event.data.object;
-    const email = s.customer_details && s.customer_details.email;
-    const payload = unlockPayload(s.metadata || {});
-    console.log('[paid]', s.id, s.metadata && s.metadata.type, email);
-    // Email the address + access to the buyer (no-op if Resend isn't configured).
-    if (payload) sendConfirmation(email, payload).catch(function (e) { console.error('[email]', e.message); });
+    console.log('[paid]', s.id, s.metadata && s.metadata.type, s.customer_details && s.customer_details.email);
   }
   res.json({ received: true });
 });
