@@ -67,7 +67,7 @@
     function accessBlock(it) {
       // Guided access: reveal ONLY the address (a host welcomes you on site, no code).
       if (it.accessMethod === 'Accompagné') {
-        return '<div class="lbl">Sur place</div><div class="val" style="font-size:1rem">Rendez-vous à cette adresse : un hôte vous accueille le jour J.</div>';
+        return '<div class="lbl">Sur place</div><div class="val" style="font-size:1rem">Rendez-vous à cette adresse : un hôte vous accueille dès 22h15 le jour J.</div>';
       }
       return '<div class="lbl">' + (it.accessMethod === 'Clé' ? 'Clé d\'accès' : 'Code d\'entrée') + '</div>'
         + '<div class="val code">' + esc(it.accessValue) + '</div>';
@@ -86,8 +86,8 @@
       var head = '<div class="center"><div class="check"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg></div>'
         + '<h1>' + (d.type === 'pass' ? 'Toute la carte est à vous ✨' : 'À dans les étoiles ✨') + '</h1>'
         + '<p class="lead">' + (d.type === 'pass'
-            ? 'Voici l\'adresse et l\'accès de chaque toit. Un hôte vous accueille dès 22h15.'
-            : 'Votre place est réservée. Un hôte vous accueille dès 22h15 — présentez votre e-mail de confirmation.') + '</p></div>';
+            ? 'Voici l\'adresse et l\'accès de chaque toit.'
+            : 'Votre place est réservée. Voici votre adresse et votre accès.') + '</p></div>';
       var body = d.type === 'pass' ? d.items.map(itemBlock).join('') : itemBlock(d.item);
       content.innerHTML = demo + head + body + '<a class="btn" href="/">Retour à l\'accueil</a>';
     }
