@@ -15,6 +15,7 @@ const PORT = process.env.PORT || 4242;
 const BASE_URL = process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || ('http://localhost:' + PORT);
 const CURRENCY = 'eur';
 const MAX_QTY = 3; // max 3 groups (= 3 sales) per rooftop
+const KEY_PRICE = 10; // optional add-on: buy the key (key-access rooftops)
 
 const stripeKey = process.env.STRIPE_SECRET_KEY || '';
 const stripe = stripeKey ? require('stripe')(stripeKey) : null;
@@ -81,6 +82,15 @@ app.post('/api/checkout', async (req, res) => {
         price_data: { currency: CURRENCY, unit_amount: zone.price * 100,
           product_data: { name: 'Paname Roof — ' + zone.name, description: zone.area + ' · ' + zone.view } }
       }];
+      // Optional add-on: buy the physical key (only for key-access rooftops).
+      if (req.body.key === true && zone.access.method === 'Clé') {
+        metadata.key = '1';
+        line_items.push({
+          quantity: 1,
+          price_data: { currency: CURRENCY, unit_amount: KEY_PRICE * 100,
+            product_data: { name: 'Paname Roof — Clé' } }
+        });
+      }
     } else {
       return res.status(400).json({ error: 'Type d\'achat invalide.' });
     }
