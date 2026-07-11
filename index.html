@@ -359,8 +359,8 @@
           </div>
           <div class="step">
             <div class="n">02</div>
-            <h3>Réservez & payez</h3>
-            <p>Payez via Lydia ou Revolut, puis envoyez votre preuve. On vous transmet l'adresse exacte et l'accès.</p>
+            <h3>Réservez en ligne</h3>
+            <p>Paiement sécurisé. L'adresse exacte et l'accès s'affichent juste après le paiement.</p>
           </div>
           <div class="step">
             <div class="n">03</div>
@@ -632,18 +632,6 @@
     var PAY_ERR = '<div id="payErr" class="field invalid" style="margin-top:12px; display:none"><div class="err" style="display:block"></div></div>';
 
     var KEY_PRICE = 10; // prix pour acheter la clé (toits à accès par clé)
-    // >>> Paiement rapide Lydia / Revolut — REMPLACE ces deux valeurs par les tiennes <<<
-    var PAYMENT = {
-      link: 'https://revolut.me/TON-LIEN',    // ton lien Lydia ou Revolut
-      contact: 'https://wa.me/33XXXXXXXXX'    // ton WhatsApp (ou lien de contact) pour recevoir la preuve
-    };
-    function paymentBlock(amount, ref) {
-      var msg = 'Bonjour, je viens de payer ' + euro(amount) + ' pour : ' + ref + '. Voici ma preuve de paiement.';
-      var contact = PAYMENT.contact + (PAYMENT.contact.indexOf('wa.me') > -1 ? ('?text=' + encodeURIComponent(msg)) : '');
-      return '<a href="' + PAYMENT.link + '" target="_blank" rel="noopener" class="btn btn-primary btn-block" style="margin-top:18px">Payer ' + euro(amount) + ' via Lydia / Revolut</a>'
-        + '<a href="' + contact + '" target="_blank" rel="noopener" class="btn btn-ghost btn-block" style="margin-top:10px">J\'ai payé — envoyer ma preuve</a>'
-        + '<div class="pay-note" style="text-align:left;display:block;line-height:1.6">1) Payez le montant via le lien.<br>2) Envoyez votre preuve : on vous répond avec l\'adresse et l\'accès.</div>';
-    }
     function renderCheckout(z, qty) {
       modalTitle.textContent = z.name;
       var maxQty = Math.min(z.left, 3);
@@ -661,7 +649,9 @@
         + (isKey ? '<div class="summary-row" id="rowKey" style="display:none"><span>Clé</span><span>' + euro(KEY_PRICE) + '</span></div>' : '')
         + '<div class="summary-row total"><span>Total</span><b id="totalLine">' + euro(z.price * qty) + '</b></div>'
         + '</div>'
-        + '<div id="payArea"></div>';
+        + '<button id="payBtn" class="btn btn-primary btn-block" style="margin-top:20px">Payer <span id="payAmt">' + euro(z.price * qty) + '</span></button>'
+        + PAY_ERR
+        + '<div class="pay-note">' + LOCK_SVG + ' Paiement sécurisé Stripe · adresse & accès révélés après paiement</div>';
 
       function recompute() {
         var q = parseInt(document.getElementById('qty').value, 10);
@@ -670,11 +660,14 @@
         document.getElementById('rowGroups').textContent = String(q);
         if (isKey) document.getElementById('rowKey').style.display = key ? '' : 'none';
         document.getElementById('totalLine').textContent = euro(t);
-        document.getElementById('payArea').innerHTML = paymentBlock(t, z.name + ' × ' + q + (key ? ' + clé' : ''));
+        document.getElementById('payAmt').textContent = euro(t);
       }
       document.getElementById('qty').addEventListener('change', recompute);
       if (isKey) document.getElementById('buyKey').addEventListener('change', recompute);
-      recompute();
+      document.getElementById('payBtn').addEventListener('click', function () {
+        startCheckout({ type: 'zone', zoneId: z.id, qty: parseInt(document.getElementById('qty').value, 10),
+          key: isKey && document.getElementById('buyKey').checked }, this);
+      });
     }
 
     // Create a Stripe Checkout Session on the server, then redirect to it.
@@ -741,7 +734,12 @@
         + row('Formule', PASS.label)
         + row('Toits inclus', String(ZONES.filter(function (z) { return z.status !== 'pending'; }).length))
         + '<div class="summary-row total"><span>Total</span><b>' + euro(PASS.price) + '</b></div></div>'
-        + '<div id="payArea">' + paymentBlock(PASS.price, PASS.label) + '</div>';
+        + '<button id="payBtn" class="btn btn-primary btn-block" style="margin-top:20px">Payer ' + euro(PASS.price) + '</button>'
+        + PAY_ERR
+        + '<div class="pay-note">' + LOCK_SVG + ' Paiement sécurisé Stripe · toutes les adresses après paiement</div>';
+      document.getElementById('payBtn').addEventListener('click', function () {
+        startCheckout({ type: 'pass' }, this);
+      });
     }
 
     // helpers
