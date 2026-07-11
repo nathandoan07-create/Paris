@@ -454,12 +454,14 @@
         desc: "Nouveau toit en cours de validation — bientôt disponible à la réservation.",
         tags: ["Bientôt"], access: { method: "Code", note: "Accès en cours de vérification" } }
     ];
+    // Tarif selon le type d'accès : clé = 5 €, code = 10 €.
+    ZONES.forEach(function (z) { z.price = z.access.method === 'Clé' ? 5 : 10; });
 
     var euro = function (n) { return n.toLocaleString('fr-FR') + ' €'; };
     var selected = null;
 
     // Pass intégral : un paiement débloque tous les toits de la carte.
-    var PASS = { label: "Pass intégral", price: 390 }; // <-- prix du pass à ajuster ici
+    var PASS = { label: "Pass intégral", price: 20 }; // accès à toutes les adresses
 
     // --- Countdown to July 14, 23:00 (next occurrence) ---
     (function countdown() {
@@ -560,17 +562,13 @@
       card.setAttribute('aria-pressed', 'false');
       var priceCell = pending ? '<span class="tag">Bientôt</span>'
         : (sold ? '<span class="tag soldout">Complet</span>' : euro(z.price) + ' <small>/ groupe</small>');
-      var availCell = pending ? 'Vérification' : (sold ? 'Liste d\'attente' : z.left + ' groupe' + (z.left > 1 ? 's' : ''));
       card.innerHTML =
         '<div class="top"><h3>' + z.name + '</h3>'
         + '<div class="price">' + priceCell + '</div></div>'
-        + '<div class="desc">' + z.desc + '</div>'
         + '<div class="tags">'
         + '<span class="tag view"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' + z.view + '</span>'
         + '<span class="tag">' + z.area + '</span>'
-        + '<span class="tag">' + availCell + '</span>'
         + accessTag(z)
-        + z.tags.map(function (t) { return '<span class="tag">' + t + '</span>'; }).join('')
         + '</div>';
       card.addEventListener('click', function () { selectZone(z.id, true); });
       list.appendChild(card);

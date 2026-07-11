@@ -51,8 +51,11 @@ const ZONES = [
     tags: ["Bientôt"], address: "155 rue de Grenelle, 75007 Paris", access: { method: "Code", value: "à confirmer", note: "Accès en cours de vérification" } }
 ];
 
+// Tarif selon le type d'accès : clé = 5 €, code = 10 €.
+ZONES.forEach(function (z) { z.price = z.access.method === 'Clé' ? 5 : 10; });
+
 // Pass intégral: one payment unlocks every bookable rooftop. Adjust the price here.
-const PASS = { id: "pass", label: "Pass intégral", price: 390 };
+const PASS = { id: "pass", label: "Pass intégral", price: 20 };
 
 // Public projection: everything EXCEPT the exact address and the access value.
 // accessMethod / accessNote are safe to expose (they don't reveal the building).
