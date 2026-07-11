@@ -44,11 +44,7 @@ const ZONES = [
   { id: "cretet", name: "Toit Pigalle", area: "Pigalle (9e)", lat: 48.8828, lng: 2.3388, radius: 120,
     price: 10, capacity: 3, left: 3, stars: 4, view: "Vue hauteurs de Paris",
     desc: "Sur les hauteurs du 9e, panorama ouvert sur la ville en fête.",
-    tags: ["Rooftop"], address: "3 rue Crétet, 75009 Paris", access: { method: "Code", value: "7520", note: "Deuxième porte à ouvrir" } },
-  { id: "grenelle-155", name: "Toit Gros-Caillou · II", area: "Gros-Caillou (7e)", lat: 48.8607, lng: 2.3060, radius: 115,
-    price: 15, capacity: 2, left: 2, stars: 5, view: "Meilleure vue Tour Eiffel",
-    desc: "Accès guidé le jour J : un hôte vous conduit sur le toit. Le meilleur point de vue.",
-    tags: ["Guidé"], address: "155 rue de Grenelle, 75007 Paris", access: { method: "Accompagné", value: "", note: "" } }
+    tags: ["Rooftop"], address: "3 rue Crétet, 75009 Paris", access: { method: "Code", value: "7520", note: "Deuxième porte à ouvrir" } }
 ];
 
 // Tarif selon le type d'accès : clé = 5 €, guidé = 15 €, code = 10 €.
