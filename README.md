@@ -71,8 +71,25 @@ Le repo contient un blueprint `render.yaml`. Étapes :
 > Le plan gratuit de Render met le service en veille après inactivité (premier chargement
 > un peu lent). Un plan payant supprime cette mise en veille.
 
+## E-mail de confirmation (adresse + accès)
+
+Après un paiement confirmé, le webhook `checkout.session.completed` envoie
+automatiquement l'adresse et l'accès à l'e-mail du client, via **Resend**.
+
+Pour l'activer :
+1. Crée un compte gratuit sur https://resend.com et génère une clé API (`re_...`).
+2. (Recommandé) Vérifie ton domaine dans Resend pour envoyer depuis
+   `noreply@tondomaine.com`. Sans domaine vérifié, l'expéditeur de test
+   `onboarding@resend.dev` n'envoie qu'à l'adresse de ton propre compte Resend.
+3. Ajoute dans les variables d'environnement (Render → Environment, ou `.env` en local) :
+   - `RESEND_API_KEY=re_...`
+   - `MAIL_FROM=Paname Roof <noreply@tondomaine.com>`
+4. Assure-toi que le webhook Stripe pointe bien vers `/api/webhook` (voir ci-dessus)
+   avec `STRIPE_WEBHOOK_SECRET` renseigné — sinon l'e-mail ne part pas.
+
+Si `RESEND_API_KEY` n'est pas défini, l'envoi est simplement ignoré (le paiement
+fonctionne quand même).
+
 ## À faire ensuite
 
-- Envoi de l'e-mail de confirmation avec l'adresse (dans le webhook `checkout.session.completed`).
 - Décompte réel des places (`left`) après paiement.
-- Déploiement (Render, Railway, Fly.io…) avec les variables d'environnement.
