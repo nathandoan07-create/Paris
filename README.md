@@ -1,6 +1,6 @@
 # Paname Roof
 
-Site de réservation d'accès à des toits privés de Paris avec vue sur la Tour
+Site de réservation d'accès à des toits de Paris avec vue sur la Tour
 Eiffel, toute l'année. Carte interactive, sélection de zone, **paiement Stripe**,
 et révélation de l'adresse + de l'accès **uniquement après paiement confirmé**.
 

@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Paname Roof — Les toits de Paris avec vue sur la Tour Eiffel</title>
-  <meta name="description" content="Réservez un accès à un toit privé de Paris avec vue sur la Tour Eiffel. Toute l'année. Adresse et accès remis après paiement sécurisé." />
+  <meta name="description" content="Réservez un accès à un toit de Paris avec vue sur la Tour Eiffel. Toute l'année. Adresse et accès remis après paiement sécurisé." />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -299,8 +299,7 @@
             <a href="#how" class="btn btn-ghost">Comment ça marche</a>
           </div>
           <div class="hero-meta">
-            <div class="item"><span class="num" id="spotsLeft">—</span><span class="lbl">Groupes dispo</span></div>
-            <div class="item"><span class="num" id="zoneCount">—</span><span class="lbl">Toits privés</span></div>
+            <div class="item"><span class="num" id="zoneCount">—</span><span class="lbl">Toits disponibles</span></div>
           </div>
         </div>
 
@@ -329,7 +328,7 @@
         <div class="section-head">
           <span class="eyebrow">Choisissez votre point de vue</span>
           <h2>La carte des zones</h2>
-          <p>Chaque cercle représente une zone d'accueil autour d'un toit privé. Sélectionnez-la pour voir les détails, puis réservez. L'adresse précise reste masquée jusqu'au paiement.</p>
+          <p>Chaque cercle représente une zone d'accueil autour d'un toit. Sélectionnez-la pour voir les détails, puis réservez. L'adresse précise reste masquée jusqu'au paiement.</p>
         </div>
         <div class="explorer">
           <div id="map" role="application" aria-label="Carte des zones de toits autour de la Tour Eiffel"></div>
@@ -373,7 +372,7 @@
           <svg class="spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" style="width:24px;height:24px;color:var(--gold-bright)"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l4 4M15 15l4 4M19 5l-4 4M9 15l-4 4"/></svg>
           Paname Roof
         </div>
-        <p class="foot-legal">Réservation d'accès à des toits privés de Paris avec vue sur la Tour Eiffel, toute l'année.</p>
+        <p class="foot-legal">Réservation d'accès à des toits de Paris avec vue sur la Tour Eiffel, toute l'année.</p>
       </div>
       <div>
         <small>© <span id="year"></span> Paname Roof — Mentions légales · CGV · Confidentialité<br>Contact hôte : bonjour@panameroof.example</small>
@@ -454,9 +453,7 @@
     var PASS = { label: "Pass intégral", price: 20 }; // accès à toutes les adresses
 
 
-    // total spots left + zone count
-    document.getElementById('spotsLeft').textContent =
-      ZONES.reduce(function (a, z) { return a + z.left; }, 0);
+    // zone count
     document.getElementById('zoneCount').textContent =
       ZONES.filter(function (z) { return z.status !== 'pending'; }).length;
     document.getElementById('year').textContent = new Date().getFullYear();
@@ -533,7 +530,7 @@
       card.id = 'card-' + z.id;
       card.setAttribute('aria-pressed', 'false');
       var priceCell = pending ? '<span class="tag">Bientôt</span>'
-        : (sold ? '<span class="tag soldout">Complet</span>' : euro(z.price) + ' <small>/ groupe</small>');
+        : (sold ? '<span class="tag soldout">Complet</span>' : euro(z.price));
       card.innerHTML =
         '<div class="top"><h3>' + z.name + '</h3>'
         + '<div class="price">' + priceCell + '</div></div>'
@@ -600,41 +597,33 @@
     var PAY_ERR = '<div id="payErr" class="field invalid" style="margin-top:12px; display:none"><div class="err" style="display:block"></div></div>';
 
     var KEY_PRICE = 10; // prix pour acheter la clé (toits à accès par clé)
-    function renderCheckout(z, qty) {
+    function renderCheckout(z) {
       modalTitle.textContent = z.name;
-      var maxQty = Math.min(z.left, 3);
       var isKey = z.access.method === 'Clé';
-      var opts = '';
-      for (var i = 1; i <= maxQty; i++) opts += '<option value="' + i + '"' + (i === qty ? ' selected' : '') + '>' + i + ' groupe' + (i > 1 ? 's' : '') + '</option>';
       modalBody.innerHTML =
-        '<div class="field"><label for="qty">Nombre de groupes</label><select id="qty">' + opts + '</select></div>'
-        + (isKey ? '<label style="display:flex;align-items:center;gap:10px;margin-top:14px;cursor:pointer;font-size:15px">'
-            + '<input type="checkbox" id="buyKey" style="width:18px;height:18px;accent-color:var(--gold)"> Acheter la clé (+' + euro(KEY_PRICE) + ')</label>' : '')
-        + '<div style="margin-top:16px">'
+        '<div style="margin-top:4px">'
         + row('Toit', z.name)
-        + row('Prix / groupe', euro(z.price))
-        + row('Groupes', '<span id="rowGroups">' + qty + '</span>')
+        + row('Accès', euro(z.price))
         + (isKey ? '<div class="summary-row" id="rowKey" style="display:none"><span>Clé</span><span>' + euro(KEY_PRICE) + '</span></div>' : '')
-        + '<div class="summary-row total"><span>Total</span><b id="totalLine">' + euro(z.price * qty) + '</b></div>'
+        + '<div class="summary-row total"><span>Total</span><b id="totalLine">' + euro(z.price) + '</b></div>'
         + '</div>'
-        + '<button id="payBtn" class="btn btn-primary btn-block" style="margin-top:20px">Payer <span id="payAmt">' + euro(z.price * qty) + '</span></button>'
+        + (isKey ? '<label style="display:flex;align-items:center;gap:10px;margin-top:16px;cursor:pointer;font-size:15px">'
+            + '<input type="checkbox" id="buyKey" style="width:18px;height:18px;accent-color:var(--gold)"> Acheter la clé (+' + euro(KEY_PRICE) + ')</label>' : '')
+        + '<button id="payBtn" class="btn btn-primary btn-block" style="margin-top:20px">Payer <span id="payAmt">' + euro(z.price) + '</span></button>'
         + PAY_ERR
         + '<div class="pay-note">' + LOCK_SVG + ' Paiement sécurisé Stripe · adresse & accès révélés après paiement</div>';
 
-      function recompute() {
-        var q = parseInt(document.getElementById('qty').value, 10);
-        var key = isKey && document.getElementById('buyKey').checked;
-        var t = z.price * q + (key ? KEY_PRICE : 0);
-        document.getElementById('rowGroups').textContent = String(q);
-        if (isKey) document.getElementById('rowKey').style.display = key ? '' : 'none';
-        document.getElementById('totalLine').textContent = euro(t);
-        document.getElementById('payAmt').textContent = euro(t);
+      if (isKey) {
+        document.getElementById('buyKey').addEventListener('change', function () {
+          var key = document.getElementById('buyKey').checked;
+          var t = z.price + (key ? KEY_PRICE : 0);
+          document.getElementById('rowKey').style.display = key ? '' : 'none';
+          document.getElementById('totalLine').textContent = euro(t);
+          document.getElementById('payAmt').textContent = euro(t);
+        });
       }
-      document.getElementById('qty').addEventListener('change', recompute);
-      if (isKey) document.getElementById('buyKey').addEventListener('change', recompute);
       document.getElementById('payBtn').addEventListener('click', function () {
-        startCheckout({ type: 'zone', zoneId: z.id, qty: parseInt(document.getElementById('qty').value, 10),
-          key: isKey && document.getElementById('buyKey').checked }, this);
+        startCheckout({ type: 'zone', zoneId: z.id, qty: 1, key: isKey && document.getElementById('buyKey').checked }, this);
       });
     }
 
