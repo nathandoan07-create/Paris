@@ -62,7 +62,7 @@ app.post('/api/checkout', async (req, res) => {
       line_items = [{
         quantity: 1,
         price_data: { currency: CURRENCY, unit_amount: PASS.price * 100,
-          product_data: { name: 'Paname Roof — ' + PASS.label, description: 'Accès à tous les toits de la soirée' } }
+          product_data: { name: 'Paname Roof — ' + PASS.label, description: 'Accès à tous les toits' } }
       }];
     } else if (type === 'zone') {
       const zone = findZone(req.body.zoneId);
