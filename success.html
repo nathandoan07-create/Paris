@@ -67,7 +67,7 @@
     function accessBlock(it) {
       // Guided access: reveal ONLY the address (a host welcomes you on site, no code).
       if (it.accessMethod === 'Accompagné') {
-        return '<div class="lbl">Sur place</div><div class="val" style="font-size:1rem">Rendez-vous à cette adresse : un hôte vous accueille dès 22h15 le jour J.</div>';
+        return '<div class="lbl">Sur place</div><div class="val" style="font-size:1rem">Rendez-vous à cette adresse : un hôte vous accueille à l\'entrée à l\'heure convenue.</div>';
       }
       return '<div class="lbl">' + (it.accessMethod === 'Clé' ? 'Clé d\'accès' : 'Code d\'entrée') + '</div>'
         + '<div class="val code">' + esc(it.accessValue) + '</div>';

@@ -1,7 +1,7 @@
 # Paname Roof
 
-Site de réservation de places sur des toits privés pour le feu d'artifice
-du 13 juillet à Paris. Carte interactive, sélection de zone, **paiement Stripe**,
+Site de réservation d'accès à des toits privés de Paris avec vue sur la Tour
+Eiffel, toute l'année. Carte interactive, sélection de zone, **paiement Stripe**,
 et révélation de l'adresse + de l'accès **uniquement après paiement confirmé**.
 
 ## Architecture
