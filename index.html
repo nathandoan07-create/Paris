@@ -6,6 +6,21 @@
   <title>Paname Roof — Les toits de Paris avec vue sur la Tour Eiffel</title>
   <meta name="description" content="Réservez un accès à un toit de Paris avec vue sur la Tour Eiffel. Toute l'année. Adresse et accès remis après paiement sécurisé." />
 
+  <!-- Open Graph / partage (Insta, WhatsApp, SMS…) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Paname Roof" />
+  <meta property="og:locale" content="fr_FR" />
+  <meta property="og:url" content="https://paname-roof.onrender.com/" />
+  <meta property="og:title" content="Paname Roof — Les toits de Paris avec vue Tour Eiffel" />
+  <meta property="og:description" content="Réservez votre accès à un toit de Paris avec vue sur la Tour Eiffel. Adresse remise après paiement." />
+  <meta property="og:image" content="https://paname-roof.onrender.com/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Paname Roof — Les toits de Paris avec vue Tour Eiffel" />
+  <meta name="twitter:description" content="Réservez votre accès à un toit de Paris avec vue sur la Tour Eiffel." />
+  <meta name="twitter:image" content="https://paname-roof.onrender.com/og.png" />
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -595,7 +610,7 @@
         + '<div class="summary-row total"><span>Total</span><b id="totalLine">' + euro(z.price) + '</b></div>'
         + '</div>'
         + (isKey ? '<label style="display:flex;align-items:flex-start;gap:10px;margin-top:16px;cursor:pointer;font-size:15px">'
-            + '<input type="checkbox" id="buyKey" style="width:18px;height:18px;margin-top:2px;accent-color:var(--gold)"> Acheter la clé et me la faire envoyer (+' + euro(KEY_PRICE) + ')</label>'
+            + '<input type="checkbox" id="buyKey" style="width:18px;height:18px;margin-top:2px;accent-color:var(--gold)"> Acheter la clé et me la faire envoyer (+' + euro(KEY_PRICE) + ') — fonctionne sur toutes les adresses</label>'
             + '<div id="keyFields" style="display:none;margin-top:10px">'
             + field('keyName', 'Nom complet', 'text', 'Jean Dupont', true)
             + field('keyPhone', 'Téléphone', 'tel', '06 12 34 56 78', true)
@@ -689,16 +704,39 @@
     function renderPassCheckout() {
       modalTitle.textContent = PASS.label;
       modalBody.innerHTML =
-        '<p style="color:var(--muted)">Un seul paiement pour <b>tous les toits</b> de la carte : vous recevez l\'adresse + l\'accès de chacune.</p>'
+        '<p style="color:var(--muted)">Un seul paiement pour <b>tous les toits</b> de la carte : vous recevez l\'adresse + l\'accès de chacun.</p>'
         + '<div style="margin-top:16px">'
         + row('Formule', PASS.label)
         + row('Toits inclus', String(ZONES.filter(function (z) { return z.status !== 'pending'; }).length))
-        + '<div class="summary-row total"><span>Total</span><b>' + euro(PASS.price) + '</b></div></div>'
-        + '<button id="payBtn" class="btn btn-primary btn-block" style="margin-top:20px">Payer ' + euro(PASS.price) + '</button>'
+        + '<div class="summary-row" id="rowKey" style="display:none"><span>Clé (envoi)</span><span>' + euro(KEY_PRICE) + '</span></div>'
+        + '<div class="summary-row total"><span>Total</span><b id="totalLine">' + euro(PASS.price) + '</b></div></div>'
+        + '<label style="display:flex;align-items:flex-start;gap:10px;margin-top:16px;cursor:pointer;font-size:15px">'
+        + '<input type="checkbox" id="buyKey" style="width:18px;height:18px;margin-top:2px;accent-color:var(--gold)"> Acheter la clé et me la faire envoyer (+' + euro(KEY_PRICE) + ') — fonctionne sur toutes les adresses</label>'
+        + '<div id="keyFields" style="display:none;margin-top:10px">'
+        + field('keyName', 'Nom complet', 'text', 'Jean Dupont', true)
+        + field('keyPhone', 'Téléphone', 'tel', '06 12 34 56 78', true)
+        + field('keyAddress', 'Adresse postale (envoi de la clé)', 'text', '12 rue…, 75000 Paris', true)
+        + '</div>'
+        + '<button id="payBtn" class="btn btn-primary btn-block" style="margin-top:20px">Payer <span id="payAmt">' + euro(PASS.price) + '</span></button>'
         + PAY_ERR
         + '<div class="pay-note">' + LOCK_SVG + ' Paiement sécurisé Stripe · toutes les adresses après paiement</div>';
+
+      document.getElementById('buyKey').addEventListener('change', function () {
+        var key = document.getElementById('buyKey').checked;
+        document.getElementById('rowKey').style.display = key ? '' : 'none';
+        document.getElementById('keyFields').style.display = key ? '' : 'none';
+        var t = PASS.price + (key ? KEY_PRICE : 0);
+        document.getElementById('totalLine').textContent = euro(t);
+        document.getElementById('payAmt').textContent = euro(t);
+      });
       document.getElementById('payBtn').addEventListener('click', function () {
-        startCheckout({ type: 'pass' }, this);
+        var key = document.getElementById('buyKey').checked;
+        var ship = null;
+        if (key) {
+          if (!validate(['keyName', 'keyPhone', 'keyAddress'])) return;
+          ship = { name: document.getElementById('keyName').value, phone: document.getElementById('keyPhone').value, address: document.getElementById('keyAddress').value };
+        }
+        startCheckout({ type: 'pass', key: key, ship: ship }, this);
       });
     }
 

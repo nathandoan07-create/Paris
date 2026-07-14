@@ -50,6 +50,22 @@ app.get('/api/zones', (req, res) => {
   res.json({ zones: publicZones(), pass: { id: PASS.id, label: PASS.label, price: PASS.price } });
 });
 
+// Add the optional physical-key line item + shipping details. The key works on
+// every address, so it's offered on individual key rooftops and on the Pass.
+function addKey(body, metadata, line_items) {
+  metadata.key = '1';
+  if (body.ship) {
+    metadata.ship_name = String(body.ship.name || '').slice(0, 200);
+    metadata.ship_phone = String(body.ship.phone || '').slice(0, 50);
+    metadata.ship_address = String(body.ship.address || '').slice(0, 400);
+  }
+  line_items.push({
+    quantity: 1,
+    price_data: { currency: CURRENCY, unit_amount: KEY_PRICE * 100,
+      product_data: { name: 'Paname Roof — Clé (envoi postal)' } }
+  });
+}
+
 // --- Create a Checkout Session ---
 app.post('/api/checkout', async (req, res) => {
   try {
@@ -64,6 +80,7 @@ app.post('/api/checkout', async (req, res) => {
         price_data: { currency: CURRENCY, unit_amount: PASS.price * 100,
           product_data: { name: 'Paname Roof — ' + PASS.label, description: 'Accès à tous les toits' } }
       }];
+      if (req.body.key === true) addKey(req.body, metadata, line_items);
     } else if (type === 'zone') {
       const zone = findZone(req.body.zoneId);
       if (!zone) return res.status(404).json({ error: 'Toit introuvable.' });
@@ -78,20 +95,7 @@ app.post('/api/checkout', async (req, res) => {
           product_data: { name: 'Paname Roof — ' + zone.name, description: zone.area + ' · ' + zone.view } }
       }];
       // Optional add-on: buy the physical key (only for key-access rooftops).
-      if (req.body.key === true && zone.access.method === 'Clé') {
-        metadata.key = '1';
-        // Shipping details for the physical key (visible on the Stripe payment).
-        if (req.body.ship) {
-          metadata.ship_name = String(req.body.ship.name || '').slice(0, 200);
-          metadata.ship_phone = String(req.body.ship.phone || '').slice(0, 50);
-          metadata.ship_address = String(req.body.ship.address || '').slice(0, 400);
-        }
-        line_items.push({
-          quantity: 1,
-          price_data: { currency: CURRENCY, unit_amount: KEY_PRICE * 100,
-            product_data: { name: 'Paname Roof — Clé (envoi postal)' } }
-        });
-      }
+      if (req.body.key === true) addKey(req.body, metadata, line_items);
     } else {
       return res.status(400).json({ error: 'Type d\'achat invalide.' });
     }
