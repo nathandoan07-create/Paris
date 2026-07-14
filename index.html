@@ -402,55 +402,42 @@
     // Stripe confirms the payment. This array can be overwritten at runtime by
     // /api/zones (source of truth) — see the fetch below.
     var ZONES = [
-      { id: "bosquet-ter", name: "Toit Bosquet", area: "Champ-de-Mars (7e)", lat: 48.8600, lng: 2.3022, radius: 120,
-        price: 25, capacity: 3, left: 3, stars: 5, view: "Vue Tour Eiffel",
-        desc: "Toit haut de gamme à deux pas du Champ-de-Mars, plein axe sur la Tour.",
-        tags: ["Assises"], access: { method: "Code", note: "" } },
+      { id: "bosquet-ter", name: "Toit Bosquet · I", area: "Champ-de-Mars (7e)", lat: 48.8600, lng: 2.3022, radius: 120,
+        price: 15, capacity: 1, left: 1, stars: 5, view: "Vue Tour Eiffel",
+        desc: "", tags: [], access: { method: "Code", note: "" } },
+      { id: "bosquet-bis", name: "Toit Bosquet · II", area: "Champ-de-Mars (7e)", lat: 48.8598, lng: 2.3020, radius: 115,
+        price: 15, capacity: 1, left: 1, stars: 5, view: "Vue Tour Eiffel",
+        desc: "", tags: [], access: { method: "Code", note: "" } },
+      { id: "bosquet-33", name: "Toit Bosquet · III", area: "Champ-de-Mars (7e)", lat: 48.8580, lng: 2.3010, radius: 120,
+        price: 15, capacity: 1, left: 1, stars: 4, view: "Vue Tour Eiffel",
+        desc: "", tags: [], access: { method: "Code", note: "" } },
       { id: "duvivier", name: "Toit École Militaire", area: "École Militaire (7e)", lat: 48.8567, lng: 2.3047, radius: 115,
-        price: 24, capacity: 3, left: 2, stars: 5, view: "Vue Tour Eiffel",
-        desc: "Au plus près de la Tour, feu d'artifice quasiment à la verticale.",
-        tags: ["Ambiance festive"], access: { method: "Code", note: "" } },
-      { id: "expo-10", name: "Toit Champ-de-Mars · I", area: "Gros-Caillou (7e)", lat: 48.8574, lng: 2.3038, radius: 110,
-        price: 22, capacity: 3, left: 3, stars: 5, view: "Vue Tour Eiffel",
-        desc: "Petite rue calme du 7e, vue dégagée sur l'esplanade et la Tour.",
-        tags: ["Couvertures fournies"], access: { method: "Clé", note: "" } },
-      { id: "expo-16", name: "Toit Champ-de-Mars · II", area: "Gros-Caillou (7e)", lat: 48.8571, lng: 2.3033, radius: 110,
-        price: 22, capacity: 3, left: 1, stars: 5, view: "Vue Tour Eiffel",
-        desc: "Toit voisin, même vue superbe sur la Tour, jauge réduite.",
-        tags: ["Jauge réduite"], access: { method: "Clé", note: "" } },
-      { id: "grenelle-176", name: "Toit Gros-Caillou", area: "Gros-Caillou (7e)", lat: 48.8603, lng: 2.3038, radius: 115,
-        price: 20, capacity: 3, left: 3, stars: 4, view: "Vue dégagée sur la Tour",
-        desc: "Belle hauteur côté Grenelle, panorama large vers la Tour Eiffel.",
-        tags: ["Panorama"], access: { method: "Code", note: "" } },
-      { id: "brey", name: "Toit Étoile · I", area: "Étoile (17e)", lat: 48.8759, lng: 2.2962, radius: 115,
-        price: 16, capacity: 3, left: 2, stars: 4, view: "Vue Arc de Triomphe & Tour",
-        desc: "À deux pas de l'Étoile, panorama sur l'ouest parisien et le feu d'artifice.",
-        tags: ["Photogénique"], access: { method: "Code", note: "" } },
-      { id: "macmahon", name: "Toit Étoile · II", area: "Étoile (17e)", lat: 48.8748, lng: 2.2952, radius: 115,
-        price: 15, capacity: 3, left: 3, stars: 4, view: "Vue sur l'Étoile",
-        desc: "Toit sur l'avenue Mac-Mahon, vue dégagée vers l'Arc et la Tour au loin.",
-        tags: ["Vue ouest"], access: { method: "Code", note: "Cadenas à enlever" } },
+        price: 15, capacity: 1, left: 1, stars: 5, view: "Vue Tour Eiffel",
+        desc: "", tags: [], access: { method: "Code", note: "" } },
+      { id: "expo-16", name: "Toit Champ-de-Mars · I", area: "Gros-Caillou (7e)", lat: 48.8571, lng: 2.3033, radius: 110,
+        price: 10, capacity: 1, left: 1, stars: 5, view: "Vue Tour Eiffel",
+        desc: "", tags: [], access: { method: "Clé", note: "" } },
+      { id: "expo-21", name: "Toit Champ-de-Mars · II", area: "Gros-Caillou (7e)", lat: 48.8569, lng: 2.3030, radius: 110,
+        price: 10, capacity: 1, left: 1, stars: 5, view: "Vue Tour Eiffel",
+        desc: "", tags: [], access: { method: "Clé", note: "" } },
+      { id: "brey", name: "Toit Étoile", area: "Étoile (17e)", lat: 48.8759, lng: 2.2962, radius: 115,
+        price: 15, capacity: 1, left: 1, stars: 4, view: "Vue Arc de Triomphe & Tour",
+        desc: "", tags: [], access: { method: "Code", note: "" } },
       { id: "duguay", name: "Toit Montparnasse", area: "Montparnasse (6e)", lat: 48.8466, lng: 2.3296, radius: 120,
-        price: 14, capacity: 3, left: 3, stars: 4, view: "Vue vers la Tour Eiffel",
-        desc: "Rive gauche, hauteur dégagée avec la Tour Eiffel en ligne de mire.",
-        tags: ["Calme"], access: { method: "Code", note: "" } },
+        price: 15, capacity: 1, left: 1, stars: 4, view: "Vue vers la Tour Eiffel",
+        desc: "", tags: [], access: { method: "Code", note: "" } },
       { id: "bergere", name: "Toit Grands Boulevards", area: "Grands Boulevards (9e)", lat: 48.8722, lng: 2.3443, radius: 120,
-        price: 11, capacity: 3, left: 1, stars: 4, view: "Panorama & feu au loin",
-        desc: "Grand toit central, vue sur les toits de Paris et le ciel du feu d'artifice.",
-        tags: ["Central", "Ambiance festive"], access: { method: "Code", note: "" } },
-      { id: "cretet", name: "Toit Pigalle", area: "Pigalle (9e)", lat: 48.8828, lng: 2.3388, radius: 120,
-        price: 10, capacity: 3, left: 3, stars: 4, view: "Vue hauteurs de Paris",
-        desc: "Sur les hauteurs du 9e, panorama ouvert sur la ville en fête.",
-        tags: ["Rooftop"], access: { method: "Code", note: "Deuxième porte à ouvrir" } }
+        price: 15, capacity: 1, left: 1, stars: 4, view: "Panorama sur Paris",
+        desc: "", tags: [], access: { method: "Code", note: "" } }
     ];
-    // Tarif selon le type d'accès : clé = 5 €, guidé = 15 €, code = 10 €.
-    ZONES.forEach(function (z) { z.price = z.access.method === 'Clé' ? 5 : z.access.method === 'Accompagné' ? 15 : 10; });
+    // Tarif de l'accès selon le type : clé = 10 €, code = 15 €.
+    ZONES.forEach(function (z) { z.price = z.access.method === 'Clé' ? 10 : 15; });
 
     var euro = function (n) { return n.toLocaleString('fr-FR') + ' €'; };
     var selected = null;
 
     // Pass intégral : un paiement débloque tous les toits de la carte.
-    var PASS = { label: "Pass intégral", price: 20 }; // accès à toutes les adresses
+    var PASS = { label: "Pass intégral", price: 30 }; // accès à toutes les adresses
 
 
     // zone count
@@ -596,7 +583,7 @@
     var LOCK_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
     var PAY_ERR = '<div id="payErr" class="field invalid" style="margin-top:12px; display:none"><div class="err" style="display:block"></div></div>';
 
-    var KEY_PRICE = 10; // prix pour acheter la clé (toits à accès par clé)
+    var KEY_PRICE = 15; // acheter la clé (envoi postal) — nécessite nom / téléphone / adresse
     function renderCheckout(z) {
       modalTitle.textContent = z.name;
       var isKey = z.access.method === 'Clé';
@@ -604,11 +591,16 @@
         '<div style="margin-top:4px">'
         + row('Toit', z.name)
         + row('Accès', euro(z.price))
-        + (isKey ? '<div class="summary-row" id="rowKey" style="display:none"><span>Clé</span><span>' + euro(KEY_PRICE) + '</span></div>' : '')
+        + (isKey ? '<div class="summary-row" id="rowKey" style="display:none"><span>Clé (envoi)</span><span>' + euro(KEY_PRICE) + '</span></div>' : '')
         + '<div class="summary-row total"><span>Total</span><b id="totalLine">' + euro(z.price) + '</b></div>'
         + '</div>'
-        + (isKey ? '<label style="display:flex;align-items:center;gap:10px;margin-top:16px;cursor:pointer;font-size:15px">'
-            + '<input type="checkbox" id="buyKey" style="width:18px;height:18px;accent-color:var(--gold)"> Acheter la clé (+' + euro(KEY_PRICE) + ')</label>' : '')
+        + (isKey ? '<label style="display:flex;align-items:flex-start;gap:10px;margin-top:16px;cursor:pointer;font-size:15px">'
+            + '<input type="checkbox" id="buyKey" style="width:18px;height:18px;margin-top:2px;accent-color:var(--gold)"> Acheter la clé et me la faire envoyer (+' + euro(KEY_PRICE) + ')</label>'
+            + '<div id="keyFields" style="display:none;margin-top:10px">'
+            + field('keyName', 'Nom complet', 'text', 'Jean Dupont', true)
+            + field('keyPhone', 'Téléphone', 'tel', '06 12 34 56 78', true)
+            + field('keyAddress', 'Adresse postale (envoi de la clé)', 'text', '12 rue…, 75000 Paris', true)
+            + '</div>' : '')
         + '<button id="payBtn" class="btn btn-primary btn-block" style="margin-top:20px">Payer <span id="payAmt">' + euro(z.price) + '</span></button>'
         + PAY_ERR
         + '<div class="pay-note">' + LOCK_SVG + ' Paiement sécurisé Stripe · adresse & accès révélés après paiement</div>';
@@ -616,14 +608,25 @@
       if (isKey) {
         document.getElementById('buyKey').addEventListener('change', function () {
           var key = document.getElementById('buyKey').checked;
-          var t = z.price + (key ? KEY_PRICE : 0);
           document.getElementById('rowKey').style.display = key ? '' : 'none';
+          document.getElementById('keyFields').style.display = key ? '' : 'none';
+          var t = z.price + (key ? KEY_PRICE : 0);
           document.getElementById('totalLine').textContent = euro(t);
           document.getElementById('payAmt').textContent = euro(t);
         });
       }
       document.getElementById('payBtn').addEventListener('click', function () {
-        startCheckout({ type: 'zone', zoneId: z.id, qty: 1, key: isKey && document.getElementById('buyKey').checked }, this);
+        var key = isKey && document.getElementById('buyKey').checked;
+        var ship = null;
+        if (key) {
+          if (!validate(['keyName', 'keyPhone', 'keyAddress'])) return;
+          ship = {
+            name: document.getElementById('keyName').value,
+            phone: document.getElementById('keyPhone').value,
+            address: document.getElementById('keyAddress').value
+          };
+        }
+        startCheckout({ type: 'zone', zoneId: z.id, qty: 1, key: key, ship: ship }, this);
       });
     }
 

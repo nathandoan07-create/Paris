@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 4242;
 const BASE_URL = process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || ('http://localhost:' + PORT);
 const CURRENCY = 'eur';
 const MAX_QTY = 3; // max 3 groups (= 3 sales) per rooftop
-const KEY_PRICE = 10; // optional add-on: buy the key (key-access rooftops)
+const KEY_PRICE = 15; // optional add-on: buy the key and have it mailed (key-access rooftops)
 
 const stripeKey = process.env.STRIPE_SECRET_KEY || '';
 const stripe = stripeKey ? require('stripe')(stripeKey) : null;
@@ -80,10 +80,16 @@ app.post('/api/checkout', async (req, res) => {
       // Optional add-on: buy the physical key (only for key-access rooftops).
       if (req.body.key === true && zone.access.method === 'Clé') {
         metadata.key = '1';
+        // Shipping details for the physical key (visible on the Stripe payment).
+        if (req.body.ship) {
+          metadata.ship_name = String(req.body.ship.name || '').slice(0, 200);
+          metadata.ship_phone = String(req.body.ship.phone || '').slice(0, 50);
+          metadata.ship_address = String(req.body.ship.address || '').slice(0, 400);
+        }
         line_items.push({
           quantity: 1,
           price_data: { currency: CURRENCY, unit_amount: KEY_PRICE * 100,
-            product_data: { name: 'Paname Roof — Clé' } }
+            product_data: { name: 'Paname Roof — Clé (envoi postal)' } }
         });
       }
     } else {

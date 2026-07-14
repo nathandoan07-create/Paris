@@ -2,56 +2,51 @@
 // sent to the browser except by /api/unlock, after Stripe confirms the payment.
 // This is the single source of truth for the secret fields.
 
-// Each rooftop sells max 3 groups (= 3 accès max). `price` is per group, `left`
-// is the number of groups still available (0–3).
+// Each rooftop is a single access purchase. `left` > 0 = available.
 const ZONES = [
-  { id: "bosquet-ter", name: "Toit Bosquet", area: "Champ-de-Mars (7e)", lat: 48.8600, lng: 2.3022, radius: 120,
-    price: 25, capacity: 3, left: 3, stars: 5, view: "Vue Tour Eiffel",
-    desc: "Toit haut de gamme à deux pas du Champ-de-Mars, plein axe sur la Tour.",
-    tags: ["Assises"], address: "14 ter avenue Bosquet, 75007 Paris", access: { method: "Code", value: "7520", note: "" } },
+  { id: "bosquet-ter", name: "Toit Bosquet · I", area: "Champ-de-Mars (7e)", lat: 48.8600, lng: 2.3022, radius: 120,
+    price: 10, capacity: 1, left: 1, stars: 5, view: "Vue Tour Eiffel",
+    desc: "Toit à deux pas du Champ-de-Mars, plein axe sur la Tour.",
+    tags: [], address: "14 ter avenue Bosquet, 75007 Paris", access: { method: "Code", value: "7520", note: "" } },
+  { id: "bosquet-bis", name: "Toit Bosquet · II", area: "Champ-de-Mars (7e)", lat: 48.8598, lng: 2.3020, radius: 115,
+    price: 10, capacity: 1, left: 1, stars: 5, view: "Vue Tour Eiffel",
+    desc: "Vue dégagée sur la Tour illuminée.",
+    tags: [], address: "14 bis avenue Bosquet, 75007 Paris", access: { method: "Code", value: "7520", note: "" } },
+  { id: "bosquet-33", name: "Toit Bosquet · III", area: "Champ-de-Mars (7e)", lat: 48.8580, lng: 2.3010, radius: 120,
+    price: 10, capacity: 1, left: 1, stars: 4, view: "Vue Tour Eiffel",
+    desc: "Grand toit dans l'axe du monument.",
+    tags: [], address: "33 avenue Bosquet, 75007 Paris", access: { method: "Code", value: "7520", note: "" } },
   { id: "duvivier", name: "Toit École Militaire", area: "École Militaire (7e)", lat: 48.8567, lng: 2.3047, radius: 115,
-    price: 24, capacity: 3, left: 2, stars: 5, view: "Vue Tour Eiffel",
-    desc: "Au plus près de la Tour, feu d'artifice quasiment à la verticale.",
-    tags: ["Ambiance festive"], address: "7 rue Duvivier, 75007 Paris", access: { method: "Code", value: "1104", note: "" } },
-  { id: "expo-10", name: "Toit Champ-de-Mars · I", area: "Gros-Caillou (7e)", lat: 48.8574, lng: 2.3038, radius: 110,
-    price: 22, capacity: 3, left: 3, stars: 5, view: "Vue Tour Eiffel",
-    desc: "Petite rue calme du 7e, vue dégagée sur l'esplanade et la Tour.",
-    tags: ["Couvertures fournies"], address: "10 rue de l'Exposition, 75007 Paris", access: { method: "Clé", value: "PTT T10", note: "" } },
-  { id: "expo-16", name: "Toit Champ-de-Mars · II", area: "Gros-Caillou (7e)", lat: 48.8571, lng: 2.3033, radius: 110,
-    price: 22, capacity: 3, left: 1, stars: 5, view: "Vue Tour Eiffel",
-    desc: "Toit voisin, même vue superbe sur la Tour, jauge réduite.",
-    tags: ["Jauge réduite"], address: "16 rue de l'Exposition, 75007 Paris", access: { method: "Clé", value: "PTT T10", note: "" } },
-  { id: "grenelle-176", name: "Toit Gros-Caillou", area: "Gros-Caillou (7e)", lat: 48.8603, lng: 2.3038, radius: 115,
-    price: 20, capacity: 3, left: 3, stars: 4, view: "Vue dégagée sur la Tour",
-    desc: "Belle hauteur côté Grenelle, panorama large vers la Tour Eiffel.",
-    tags: ["Panorama"], address: "176 rue de Grenelle, 75007 Paris", access: { method: "Code", value: "7917", note: "" } },
-  { id: "brey", name: "Toit Étoile · I", area: "Étoile (17e)", lat: 48.8759, lng: 2.2962, radius: 115,
-    price: 16, capacity: 3, left: 2, stars: 4, view: "Vue Arc de Triomphe & Tour",
-    desc: "À deux pas de l'Étoile, panorama sur l'ouest parisien et le feu d'artifice.",
-    tags: ["Photogénique"], address: "5 rue Brey, 75017 Paris", access: { method: "Code", value: "7520", note: "" } },
-  { id: "macmahon", name: "Toit Étoile · II", area: "Étoile (17e)", lat: 48.8748, lng: 2.2952, radius: 115,
-    price: 15, capacity: 3, left: 3, stars: 4, view: "Vue sur l'Étoile",
-    desc: "Toit sur l'avenue Mac-Mahon, vue dégagée vers l'Arc et la Tour au loin.",
-    tags: ["Vue ouest"], address: "1 avenue Mac-Mahon, 75017 Paris", access: { method: "Code", value: "7520", note: "Cadenas à enlever" } },
+    price: 10, capacity: 1, left: 1, stars: 5, view: "Vue Tour Eiffel",
+    desc: "Au plus près de la Tour Eiffel.",
+    tags: [], address: "7 rue Duvivier, 75007 Paris", access: { method: "Code", value: "1104", note: "" } },
+  { id: "expo-16", name: "Toit Champ-de-Mars · I", area: "Gros-Caillou (7e)", lat: 48.8571, lng: 2.3033, radius: 110,
+    price: 5, capacity: 1, left: 1, stars: 5, view: "Vue Tour Eiffel",
+    desc: "Rue calme du 7e, vue dégagée sur la Tour.",
+    tags: [], address: "16 rue de l'Exposition, 75007 Paris", access: { method: "Clé", value: "PTT T10", note: "" } },
+  { id: "expo-21", name: "Toit Champ-de-Mars · II", area: "Gros-Caillou (7e)", lat: 48.8569, lng: 2.3030, radius: 110,
+    price: 5, capacity: 1, left: 1, stars: 5, view: "Vue Tour Eiffel",
+    desc: "Toit voisin, même belle vue sur la Tour.",
+    tags: [], address: "21 rue de l'Exposition, 75007 Paris", access: { method: "Clé", value: "PTT T10", note: "" } },
+  { id: "brey", name: "Toit Étoile", area: "Étoile (17e)", lat: 48.8759, lng: 2.2962, radius: 115,
+    price: 10, capacity: 1, left: 1, stars: 4, view: "Vue Arc de Triomphe & Tour",
+    desc: "À deux pas de l'Étoile, panorama sur l'ouest parisien.",
+    tags: [], address: "5 rue Brey, 75017 Paris", access: { method: "Code", value: "7520", note: "" } },
   { id: "duguay", name: "Toit Montparnasse", area: "Montparnasse (6e)", lat: 48.8466, lng: 2.3296, radius: 120,
-    price: 14, capacity: 3, left: 3, stars: 4, view: "Vue vers la Tour Eiffel",
-    desc: "Rive gauche, hauteur dégagée avec la Tour Eiffel en ligne de mire.",
-    tags: ["Calme"], address: "19 rue Duguay-Trouin, 75006 Paris", access: { method: "Code", value: "7520", note: "" } },
+    price: 10, capacity: 1, left: 1, stars: 4, view: "Vue vers la Tour Eiffel",
+    desc: "Rive gauche, hauteur dégagée avec la Tour en ligne de mire.",
+    tags: [], address: "19 rue Duguay-Trouin, 75006 Paris", access: { method: "Code", value: "7520", note: "" } },
   { id: "bergere", name: "Toit Grands Boulevards", area: "Grands Boulevards (9e)", lat: 48.8722, lng: 2.3443, radius: 120,
-    price: 11, capacity: 3, left: 1, stars: 4, view: "Panorama & feu au loin",
-    desc: "Grand toit central, vue sur les toits de Paris et le ciel du feu d'artifice.",
-    tags: ["Central", "Ambiance festive"], address: "25 rue Bergère, 75009 Paris", access: { method: "Code", value: "1104", note: "" } },
-  { id: "cretet", name: "Toit Pigalle", area: "Pigalle (9e)", lat: 48.8828, lng: 2.3388, radius: 120,
-    price: 10, capacity: 3, left: 3, stars: 4, view: "Vue hauteurs de Paris",
-    desc: "Sur les hauteurs du 9e, panorama ouvert sur la ville en fête.",
-    tags: ["Rooftop"], address: "3 rue Crétet, 75009 Paris", access: { method: "Code", value: "7520", note: "Deuxième porte à ouvrir" } }
+    price: 10, capacity: 1, left: 1, stars: 4, view: "Panorama sur Paris",
+    desc: "Grand toit central, vue sur les toits de Paris.",
+    tags: [], address: "25 rue Bergère, 75009 Paris", access: { method: "Code", value: "1104", note: "" } }
 ];
 
-// Tarif selon le type d'accès : clé = 5 €, guidé = 15 €, code = 10 €.
-ZONES.forEach(function (z) { z.price = z.access.method === 'Clé' ? 5 : z.access.method === 'Accompagné' ? 15 : 10; });
+// Tarif de l'accès selon le type : clé = 10 €, code = 15 €.
+ZONES.forEach(function (z) { z.price = z.access.method === 'Clé' ? 10 : 15; });
 
 // Pass intégral: one payment unlocks every bookable rooftop. Adjust the price here.
-const PASS = { id: "pass", label: "Pass intégral", price: 20 };
+const PASS = { id: "pass", label: "Pass intégral", price: 30 };
 
 // Public projection: everything EXCEPT the exact address and the access value.
 // accessMethod / accessNote are safe to expose (they don't reveal the building).
