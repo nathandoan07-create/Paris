@@ -7,7 +7,7 @@ const SALON = {
   tagline: 'Manucure, pose gel & semi-permanent — Paris 17e',
   address: '72 Rue Boursault, 75017 Paris',
   addressShort: '72 Rue Boursault, 75017',
-  phone: '+33 1 00 00 00 00',        // ← à renseigner (numéro du salon)
+  phone: '+33 1 73 70 65 87',        // numéro du salon (source : fiche Google)
   email: 'contact@maianhnailsparis.fr',
   instagram: 'maianhnailsparis',      // handle Instagram (sans @)
   // Coordonnées GPS exactes du salon (depuis la fiche Google Maps).
@@ -15,6 +15,9 @@ const SALON = {
   lng: 2.3181044,
   // Fiche Google Maps du salon (avec avis) — pour le bouton « Voir sur Google ».
   placeUrl: 'https://maps.google.com/?cid=11416418311647431405',
+  // Note Google (source : fiche Google). Mettez à jour au fil des avis.
+  rating: 4.9,
+  reviews: 36,
   // Lien « Itinéraire » : ouvre l'itinéraire vers le salon (coordonnées exactes).
   mapsUrl: 'https://www.google.com/maps/dir/?api=1&destination=48.8860545%2C2.3181044',
   timezone: 'Europe/Paris',
@@ -25,14 +28,16 @@ const SALON = {
 
 // Horaires d'ouverture par jour (0 = dimanche … 6 = samedi).
 // open/close en minutes depuis minuit (600 = 10:00, 1140 = 19:00). null = fermé.
+// Source : fiche Google (lundi fermé ; mar–jeu 10h–19h confirmés).
+// ⚠️ Vendredi / samedi / dimanche À CONFIRMER par le salon.
 const HOURS = {
-  0: null,                     // dimanche — fermé
-  1: { open: 600, close: 1140 }, // lundi   10:00–19:00
-  2: { open: 600, close: 1140 }, // mardi
-  3: { open: 600, close: 1140 }, // mercredi
-  4: { open: 600, close: 1170 }, // jeudi   10:00–19:30
-  5: { open: 600, close: 1170 }, // vendredi
-  6: { open: 570, close: 1140 }, // samedi   9:30–19:00
+  0: null,                       // dimanche — à confirmer (fermé ?)
+  1: null,                       // lundi   — FERMÉ (confirmé)
+  2: { open: 600, close: 1140 }, // mardi    10:00–19:00 (confirmé)
+  3: { open: 600, close: 1140 }, // mercredi 10:00–19:00 (confirmé)
+  4: { open: 600, close: 1140 }, // jeudi    10:00–19:00 (confirmé)
+  5: { open: 600, close: 1140 }, // vendredi 10:00–19:00 (à confirmer)
+  6: { open: 600, close: 1140 }, // samedi   10:00–19:00 (à confirmer)
 };
 
 // Pas de la grille de créneaux, en minutes (créneaux toutes les 15 min).
@@ -111,7 +116,7 @@ function publicCatalogue() {
       name: SALON.name, tagline: SALON.tagline, address: SALON.address,
       addressShort: SALON.addressShort, phone: SALON.phone, email: SALON.email,
       instagram: SALON.instagram, mapsUrl: SALON.mapsUrl, placeUrl: SALON.placeUrl,
-      lat: SALON.lat, lng: SALON.lng,
+      lat: SALON.lat, lng: SALON.lng, rating: SALON.rating, reviews: SALON.reviews,
     },
     categories: CATEGORIES,
   };
