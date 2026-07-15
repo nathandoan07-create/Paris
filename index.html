@@ -185,6 +185,9 @@
     .pass-card .plabel { display: flex; align-items: center; gap: 8px; font-family: 'Playfair Display', serif; font-size: 1.15rem; }
     .pass-card .pprice { font-family: 'Playfair Display', serif; color: var(--gold-bright); font-size: 1.35rem; }
     .pass-badge { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: #201704; background: var(--gold-bright); padding: 3px 9px; border-radius: 999px; font-weight: 700; }
+    .guided-card { background: linear-gradient(135deg, rgba(244,114,182,0.16), rgba(201,162,75,0.08)); border-color: rgba(244,114,182,0.5); }
+    .guided-card:hover { box-shadow: 0 10px 30px rgba(244,114,182,0.22); }
+    .guided-badge { background: var(--rose); color: #3a0b25; }
     .zone-card .top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
     .zone-card h3 { font-size: 1.15rem; }
     .zone-card .price { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--gold-bright); white-space: nowrap; }
@@ -511,8 +514,9 @@
           .then(function (res) {
             btn.disabled = false;
             if (res.ok && res.d.ok) {
+              try { localStorage.setItem('pr_promo', res.d.code); } catch (e) {}
               msg.className = 'news-msg ok';
-              msg.innerHTML = 'Merci ! Votre code : <span class="news-code">' + res.d.code + '</span> (−' + res.d.percent + '% sur votre 1er achat).';
+              msg.innerHTML = 'Merci ! Votre <b>−' + res.d.percent + '%</b> est activé — il s\'applique automatiquement à votre premier achat.';
               form.reset();
             } else {
               msg.className = 'news-msg err'; msg.textContent = (res.d && res.d.error) || 'Inscription impossible.';
@@ -586,6 +590,18 @@
       + '<div class="desc" style="margin-top:8px">Débloque <b>tous les toits</b> de la carte d\'un coup — l\'adresse et l\'accès de chaque toit.</div>';
     passCard.addEventListener('click', openPass);
     list.appendChild(passCard);
+
+    // Accès guidé card (contact via Instagram)
+    var guidedCard = document.createElement('button');
+    guidedCard.className = 'pass-card guided-card';
+    guidedCard.setAttribute('aria-label', 'Accès guidé, sur demande via Instagram');
+    guidedCard.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px">'
+      + '<span class="plabel"><span class="pass-badge guided-badge">Guidé</span> Accès guidé</span>'
+      + '<span class="pprice" style="font-size:1rem;color:var(--muted)">Sur demande</span></div>'
+      + '<div class="desc" style="margin-top:8px">Vous préférez être accompagné ? Contactez-moi sur Instagram pour organiser un accès guidé.</div>';
+    guidedCard.addEventListener('click', openGuided);
+    list.appendChild(guidedCard);
 
     ZONES.forEach(function (z) {
       var sold = z.left <= 0, pending = z.status === 'pending';
@@ -662,20 +678,24 @@
 
     var KEY_PRICE = 15; // acheter la clé (envoi postal) — nécessite nom / téléphone / adresse
     var PROMO = { code: 'BIENVENUE10', percent: 10 };
-    function promoOk(v) { return !!v && v.trim().toUpperCase() === PROMO.code; }
-    function promoFieldHtml() {
-      return '<div class="field" style="margin-top:14px"><label for="promo">Code promo (optionnel)</label>'
-        + '<input id="promo" type="text" placeholder="' + PROMO.code + '" autocapitalize="characters" /></div>';
-    }
+    // The -10% is unlocked only after subscribing to the newsletter (stored locally).
+    function getPromoCode() { try { return (localStorage.getItem('pr_promo') || '').trim().toUpperCase(); } catch (e) { return ''; } }
+    function promoActive() { return getPromoCode() === PROMO.code; }
     function promoRowHtml() {
-      return '<div class="summary-row" id="rowPromo" style="display:none;color:var(--success)"><span>Code promo −' + PROMO.percent + '%</span><span id="promoAmt"></span></div>';
+      return '<div class="summary-row" id="rowPromo" style="display:none;color:var(--success)"><span>−' + PROMO.percent + '% newsletter</span><span id="promoAmt"></span></div>';
     }
+    function promoNoteHtml() {
+      return promoActive()
+        ? '<div class="pay-note" style="color:var(--success);justify-content:flex-start">✓ Réduction newsletter −' + PROMO.percent + '% appliquée</div>'
+        : '<a href="#newsletter" id="promoInvite" style="display:block;margin-top:14px;font-size:14px;color:var(--gold-bright);text-decoration:none">Inscrivez-vous à la newsletter pour −' + PROMO.percent + '% →</a>';
+    }
+    function wirePromoInvite() { var a = document.getElementById('promoInvite'); if (a) a.addEventListener('click', closeCheckout); }
     function applyTotal(sub) {
-      var promo = promoOk(document.getElementById('promo').value);
-      var total = promo ? Math.round(sub * (1 - PROMO.percent / 100) * 100) / 100 : sub;
+      var active = promoActive();
+      var total = active ? Math.round(sub * (1 - PROMO.percent / 100) * 100) / 100 : sub;
       var rp = document.getElementById('rowPromo');
-      rp.style.display = promo ? '' : 'none';
-      if (promo) document.getElementById('promoAmt').textContent = '−' + euro(Math.round((sub - total) * 100) / 100);
+      rp.style.display = active ? '' : 'none';
+      if (active) document.getElementById('promoAmt').textContent = '−' + euro(Math.round((sub - total) * 100) / 100);
       document.getElementById('totalLine').textContent = euro(total);
       document.getElementById('payAmt').textContent = euro(total);
     }
@@ -697,7 +717,7 @@
             + field('keyPhone', 'Téléphone', 'tel', '06 12 34 56 78', true)
             + field('keyAddress', 'Adresse postale (envoi de la clé)', 'text', '12 rue…, 75000 Paris', true)
             + '</div>' : '')
-        + promoFieldHtml()
+        + promoNoteHtml()
         + '<button id="payBtn" class="btn btn-primary btn-block" style="margin-top:20px">Payer <span id="payAmt">' + euro(z.price) + '</span></button>'
         + PAY_ERR
         + '<div class="pay-note">' + LOCK_SVG + ' Paiement sécurisé Stripe · adresse & accès révélés après paiement</div>';
@@ -711,7 +731,8 @@
         applyTotal(z.price + (key ? KEY_PRICE : 0));
       }
       if (isKey) document.getElementById('buyKey').addEventListener('change', recompute);
-      document.getElementById('promo').addEventListener('input', recompute);
+      wirePromoInvite();
+      recompute();
       document.getElementById('payBtn').addEventListener('click', function () {
         var key = isKey && document.getElementById('buyKey').checked;
         var ship = null;
@@ -723,7 +744,7 @@
             address: document.getElementById('keyAddress').value
           };
         }
-        startCheckout({ type: 'zone', zoneId: z.id, qty: 1, key: key, ship: ship, promo: document.getElementById('promo').value }, this);
+        startCheckout({ type: 'zone', zoneId: z.id, qty: 1, key: key, ship: ship, promo: getPromoCode() }, this);
       });
     }
 
@@ -774,6 +795,22 @@
       });
     }
 
+    // --- Accès guidé (contact Instagram) ---
+    function openGuided() {
+      modalTitle.textContent = 'Accès guidé';
+      modalBody.innerHTML =
+        '<p style="color:var(--muted)">Vous préférez être accompagné sur place ? Pour organiser un <b>accès guidé</b>, contactez-moi directement sur Instagram — je vous réponds en message privé.</p>'
+        + '<a href="https://www.instagram.com/nathann.d7/" target="_blank" rel="noopener" class="btn btn-primary btn-block" style="margin-top:18px">'
+        + '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>'
+        + ' Me contacter sur Instagram</a>'
+        + '<div class="pay-note" style="justify-content:center">@nathann.d7</div>';
+      lastFocus = document.activeElement;
+      scrim.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      var f = modalBody.querySelector('a, button');
+      if (f) f.focus();
+    }
+
     // --- Pass intégral ---
     function openPass() {
       renderPassCheckout();
@@ -800,7 +837,7 @@
         + field('keyPhone', 'Téléphone', 'tel', '06 12 34 56 78', true)
         + field('keyAddress', 'Adresse postale (envoi de la clé)', 'text', '12 rue…, 75000 Paris', true)
         + '</div>'
-        + promoFieldHtml()
+        + promoNoteHtml()
         + '<button id="payBtn" class="btn btn-primary btn-block" style="margin-top:20px">Payer <span id="payAmt">' + euro(PASS.price) + '</span></button>'
         + PAY_ERR
         + '<div class="pay-note">' + LOCK_SVG + ' Paiement sécurisé Stripe · toutes les adresses après paiement</div>';
@@ -812,7 +849,8 @@
         applyTotal(PASS.price + (key ? KEY_PRICE : 0));
       }
       document.getElementById('buyKey').addEventListener('change', recompute);
-      document.getElementById('promo').addEventListener('input', recompute);
+      wirePromoInvite();
+      recompute();
       document.getElementById('payBtn').addEventListener('click', function () {
         var key = document.getElementById('buyKey').checked;
         var ship = null;
@@ -820,7 +858,7 @@
           if (!validate(['keyName', 'keyPhone', 'keyAddress'])) return;
           ship = { name: document.getElementById('keyName').value, phone: document.getElementById('keyPhone').value, address: document.getElementById('keyAddress').value };
         }
-        startCheckout({ type: 'pass', key: key, ship: ship, promo: document.getElementById('promo').value }, this);
+        startCheckout({ type: 'pass', key: key, ship: ship, promo: getPromoCode() }, this);
       });
     }
 
