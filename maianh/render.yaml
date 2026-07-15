@@ -1,0 +1,20 @@
+# Blueprint Render pour Mai Anh Nails (serveur qui sert aussi le site).
+# Déploiement : Render → New → Blueprint, puis pointez sur ce fichier
+# (maianh/render.yaml). Le site rooftop à la racine reste indépendant.
+services:
+  - type: web
+    name: mai-anh-nails
+    runtime: node
+    rootDir: maianh/server
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      # À définir dans le dashboard Render (onglet Environment). D'abord sk_test_..., puis sk_live_...
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      # Optionnel mais recommandé : depuis le webhook Stripe créé sur /api/webhook (whsec_...)
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      # BASE_URL est renseigné automatiquement depuis RENDER_EXTERNAL_URL.
