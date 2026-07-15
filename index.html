@@ -406,8 +406,8 @@
       <div class="container">
         <div class="news-card">
           <span class="eyebrow" style="justify-content:center; display:inline-flex;">Newsletter</span>
-          <h2><span class="accent">−10%</span> sur votre premier achat</h2>
-          <p>Inscrivez-vous : nouvelles adresses en avant-première et offres exclusives, directement par e-mail.</p>
+          <h2>Restez <span class="accent">informé</span></h2>
+          <p>Inscrivez-vous : recevez les nouvelles adresses en avant-première, directement par e-mail.</p>
           <form id="newsForm" class="news-form" novalidate>
             <input id="newsEmail" type="email" placeholder="vous@email.com" autocomplete="email" aria-label="Votre e-mail" required />
             <button class="btn btn-primary" type="submit">S'inscrire</button>
@@ -498,7 +498,7 @@
       ZONES.filter(function (z) { return z.status !== 'pending'; }).length;
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Newsletter signup (returns the -10% code)
+    // Newsletter signup
     (function () {
       var form = document.getElementById('newsForm');
       if (!form) return;
@@ -514,9 +514,8 @@
           .then(function (res) {
             btn.disabled = false;
             if (res.ok && res.d.ok) {
-              try { localStorage.setItem('pr_promo', res.d.code); } catch (e) {}
               msg.className = 'news-msg ok';
-              msg.innerHTML = 'Merci ! Votre <b>−' + res.d.percent + '%</b> est activé — il s\'applique automatiquement à votre premier achat.';
+              msg.textContent = 'Merci ! Vous serez prévenu des nouvelles adresses.';
               form.reset();
             } else {
               msg.className = 'news-msg err'; msg.textContent = (res.d && res.d.error) || 'Inscription impossible.';
@@ -677,25 +676,7 @@
     var PAY_ERR = '<div id="payErr" class="field invalid" style="margin-top:12px; display:none"><div class="err" style="display:block"></div></div>';
 
     var KEY_PRICE = 15; // acheter la clé (envoi postal) — nécessite nom / téléphone / adresse
-    var PROMO = { code: 'BIENVENUE10', percent: 10 };
-    // The -10% is unlocked only after subscribing to the newsletter (stored locally).
-    function getPromoCode() { try { return (localStorage.getItem('pr_promo') || '').trim().toUpperCase(); } catch (e) { return ''; } }
-    function promoActive() { return getPromoCode() === PROMO.code; }
-    function promoRowHtml() {
-      return '<div class="summary-row" id="rowPromo" style="display:none;color:var(--success)"><span>−' + PROMO.percent + '% newsletter</span><span id="promoAmt"></span></div>';
-    }
-    function promoNoteHtml() {
-      return promoActive()
-        ? '<div class="pay-note" style="color:var(--success);justify-content:flex-start">✓ Réduction newsletter −' + PROMO.percent + '% appliquée</div>'
-        : '<a href="#newsletter" id="promoInvite" style="display:block;margin-top:14px;font-size:14px;color:var(--gold-bright);text-decoration:none">Inscrivez-vous à la newsletter pour −' + PROMO.percent + '% →</a>';
-    }
-    function wirePromoInvite() { var a = document.getElementById('promoInvite'); if (a) a.addEventListener('click', closeCheckout); }
-    function applyTotal(sub) {
-      var active = promoActive();
-      var total = active ? Math.round(sub * (1 - PROMO.percent / 100) * 100) / 100 : sub;
-      var rp = document.getElementById('rowPromo');
-      rp.style.display = active ? '' : 'none';
-      if (active) document.getElementById('promoAmt').textContent = '−' + euro(Math.round((sub - total) * 100) / 100);
+    function applyTotal(total) {
       document.getElementById('totalLine').textContent = euro(total);
       document.getElementById('payAmt').textContent = euro(total);
     }
@@ -707,7 +688,6 @@
         + row('Toit', z.name)
         + row('Accès', euro(z.price))
         + (isKey ? '<div class="summary-row" id="rowKey" style="display:none"><span>Clé (envoi)</span><span>' + euro(KEY_PRICE) + '</span></div>' : '')
-        + promoRowHtml()
         + '<div class="summary-row total"><span>Total</span><b id="totalLine">' + euro(z.price) + '</b></div>'
         + '</div>'
         + (isKey ? '<label style="display:flex;align-items:flex-start;gap:10px;margin-top:16px;cursor:pointer;font-size:15px">'
@@ -717,7 +697,6 @@
             + field('keyPhone', 'Téléphone', 'tel', '06 12 34 56 78', true)
             + field('keyAddress', 'Adresse postale (envoi de la clé)', 'text', '12 rue…, 75000 Paris', true)
             + '</div>' : '')
-        + promoNoteHtml()
         + '<button id="payBtn" class="btn btn-primary btn-block" style="margin-top:20px">Payer <span id="payAmt">' + euro(z.price) + '</span></button>'
         + PAY_ERR
         + '<div class="pay-note">' + LOCK_SVG + ' Paiement sécurisé Stripe · adresse & accès révélés après paiement</div>';
@@ -731,8 +710,6 @@
         applyTotal(z.price + (key ? KEY_PRICE : 0));
       }
       if (isKey) document.getElementById('buyKey').addEventListener('change', recompute);
-      wirePromoInvite();
-      recompute();
       document.getElementById('payBtn').addEventListener('click', function () {
         var key = isKey && document.getElementById('buyKey').checked;
         var ship = null;
@@ -744,7 +721,7 @@
             address: document.getElementById('keyAddress').value
           };
         }
-        startCheckout({ type: 'zone', zoneId: z.id, qty: 1, key: key, ship: ship, promo: getPromoCode() }, this);
+        startCheckout({ type: 'zone', zoneId: z.id, qty: 1, key: key, ship: ship }, this);
       });
     }
 
@@ -828,7 +805,6 @@
         + row('Formule', PASS.label)
         + row('Toits inclus', String(ZONES.filter(function (z) { return z.status !== 'pending'; }).length))
         + '<div class="summary-row" id="rowKey" style="display:none"><span>Clé (envoi)</span><span>' + euro(KEY_PRICE) + '</span></div>'
-        + promoRowHtml()
         + '<div class="summary-row total"><span>Total</span><b id="totalLine">' + euro(PASS.price) + '</b></div></div>'
         + '<label style="display:flex;align-items:flex-start;gap:10px;margin-top:16px;cursor:pointer;font-size:15px">'
         + '<input type="checkbox" id="buyKey" style="width:18px;height:18px;margin-top:2px;accent-color:var(--gold)"> Acheter la clé et me la faire envoyer (+' + euro(KEY_PRICE) + ') — fonctionne sur toutes les adresses</label>'
@@ -837,7 +813,6 @@
         + field('keyPhone', 'Téléphone', 'tel', '06 12 34 56 78', true)
         + field('keyAddress', 'Adresse postale (envoi de la clé)', 'text', '12 rue…, 75000 Paris', true)
         + '</div>'
-        + promoNoteHtml()
         + '<button id="payBtn" class="btn btn-primary btn-block" style="margin-top:20px">Payer <span id="payAmt">' + euro(PASS.price) + '</span></button>'
         + PAY_ERR
         + '<div class="pay-note">' + LOCK_SVG + ' Paiement sécurisé Stripe · toutes les adresses après paiement</div>';
@@ -849,8 +824,6 @@
         applyTotal(PASS.price + (key ? KEY_PRICE : 0));
       }
       document.getElementById('buyKey').addEventListener('change', recompute);
-      wirePromoInvite();
-      recompute();
       document.getElementById('payBtn').addEventListener('click', function () {
         var key = document.getElementById('buyKey').checked;
         var ship = null;
@@ -858,7 +831,7 @@
           if (!validate(['keyName', 'keyPhone', 'keyAddress'])) return;
           ship = { name: document.getElementById('keyName').value, phone: document.getElementById('keyPhone').value, address: document.getElementById('keyAddress').value };
         }
-        startCheckout({ type: 'pass', key: key, ship: ship, promo: getPromoCode() }, this);
+        startCheckout({ type: 'pass', key: key, ship: ship }, this);
       });
     }
 
