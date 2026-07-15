@@ -5,6 +5,7 @@
 
 require('dotenv').config();
 const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const { ZONES, PASS, publicZones, findZone, isSellable } = require('./zones');
 
@@ -15,6 +16,8 @@ const BASE_URL = process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || ('ht
 const CURRENCY = 'eur';
 const MAX_QTY = 3; // max 3 groups (= 3 sales) per rooftop
 const KEY_PRICE = 15; // optional add-on: buy the key and have it mailed (key-access rooftops)
+const PROMO = { code: 'BIENVENUE10', percent: 10 }; // -10% newsletter (first purchase)
+const SUBS_FILE = path.join(__dirname, 'subscribers.json');
 
 const stripeKey = process.env.STRIPE_SECRET_KEY || '';
 const stripe = stripeKey ? require('stripe')(stripeKey) : null;
@@ -48,6 +51,20 @@ app.get('/api/config', (req, res) => {
 });
 app.get('/api/zones', (req, res) => {
   res.json({ zones: publicZones(), pass: { id: PASS.id, label: PASS.label, price: PASS.price } });
+});
+
+// --- Newsletter signup (stores emails; returns the -10% code) ---
+function readSubs() { try { return JSON.parse(fs.readFileSync(SUBS_FILE, 'utf8')); } catch (e) { return []; } }
+app.post('/api/subscribe', (req, res) => {
+  const email = String((req.body && req.body.email) || '').trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'E-mail invalide.' });
+  const subs = readSubs();
+  if (!subs.some((s) => s.email === email)) {
+    subs.push({ email: email, date: new Date().toISOString() });
+    try { fs.writeFileSync(SUBS_FILE, JSON.stringify(subs, null, 2)); }
+    catch (e) { console.error('subscribers write failed', e.message); }
+  }
+  res.json({ ok: true, code: PROMO.code, percent: PROMO.percent });
 });
 
 // Add the optional physical-key line item + shipping details. The key works on
@@ -98,6 +115,15 @@ app.post('/api/checkout', async (req, res) => {
       if (req.body.key === true) addKey(req.body, metadata, line_items);
     } else {
       return res.status(400).json({ error: 'Type d\'achat invalide.' });
+    }
+
+    // Promo code -10% (newsletter): discount every line item.
+    if (req.body.promo && String(req.body.promo).trim().toUpperCase() === PROMO.code) {
+      metadata.promo = PROMO.code;
+      line_items = line_items.map(function (li) {
+        li.price_data.unit_amount = Math.round(li.price_data.unit_amount * (1 - PROMO.percent / 100));
+        return li;
+      });
     }
 
     // Demo mode (no Stripe key): skip Stripe and go straight to a demo success page.

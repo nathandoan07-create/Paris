@@ -223,6 +223,22 @@
     details[open] summary::after { transform: rotate(45deg); }
     details p { color: var(--muted); padding: 0 0 16px; font-size: 15px; }
 
+    /* Newsletter */
+    .news-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: var(--space-4);
+      box-shadow: var(--shadow); text-align: center; }
+    .news-card h2 { font-size: clamp(1.6rem, 3.5vw, 2.2rem); margin-top: 8px; }
+    .news-card h2 .accent { color: var(--gold-bright); }
+    .news-card > p { color: var(--muted); margin: 12px auto 0; max-width: 52ch; }
+    .news-form { display: flex; gap: 10px; max-width: 480px; margin: var(--space-3) auto 0; flex-wrap: wrap; }
+    .news-form input { flex: 1; min-width: 200px; font: inherit; color: var(--fg); background: rgba(0,0,0,0.28);
+      border: 1px solid var(--border-soft); border-radius: 999px; padding: 13px 20px; min-height: 48px; }
+    .news-form input:focus { outline: none; border-color: var(--gold); }
+    .news-form .btn { min-height: 48px; }
+    .news-msg { margin: 14px 0 0; font-size: 15px; min-height: 1.2em; }
+    .news-msg.ok { color: var(--success); }
+    .news-msg.err { color: var(--danger); }
+    .news-code { font-family: ui-monospace, monospace; letter-spacing: 2px; color: var(--gold-bright); font-weight: 700; }
+
     /* Footer */
     footer.site { border-top: 1px solid var(--border-soft); padding: var(--space-5) 0 var(--space-4); color: var(--muted); }
     .foot-grid { display: flex; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
@@ -344,6 +360,10 @@
           <span class="eyebrow">Choisissez votre point de vue</span>
           <h2>La carte des zones</h2>
           <p>Chaque cercle représente une zone d'accueil autour d'un toit. Sélectionnez-la pour voir les détails, puis réservez. L'adresse précise reste masquée jusqu'au paiement.</p>
+          <p style="color:var(--gold-bright);font-size:0.95rem;margin-top:12px;display:flex;align-items:center;gap:8px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l4 4M15 15l4 4M19 5l-4 4M9 15l-4 4"/></svg>
+            De nouvelles adresses sont ajoutées régulièrement.
+          </p>
         </div>
         <div class="explorer">
           <div id="map" role="application" aria-label="Carte des zones de toits autour de la Tour Eiffel"></div>
@@ -378,6 +398,21 @@
       </div>
     </section>
 
+    <!-- NEWSLETTER -->
+    <section id="newsletter">
+      <div class="container">
+        <div class="news-card">
+          <span class="eyebrow" style="justify-content:center; display:inline-flex;">Newsletter</span>
+          <h2><span class="accent">−10%</span> sur votre premier achat</h2>
+          <p>Inscrivez-vous : nouvelles adresses en avant-première et offres exclusives, directement par e-mail.</p>
+          <form id="newsForm" class="news-form" novalidate>
+            <input id="newsEmail" type="email" placeholder="vous@email.com" autocomplete="email" aria-label="Votre e-mail" required />
+            <button class="btn btn-primary" type="submit">S'inscrire</button>
+          </form>
+          <p id="newsMsg" class="news-msg" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="site">
@@ -460,6 +495,33 @@
       ZONES.filter(function (z) { return z.status !== 'pending'; }).length;
     document.getElementById('year').textContent = new Date().getFullYear();
 
+    // Newsletter signup (returns the -10% code)
+    (function () {
+      var form = document.getElementById('newsForm');
+      if (!form) return;
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var email = document.getElementById('newsEmail').value.trim();
+        var msg = document.getElementById('newsMsg');
+        var btn = form.querySelector('button');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { msg.className = 'news-msg err'; msg.textContent = 'E-mail invalide.'; return; }
+        btn.disabled = true;
+        fetch('/api/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email }) })
+          .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+          .then(function (res) {
+            btn.disabled = false;
+            if (res.ok && res.d.ok) {
+              msg.className = 'news-msg ok';
+              msg.innerHTML = 'Merci ! Votre code : <span class="news-code">' + res.d.code + '</span> (−' + res.d.percent + '% sur votre 1er achat).';
+              form.reset();
+            } else {
+              msg.className = 'news-msg err'; msg.textContent = (res.d && res.d.error) || 'Inscription impossible.';
+            }
+          })
+          .catch(function () { btn.disabled = false; msg.className = 'news-msg err'; msg.textContent = 'Serveur injoignable.'; });
+      });
+    })();
+
     // --- Map (resilient: zone cards + checkout still work if Leaflet/tiles fail to load) ---
     var map = null, circles = {};
     try {
@@ -499,7 +561,7 @@
         color: unavail ? '#6B7488' : '#C9A24B',
         weight: 2, fillColor: unavail ? '#6B7488' : '#E7C878', fillOpacity: 0.18
       }).addTo(map);
-      c.bindPopup('<b>' + z.name + '</b><br>' + (z.status === 'pending' ? 'Bientôt disponible' : (z.left <= 0 ? 'Complet' : euro(z.price) + ' · ' + z.left + ' places')));
+      c.bindPopup('<b>' + z.name + '</b><br>' + (z.status === 'pending' ? 'Bientôt disponible' : (z.left <= 0 ? 'Complet' : euro(z.price))));
       c.on('click', function () { selectZone(z.id, true); });
       circles[z.id] = c;
     });
@@ -599,6 +661,24 @@
     var PAY_ERR = '<div id="payErr" class="field invalid" style="margin-top:12px; display:none"><div class="err" style="display:block"></div></div>';
 
     var KEY_PRICE = 15; // acheter la clé (envoi postal) — nécessite nom / téléphone / adresse
+    var PROMO = { code: 'BIENVENUE10', percent: 10 };
+    function promoOk(v) { return !!v && v.trim().toUpperCase() === PROMO.code; }
+    function promoFieldHtml() {
+      return '<div class="field" style="margin-top:14px"><label for="promo">Code promo (optionnel)</label>'
+        + '<input id="promo" type="text" placeholder="' + PROMO.code + '" autocapitalize="characters" /></div>';
+    }
+    function promoRowHtml() {
+      return '<div class="summary-row" id="rowPromo" style="display:none;color:var(--success)"><span>Code promo −' + PROMO.percent + '%</span><span id="promoAmt"></span></div>';
+    }
+    function applyTotal(sub) {
+      var promo = promoOk(document.getElementById('promo').value);
+      var total = promo ? Math.round(sub * (1 - PROMO.percent / 100) * 100) / 100 : sub;
+      var rp = document.getElementById('rowPromo');
+      rp.style.display = promo ? '' : 'none';
+      if (promo) document.getElementById('promoAmt').textContent = '−' + euro(Math.round((sub - total) * 100) / 100);
+      document.getElementById('totalLine').textContent = euro(total);
+      document.getElementById('payAmt').textContent = euro(total);
+    }
     function renderCheckout(z) {
       modalTitle.textContent = z.name;
       var isKey = z.access.method === 'Clé';
@@ -607,6 +687,7 @@
         + row('Toit', z.name)
         + row('Accès', euro(z.price))
         + (isKey ? '<div class="summary-row" id="rowKey" style="display:none"><span>Clé (envoi)</span><span>' + euro(KEY_PRICE) + '</span></div>' : '')
+        + promoRowHtml()
         + '<div class="summary-row total"><span>Total</span><b id="totalLine">' + euro(z.price) + '</b></div>'
         + '</div>'
         + (isKey ? '<label style="display:flex;align-items:flex-start;gap:10px;margin-top:16px;cursor:pointer;font-size:15px">'
@@ -616,20 +697,21 @@
             + field('keyPhone', 'Téléphone', 'tel', '06 12 34 56 78', true)
             + field('keyAddress', 'Adresse postale (envoi de la clé)', 'text', '12 rue…, 75000 Paris', true)
             + '</div>' : '')
+        + promoFieldHtml()
         + '<button id="payBtn" class="btn btn-primary btn-block" style="margin-top:20px">Payer <span id="payAmt">' + euro(z.price) + '</span></button>'
         + PAY_ERR
         + '<div class="pay-note">' + LOCK_SVG + ' Paiement sécurisé Stripe · adresse & accès révélés après paiement</div>';
 
-      if (isKey) {
-        document.getElementById('buyKey').addEventListener('change', function () {
-          var key = document.getElementById('buyKey').checked;
+      function recompute() {
+        var key = isKey && document.getElementById('buyKey').checked;
+        if (isKey) {
           document.getElementById('rowKey').style.display = key ? '' : 'none';
           document.getElementById('keyFields').style.display = key ? '' : 'none';
-          var t = z.price + (key ? KEY_PRICE : 0);
-          document.getElementById('totalLine').textContent = euro(t);
-          document.getElementById('payAmt').textContent = euro(t);
-        });
+        }
+        applyTotal(z.price + (key ? KEY_PRICE : 0));
       }
+      if (isKey) document.getElementById('buyKey').addEventListener('change', recompute);
+      document.getElementById('promo').addEventListener('input', recompute);
       document.getElementById('payBtn').addEventListener('click', function () {
         var key = isKey && document.getElementById('buyKey').checked;
         var ship = null;
@@ -641,7 +723,7 @@
             address: document.getElementById('keyAddress').value
           };
         }
-        startCheckout({ type: 'zone', zoneId: z.id, qty: 1, key: key, ship: ship }, this);
+        startCheckout({ type: 'zone', zoneId: z.id, qty: 1, key: key, ship: ship, promo: document.getElementById('promo').value }, this);
       });
     }
 
@@ -709,6 +791,7 @@
         + row('Formule', PASS.label)
         + row('Toits inclus', String(ZONES.filter(function (z) { return z.status !== 'pending'; }).length))
         + '<div class="summary-row" id="rowKey" style="display:none"><span>Clé (envoi)</span><span>' + euro(KEY_PRICE) + '</span></div>'
+        + promoRowHtml()
         + '<div class="summary-row total"><span>Total</span><b id="totalLine">' + euro(PASS.price) + '</b></div></div>'
         + '<label style="display:flex;align-items:flex-start;gap:10px;margin-top:16px;cursor:pointer;font-size:15px">'
         + '<input type="checkbox" id="buyKey" style="width:18px;height:18px;margin-top:2px;accent-color:var(--gold)"> Acheter la clé et me la faire envoyer (+' + euro(KEY_PRICE) + ') — fonctionne sur toutes les adresses</label>'
@@ -717,18 +800,19 @@
         + field('keyPhone', 'Téléphone', 'tel', '06 12 34 56 78', true)
         + field('keyAddress', 'Adresse postale (envoi de la clé)', 'text', '12 rue…, 75000 Paris', true)
         + '</div>'
+        + promoFieldHtml()
         + '<button id="payBtn" class="btn btn-primary btn-block" style="margin-top:20px">Payer <span id="payAmt">' + euro(PASS.price) + '</span></button>'
         + PAY_ERR
         + '<div class="pay-note">' + LOCK_SVG + ' Paiement sécurisé Stripe · toutes les adresses après paiement</div>';
 
-      document.getElementById('buyKey').addEventListener('change', function () {
+      function recompute() {
         var key = document.getElementById('buyKey').checked;
         document.getElementById('rowKey').style.display = key ? '' : 'none';
         document.getElementById('keyFields').style.display = key ? '' : 'none';
-        var t = PASS.price + (key ? KEY_PRICE : 0);
-        document.getElementById('totalLine').textContent = euro(t);
-        document.getElementById('payAmt').textContent = euro(t);
-      });
+        applyTotal(PASS.price + (key ? KEY_PRICE : 0));
+      }
+      document.getElementById('buyKey').addEventListener('change', recompute);
+      document.getElementById('promo').addEventListener('input', recompute);
       document.getElementById('payBtn').addEventListener('click', function () {
         var key = document.getElementById('buyKey').checked;
         var ship = null;
@@ -736,7 +820,7 @@
           if (!validate(['keyName', 'keyPhone', 'keyAddress'])) return;
           ship = { name: document.getElementById('keyName').value, phone: document.getElementById('keyPhone').value, address: document.getElementById('keyAddress').value };
         }
-        startCheckout({ type: 'pass', key: key, ship: ship }, this);
+        startCheckout({ type: 'pass', key: key, ship: ship, promo: document.getElementById('promo').value }, this);
       });
     }
 
