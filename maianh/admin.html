@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Tableau de bord — Mai Anh Nails</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cream:#FBF6F0; --card:#fff; --ink:#2B2320; --ink-soft:#4A403A; --muted:#8D8079;
+      --line:rgba(43,35,32,0.10); --line-soft:rgba(43,35,32,0.06); --blush:#E8C4C4;
+      --rose:#C6797F; --rose-deep:#A85D63; --plum:#6E3E4A; --gold:#C4A46A;
+      --ok:#3B8C6E; --ok-bg:#E7F1EC; --err:#C0483F; --err-bg:#F7E7E5; --warn:#B9822A; --warn-bg:#F6EDDD;
+      --radius:16px; --shadow:0 10px 34px rgba(110,62,74,0.12); --shadow-sm:0 4px 14px rgba(110,62,74,0.09);
+    }
+    *{box-sizing:border-box;}
+    body{margin:0;background:var(--cream);color:var(--ink);font-family:'Inter',system-ui,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;}
+    h1,h2,h3,.serif{font-family:'Cormorant Garamond',Georgia,serif;}
+    a{color:var(--rose-deep);text-decoration:none;}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 20px;}
+    button{font-family:inherit;cursor:pointer;}
+    .btn{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:500;padding:9px 16px;border-radius:999px;border:1px solid transparent;transition:.15s;}
+    .btn-primary{background:var(--rose-deep);color:#fff;} .btn-primary:hover{background:var(--plum);}
+    .btn-ghost{background:#fff;color:var(--ink);border-color:var(--line);} .btn-ghost:hover{border-color:var(--rose);color:var(--rose-deep);}
+    .btn-danger{background:var(--err-bg);color:var(--err);border-color:transparent;} .btn-danger:hover{background:#F1D9D6;}
+    .btn-sm{padding:6px 12px;font-size:13px;}
+    .btn[disabled]{opacity:.5;cursor:not-allowed;}
+
+    header.top{background:#fff;border-bottom:1px solid var(--line-soft);position:sticky;top:0;z-index:20;}
+    .top-in{display:flex;align-items:center;justify-content:space-between;height:62px;}
+    .brand{display:flex;align-items:baseline;gap:9px;}
+    .brand .logo{font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:700;}
+    .brand .dot{color:var(--rose);}
+    .brand .tag{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+    .top-actions{display:flex;align-items:center;gap:10px;}
+
+    /* Login */
+    .login-wrap{min-height:calc(100vh - 62px);display:flex;align-items:center;justify-content:center;padding:24px;}
+    .login{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:34px 30px;max-width:380px;width:100%;text-align:center;}
+    .login h2{font-size:28px;margin:0 0 6px;}
+    .login p{color:var(--muted);margin:0 0 20px;font-size:14px;}
+    .login input{width:100%;font-family:inherit;font-size:15px;padding:12px 14px;border:1px solid var(--line);border-radius:11px;margin-bottom:12px;}
+    .login input:focus{outline:none;border-color:var(--rose);box-shadow:0 0 0 3px rgba(198,121,127,.15);}
+    .login .btn{width:100%;justify-content:center;}
+    .msg{font-size:13.5px;margin-top:10px;min-height:18px;} .msg.err{color:var(--err);}
+
+    /* Dashboard */
+    main{padding:26px 0 60px;}
+    .page-head{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:20px;}
+    .page-head h1{font-size:34px;margin:0;}
+    .page-head .sub{color:var(--muted);font-size:14px;}
+
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+    .kpi{background:#fff;border:1px solid var(--line-soft);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow-sm);}
+    .kpi .l{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+    .kpi .v{font-family:'Cormorant Garamond',serif;font-size:38px;line-height:1.1;color:var(--plum);font-variant-numeric:tabular-nums;}
+    .kpi .v small{font-size:18px;color:var(--muted);}
+
+    .toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;}
+    .tab{border:1px solid var(--line);background:#fff;color:var(--ink-soft);padding:7px 14px;border-radius:999px;font-size:13.5px;}
+    .tab:hover{border-color:var(--rose);} .tab.active{background:var(--plum);color:#fff;border-color:var(--plum);}
+    .toolbar .right{display:flex;gap:10px;align-items:center;}
+    .toolbar input[type=date]{font-family:inherit;font-size:14px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;}
+
+    .day-group{margin-bottom:22px;}
+    .day-head{display:flex;align-items:baseline;gap:12px;margin:0 0 10px;padding-bottom:8px;border-bottom:1px solid var(--line-soft);}
+    .day-head .d{font-family:'Cormorant Garamond',serif;font-size:22px;text-transform:capitalize;}
+    .day-head .n{font-size:13px;color:var(--muted);}
+    .day-head .rev{margin-left:auto;font-size:13px;color:var(--plum);font-weight:600;}
+
+    .table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--line-soft);border-radius:var(--radius);overflow:hidden;}
+    .table th{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);text-align:left;padding:11px 14px;background:#FBF1EC;border-bottom:1px solid var(--line-soft);font-weight:600;}
+    .table td{padding:12px 14px;border-bottom:1px solid var(--line-soft);font-size:14px;vertical-align:middle;}
+    .table tr:last-child td{border-bottom:none;}
+    .table tr.cancelled td{opacity:.5;}
+    .table tr.cancelled .svc-name{text-decoration:line-through;}
+    .time{font-weight:600;color:var(--plum);font-variant-numeric:tabular-nums;white-space:nowrap;}
+    .time small{display:block;color:var(--muted);font-weight:400;font-size:12px;}
+    .who b{font-weight:600;} .who small{display:block;color:var(--muted);font-size:12.5px;}
+    .price{font-variant-numeric:tabular-nums;font-weight:600;}
+    .chip{display:inline-block;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:999px;}
+    .chip.ok{background:var(--ok-bg);color:var(--ok);}
+    .chip.cancel{background:var(--err-bg);color:var(--err);}
+    .chip.manual{background:var(--warn-bg);color:var(--warn);}
+    .chip.online{background:#EDE7F0;color:var(--plum);}
+    .empty{text-align:center;color:var(--muted);padding:40px 0;background:#fff;border:1px dashed var(--line);border-radius:var(--radius);}
+
+    .table-scroll{overflow-x:auto;}
+
+    /* Modal */
+    .modal-bg{position:fixed;inset:0;background:rgba(43,35,32,.5);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:22px;z-index:40;}
+    .modal-bg.open{display:flex;}
+    .modal{background:#fff;border-radius:20px;box-shadow:var(--shadow);max-width:460px;width:100%;padding:28px;max-height:90vh;overflow-y:auto;}
+    .modal h3{font-size:26px;margin:0 0 16px;}
+    .field{margin-bottom:14px;} .field label{display:block;font-size:13px;font-weight:500;margin-bottom:5px;}
+    .field input,.field select,.field textarea{width:100%;font-family:inherit;font-size:14.5px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;}
+    .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--rose);box-shadow:0 0 0 3px rgba(198,121,127,.15);}
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .modal-slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:7px;max-height:150px;overflow-y:auto;margin-top:6px;}
+    .mslot{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 4px;font-size:13px;text-align:center;}
+    .mslot.sel{background:var(--plum);color:#fff;border-color:var(--plum);} .mslot:hover{border-color:var(--rose);}
+    .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;}
+
+    @media(max-width:820px){ .kpis{grid-template-columns:1fr 1fr;} }
+    @media(max-width:520px){ .field-row{grid-template-columns:1fr;} .page-head h1{font-size:28px;} }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top-in">
+      <div class="brand"><span class="logo">Mai Anh<span class="dot">.</span></span><span class="tag">Tableau de bord</span></div>
+      <div class="top-actions" id="topActions" style="display:none">
+        <a class="btn btn-ghost btn-sm" href="/" target="_blank">Voir le site ↗</a>
+        <button class="btn btn-ghost btn-sm" id="logoutBtn">Déconnexion</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Login -->
+  <div class="login-wrap" id="loginView">
+    <form class="login" id="loginForm">
+      <h2>Espace salon</h2>
+      <p>Entrez le mot de passe pour accéder à vos réservations.</p>
+      <input type="password" id="pwd" placeholder="Mot de passe" autocomplete="current-password" />
+      <button class="btn btn-primary" type="submit">Se connecter</button>
+      <div class="msg" id="loginMsg"></div>
+    </form>
+  </div>
+
+  <!-- Dashboard -->
+  <main id="dashView" style="display:none">
+    <div class="wrap">
+      <div class="page-head">
+        <div>
+          <h1>Vos rendez-vous</h1>
+          <div class="sub" id="lastUpdate"></div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-ghost btn-sm" id="refreshBtn">↻ Actualiser</button>
+          <button class="btn btn-primary btn-sm" id="addBtn">+ Ajouter un RDV</button>
+        </div>
+      </div>
+
+      <div class="kpis" id="kpis"></div>
+
+      <div class="toolbar">
+        <div class="tabs" id="tabs">
+          <button class="tab active" data-f="today">Aujourd’hui</button>
+          <button class="tab" data-f="week">7 jours</button>
+          <button class="tab" data-f="upcoming">À venir</button>
+          <button class="tab" data-f="all">Tout</button>
+        </div>
+        <div class="right">
+          <input type="date" id="dateFilter" />
+          <button class="btn btn-ghost btn-sm" id="clearDate" style="display:none">✕</button>
+        </div>
+      </div>
+
+      <div id="list"></div>
+    </div>
+  </main>
+
+  <!-- Add booking modal -->
+  <div class="modal-bg" id="modalBg">
+    <div class="modal">
+      <h3>Ajouter un rendez-vous</h3>
+      <div class="field">
+        <label for="mService">Prestation</label>
+        <select id="mService"></select>
+      </div>
+      <div class="field-row">
+        <div class="field"><label for="mDate">Date</label><input type="date" id="mDate" /></div>
+        <div class="field"><label>Créneau</label><div class="modal-slots" id="mSlots"><span style="color:var(--muted);font-size:13px">Choisissez une date.</span></div></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label for="mName">Cliente</label><input type="text" id="mName" placeholder="Nom (ou « RDV téléphone »)" /></div>
+        <div class="field"><label for="mPhone">Téléphone</label><input type="tel" id="mPhone" placeholder="06 …" /></div>
+      </div>
+      <div class="field"><label for="mNote">Note (facultatif)</label><textarea id="mNote" rows="2"></textarea></div>
+      <div class="msg err" id="modalMsg"></div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="modalCancel">Annuler</button>
+        <button class="btn btn-primary" id="modalSave">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    var $=function(s,r){return (r||document).querySelector(s);};
+    var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+    var TOKEN=sessionStorage.getItem('maiadmin')||'';
+    var CFG=null, DATA=[], TODAY='', FILTER='today', DATEF='';
+    var mState={serviceId:null,start:null};
+
+    // ---------- Auth ----------
+    function showLogin(){ $('#loginView').style.display='flex'; $('#dashView').style.display='none'; $('#topActions').style.display='none'; }
+    function showDash(){ $('#loginView').style.display='none'; $('#dashView').style.display='block'; $('#topActions').style.display='flex'; }
+
+    $('#loginForm').onsubmit=function(e){
+      e.preventDefault();
+      var pwd=$('#pwd').value, msg=$('#loginMsg'); msg.textContent='';
+      fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:pwd})})
+        .then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j};});})
+        .then(function(res){ if(!res.ok) throw new Error(res.j.error||'Erreur.'); TOKEN=pwd; sessionStorage.setItem('maiadmin',pwd); showDash(); boot(); })
+        .catch(function(e){ msg.className='msg err'; msg.textContent=e.message; });
+    };
+    $('#logoutBtn').onclick=function(){ sessionStorage.removeItem('maiadmin'); TOKEN=''; showLogin(); };
+
+    function api(path,opts){
+      opts=opts||{}; opts.headers=Object.assign({'x-admin-token':TOKEN},opts.headers||{});
+      return fetch(path,opts).then(function(r){
+        if(r.status===401){ sessionStorage.removeItem('maiadmin'); showLogin(); throw new Error('Session expirée.'); }
+        return r.json().then(function(j){ if(!r.ok) throw new Error(j.error||'Erreur.'); return j; });
+      });
+    }
+
+    // ---------- Boot ----------
+    function boot(){
+      Promise.all([ fetch('/api/config').then(function(r){return r.json();}), api('/api/admin/bookings') ])
+        .then(function(res){ CFG=res[0]; DATA=res[1].bookings; TODAY=res[1].today; buildServiceSelect(); render(); $('#lastUpdate').textContent='Mis à jour à '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); })
+        .catch(function(e){ console.error(e); });
+    }
+    function reload(){ api('/api/admin/bookings').then(function(r){ DATA=r.bookings; TODAY=r.today; render(); $('#lastUpdate').textContent='Mis à jour à '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); }); }
+    $('#refreshBtn').onclick=reload;
+
+    // ---------- Helpers ----------
+    function eur(n){return n+' €';}
+    function dur(m){ if(m>=60){var h=Math.floor(m/60),r=m%60;return h+'h'+(r?String(r).padStart(2,'0'):'');} return m+' min'; }
+    function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+    function addDays(d,n){var x=new Date(d+'T00:00:00Z');x.setUTCDate(x.getUTCDate()+n);return x.toISOString().slice(0,10);}
+    function fmtDay(d){var dt=new Date(d+'T00:00:00Z');return dt.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',timeZone:'UTC'});}
+
+    // ---------- Filtering ----------
+    function activeList(){ return DATA.filter(function(b){return b.status!=='cancelled';}); }
+    function filtered(){
+      var arr=DATA.slice();
+      if(DATEF){ return arr.filter(function(b){return b.date===DATEF;}); }
+      if(FILTER==='today') return arr.filter(function(b){return b.date===TODAY;});
+      if(FILTER==='week'){ var end=addDays(TODAY,7); return arr.filter(function(b){return b.date>=TODAY&&b.date<=end;}); }
+      if(FILTER==='upcoming') return arr.filter(function(b){return b.date>=TODAY;});
+      return arr;
+    }
+
+    // ---------- KPIs ----------
+    function renderKpis(){
+      var conf=activeList();
+      var todayN=conf.filter(function(b){return b.date===TODAY;}).length;
+      var end=addDays(TODAY,7);
+      var weekN=conf.filter(function(b){return b.date>=TODAY&&b.date<=end;}).length;
+      var upcoming=conf.filter(function(b){return b.date>=TODAY;});
+      var revenue=upcoming.reduce(function(s,b){return s+b.price;},0);
+      var tiles=[
+        {l:'RDV aujourd’hui',v:todayN},
+        {l:'RDV sur 7 jours',v:weekN},
+        {l:'RDV à venir',v:upcoming.length},
+        {l:'Chiffre à venir',v:revenue+' <small>€</small>'}
+      ];
+      $('#kpis').innerHTML=tiles.map(function(t){return '<div class="kpi"><div class="l">'+t.l+'</div><div class="v">'+t.v+'</div></div>';}).join('');
+    }
+
+    // ---------- List ----------
+    function render(){
+      renderKpis();
+      var rows=filtered();
+      var list=$('#list');
+      if(!rows.length){ list.innerHTML='<div class="empty">Aucun rendez-vous pour cette sélection.</div>'; return; }
+      // group by date
+      var groups={}; rows.forEach(function(b){ (groups[b.date]=groups[b.date]||[]).push(b); });
+      var dates=Object.keys(groups).sort();
+      list.innerHTML=dates.map(function(d){
+        var items=groups[d];
+        var rev=items.filter(function(b){return b.status!=='cancelled';}).reduce(function(s,b){return s+b.price;},0);
+        var nb=items.filter(function(b){return b.status!=='cancelled';}).length;
+        var trs=items.map(rowHtml).join('');
+        return '<div class="day-group"><div class="day-head"><span class="d">'+fmtDay(d)+'</span>'+
+          '<span class="n">'+nb+' RDV</span><span class="rev">'+eur(rev)+'</span></div>'+
+          '<div class="table-scroll"><table class="table"><thead><tr>'+
+          '<th>Heure</th><th>Prestation</th><th>Cliente</th><th>Téléphone</th><th>Prix</th><th>Source</th><th>Statut</th><th></th>'+
+          '</tr></thead><tbody>'+trs+'</tbody></table></div></div>';
+      }).join('');
+      $$('[data-cancel]').forEach(function(b){ b.onclick=function(){ cancelBooking(b.dataset.cancel); }; });
+    }
+    function rowHtml(b){
+      var cancelled=b.status==='cancelled';
+      var srcChip=b.source==='manuel'?'<span class="chip manual">manuel</span>':'<span class="chip online">en ligne</span>';
+      var statChip=cancelled?'<span class="chip cancel">annulé</span>':'<span class="chip ok">confirmé</span>';
+      var tel=b.phone?'<a href="tel:'+esc(b.phone).replace(/\s/g,'')+'">'+esc(b.phone)+'</a>':'<span style="color:var(--muted)">—</span>';
+      var email=b.email?'<small>'+esc(b.email)+'</small>':'';
+      var note=b.note?'<small title="'+esc(b.note)+'">📝 '+esc(b.note.length>40?b.note.slice(0,40)+'…':b.note)+'</small>':'';
+      var action=cancelled?'':'<button class="btn btn-danger btn-sm" data-cancel="'+b.id+'">Annuler</button>';
+      return '<tr class="'+(cancelled?'cancelled':'')+'">'+
+        '<td class="time">'+esc(b.startLabel)+'<small>→ '+esc(b.endLabel)+'</small></td>'+
+        '<td><span class="svc-name">'+esc(b.serviceName)+'</span><small style="display:block;color:var(--muted)">'+dur(b.duration)+'</small>'+note+'</td>'+
+        '<td class="who"><b>'+esc(b.name)+'</b>'+email+'</td>'+
+        '<td>'+tel+'</td>'+
+        '<td class="price">'+eur(b.price)+'</td>'+
+        '<td>'+srcChip+'</td>'+
+        '<td>'+statChip+'</td>'+
+        '<td style="text-align:right">'+action+'</td></tr>';
+    }
+    function cancelBooking(id){
+      if(!confirm('Annuler ce rendez-vous ? Le créneau sera de nouveau disponible.')) return;
+      api('/api/admin/cancel',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})})
+        .then(reload).catch(function(e){ alert(e.message); });
+    }
+
+    // ---------- Tabs / date filter ----------
+    $$('#tabs .tab').forEach(function(t){ t.onclick=function(){ $$('#tabs .tab').forEach(function(x){x.classList.remove('active');}); t.classList.add('active'); FILTER=t.dataset.f; DATEF=''; $('#dateFilter').value=''; $('#clearDate').style.display='none'; render(); }; });
+    $('#dateFilter').onchange=function(){ DATEF=this.value; $('#clearDate').style.display=DATEF?'inline-flex':'none'; $$('#tabs .tab').forEach(function(x){x.classList.remove('active');}); render(); };
+    $('#clearDate').onclick=function(){ DATEF=''; $('#dateFilter').value=''; this.style.display='none'; $$('#tabs .tab')[0].classList.add('active'); FILTER='today'; render(); };
+
+    // ---------- Add booking modal ----------
+    function buildServiceSelect(){
+      var sel=$('#mService'); sel.innerHTML='';
+      CFG.categories.forEach(function(c){
+        var og=document.createElement('optgroup'); og.label=c.title;
+        c.services.forEach(function(s){ var o=document.createElement('option'); o.value=s.id; o.textContent=s.name+' — '+s.price+'€ ('+dur(s.duration)+')'; og.appendChild(o); });
+        sel.appendChild(og);
+      });
+      mState.serviceId=sel.value;
+    }
+    $('#addBtn').onclick=function(){ $('#modalBg').classList.add('open'); $('#modalMsg').textContent=''; };
+    $('#modalCancel').onclick=function(){ $('#modalBg').classList.remove('open'); };
+    $('#modalBg').onclick=function(e){ if(e.target===$('#modalBg')) $('#modalBg').classList.remove('open'); };
+    $('#mService').onchange=function(){ mState.serviceId=this.value; mState.start=null; loadModalSlots(); };
+    $('#mDate').onchange=function(){ mState.start=null; loadModalSlots(); };
+    function loadModalSlots(){
+      var box=$('#mSlots'); var date=$('#mDate').value; var sid=mState.serviceId;
+      if(!date||!sid){ box.innerHTML='<span style="color:var(--muted);font-size:13px">Choisissez une date.</span>'; return; }
+      box.innerHTML='<span style="color:var(--muted);font-size:13px">…</span>';
+      fetch('/api/availability?date='+date+'&serviceId='+encodeURIComponent(sid)).then(function(r){return r.json();}).then(function(d){
+        if(!d.slots||!d.slots.length){ box.innerHTML='<span style="color:var(--muted);font-size:13px">Aucun créneau libre.</span>'; return; }
+        box.innerHTML='';
+        d.slots.forEach(function(t){ var b=document.createElement('button'); b.className='mslot'; b.type='button'; b.textContent=t;
+          b.onclick=function(){ mState.start=parseInt(t.slice(0,2),10)*60+parseInt(t.slice(3),10); $$('.mslot',box).forEach(function(x){x.classList.remove('sel');}); b.classList.add('sel'); };
+          box.appendChild(b); });
+      });
+    }
+    $('#modalSave').onclick=function(){
+      var msg=$('#modalMsg'); msg.textContent='';
+      var date=$('#mDate').value;
+      if(!mState.serviceId||!date||mState.start==null){ msg.textContent='Choisissez une prestation, une date et un créneau.'; return; }
+      var btn=this; btn.disabled=true;
+      api('/api/admin/booking',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        serviceId:mState.serviceId, date:date, start:mState.start,
+        name:$('#mName').value.trim(), phone:$('#mPhone').value.trim(), note:$('#mNote').value.trim()
+      })}).then(function(){ btn.disabled=false; $('#modalBg').classList.remove('open');
+        $('#mName').value=''; $('#mPhone').value=''; $('#mNote').value=''; mState.start=null; $('#mSlots').innerHTML=''; reload();
+      }).catch(function(e){ btn.disabled=false; msg.textContent=e.message; });
+    };
+
+    // ---------- Start ----------
+    if(TOKEN){ showDash(); boot(); } else { showLogin(); }
+  })();
+  </script>
+</body>
+</html>
