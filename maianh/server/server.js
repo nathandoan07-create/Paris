@@ -242,6 +242,83 @@ app.get('/api/booking', async (req, res) => {
   }
 });
 
+// ---------- Espace admin (tableau de bord) ----------
+// Protégé par un mot de passe (ADMIN_TOKEN). En mode démo sans token, un mot de
+// passe par défaut « demo » est accepté pour pouvoir tester le dashboard.
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN || (DEMO ? 'demo' : '');
+
+function adminToken(req) {
+  return req.headers['x-admin-token'] || (req.body && req.body.token) || req.query.token || '';
+}
+function requireAdmin(req, res) {
+  if (!ADMIN_TOKEN) { res.status(503).json({ error: 'Espace admin désactivé : définissez ADMIN_TOKEN.' }); return false; }
+  if (String(adminToken(req)) !== ADMIN_TOKEN) { res.status(401).json({ error: 'Accès refusé.' }); return false; }
+  return true;
+}
+function adminView(b) {
+  return {
+    id: b.id, serviceName: b.serviceName, price: b.price, duration: b.duration,
+    date: b.date, start: b.start, startLabel: b.startLabel, endLabel: toHHMM(b.end),
+    name: b.name, phone: b.phone, email: b.email, note: b.note || '',
+    status: b.status, source: b.source || 'en ligne', createdAt: b.createdAt,
+  };
+}
+
+app.post('/api/admin/login', (req, res) => {
+  if (!ADMIN_TOKEN) return res.status(503).json({ error: 'Espace admin désactivé : définissez ADMIN_TOKEN.' });
+  if (String(adminToken(req)) !== ADMIN_TOKEN) return res.status(401).json({ error: 'Mot de passe incorrect.' });
+  res.json({ ok: true });
+});
+
+app.get('/api/admin/bookings', (req, res) => {
+  if (!requireAdmin(req, res)) return;
+  const now = Date.now();
+  const out = readBookings()
+    .filter((b) => b.status === 'confirmed' || b.status === 'cancelled' || (b.status === 'hold' && b.holdExpires > now))
+    .map(adminView)
+    .sort((a, b) => (a.date + a.startLabel).localeCompare(b.date + b.startLabel));
+  res.json({ bookings: out, capacity: SALON.capacity, today: parisNow().date });
+});
+
+// Annuler un RDV (libère le créneau).
+app.post('/api/admin/cancel', (req, res) => {
+  if (!requireAdmin(req, res)) return;
+  const list = readBookings();
+  const b = list.find((x) => x.id === String(req.body.id));
+  if (!b) return res.status(404).json({ error: 'Réservation introuvable.' });
+  b.status = 'cancelled';
+  writeBookings(list);
+  res.json({ ok: true });
+});
+
+// Ajouter un RDV manuel (ex. pris par téléphone) — sans paiement.
+app.post('/api/admin/booking', (req, res) => {
+  if (!requireAdmin(req, res)) return;
+  const body = req.body || {};
+  const service = findService(String(body.serviceId || ''));
+  if (!service) return res.status(404).json({ error: 'Prestation introuvable.' });
+  const date = String(body.date || '');
+  if (!isValidDate(date)) return res.status(400).json({ error: 'Date invalide.' });
+  const start = parseInt(body.start, 10);
+  if (!Number.isInteger(start)) return res.status(400).json({ error: 'Créneau invalide.' });
+  if (!availableSlots(date, service).includes(toHHMM(start))) {
+    return res.status(409).json({ error: 'Ce créneau n’est pas disponible.' });
+  }
+  const id = crypto.randomBytes(9).toString('hex');
+  const booking = {
+    id, serviceId: service.id, serviceName: service.name, price: service.price,
+    duration: service.duration, date, start, end: start + service.duration, startLabel: toHHMM(start),
+    name: String(body.name || '').trim().slice(0, 120) || 'RDV téléphone',
+    phone: String(body.phone || '').trim().slice(0, 40),
+    email: String(body.email || '').trim().slice(0, 160),
+    note: String(body.note || '').trim().slice(0, 500),
+    status: 'confirmed', source: 'manuel', holdExpires: 0, sessionId: null,
+    createdAt: new Date().toISOString(),
+  };
+  const list = readBookings(); list.push(booking); writeBookings(list);
+  res.json({ ok: true, id });
+});
+
 // ---------- Site statique ----------
 app.use(express.static(path.join(__dirname, '..'), { extensions: ['html'] }));
 

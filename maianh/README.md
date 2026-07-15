@@ -22,10 +22,25 @@ Planity — donc **sans commission**.
 
 - `index.html` — le site (présentation + tunnel de RDV).
 - `success.html` — page de confirmation après paiement ; appelle `/api/booking`.
+- `admin.html` — **tableau de bord privé** (`/admin`) : voir/annuler les RDV, ajouter un RDV manuel.
 - `server/`
   - `salon.js` — **source unique** des données : infos salon, horaires, prestations, prix, durées.
-  - `server.js` — sert le site + API (catalogue, disponibilités, Stripe, confirmation).
+  - `server.js` — sert le site + API (catalogue, disponibilités, Stripe, confirmation, admin).
   - `bookings.json` — réservations (créé automatiquement ; ignoré par git).
+
+## Tableau de bord (espace salon)
+
+Accessible sur **`/admin`**. Protégé par un mot de passe (`ADMIN_TOKEN`).
+
+- **Indicateurs** : RDV du jour, sur 7 jours, à venir, chiffre à venir.
+- **Liste par jour** : heure, prestation, cliente, téléphone (cliquable), prix, source
+  (en ligne / manuel), statut. Filtres : aujourd'hui / 7 jours / à venir / tout / par date.
+- **Annuler** un RDV (le créneau redevient disponible).
+- **Ajouter un RDV manuel** (ex. pris par téléphone), sans paiement.
+
+> En **mode démo** (sans clé Stripe), si `ADMIN_TOKEN` n'est pas défini, le mot de passe
+> **`demo`** est accepté pour tester le dashboard. En production, définissez **impérativement**
+> `ADMIN_TOKEN`.
 
 ## Lancer en local
 
