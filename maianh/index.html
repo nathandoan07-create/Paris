@@ -492,8 +492,12 @@
           <table class="hours-table" id="hoursTable"></table>
           <div style="margin-top:22px"><a href="#rdv" class="btn btn-primary">Prendre RDV</a></div>
         </div>
-        <div>
+        <div style="display:flex;flex-direction:column;gap:12px">
           <iframe class="map-embed" id="mapEmbed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Plan Mai Anh Nails"></iframe>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <a class="btn btn-primary btn-sm" id="dirBtn" target="_blank" rel="noopener">🧭 Itinéraire</a>
+            <a class="btn btn-ghost btn-sm" id="placeBtn" target="_blank" rel="noopener">Voir sur Google (avis)</a>
+          </div>
         </div>
       </div>
     </div>
@@ -570,7 +574,11 @@
         var ig = 'https://instagram.com/' + s.instagram;
         $('#instaBtn').href = ig; $('#footInsta').href = ig; $('#footInsta').textContent = '@' + s.instagram;
       }
-      $('#mapEmbed').src = 'https://maps.google.com/maps?q=' + encodeURIComponent(s.address) + '&z=16&output=embed';
+      // Plan : pin précis aux coordonnées exactes du salon (avec libellé).
+      var q = (s.lat && s.lng) ? (s.lat + ',' + s.lng + '(' + s.name + ')') : s.address;
+      $('#mapEmbed').src = 'https://maps.google.com/maps?q=' + encodeURIComponent(q) + '&z=17&output=embed';
+      if (s.mapsUrl) $('#dirBtn').href = s.mapsUrl;
+      if (s.placeUrl) $('#placeBtn').href = s.placeUrl; else $('#placeBtn').style.display = 'none';
       $('#year').textContent = new Date().getFullYear();
     }
 

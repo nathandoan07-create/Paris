@@ -10,7 +10,13 @@ const SALON = {
   phone: '+33 1 00 00 00 00',        // ← à renseigner (numéro du salon)
   email: 'contact@maianhnailsparis.fr',
   instagram: 'maianhnailsparis',      // handle Instagram (sans @)
-  mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Mai+Anh+Nails+72+Rue+Boursault+75017+Paris',
+  // Coordonnées GPS exactes du salon (depuis la fiche Google Maps).
+  lat: 48.8860545,
+  lng: 2.3181044,
+  // Fiche Google Maps du salon (avec avis) — pour le bouton « Voir sur Google ».
+  placeUrl: 'https://maps.google.com/?cid=11416418311647431405',
+  // Lien « Itinéraire » : ouvre l'itinéraire vers le salon (coordonnées exactes).
+  mapsUrl: 'https://www.google.com/maps/dir/?api=1&destination=48.8860545%2C2.3181044',
   timezone: 'Europe/Paris',
   // Nombre de postes (manucures pouvant travailler en parallèle).
   // Deux clientes peuvent réserver le même créneau tant que capacity n'est pas dépassée.
@@ -104,7 +110,8 @@ function publicCatalogue() {
     salon: {
       name: SALON.name, tagline: SALON.tagline, address: SALON.address,
       addressShort: SALON.addressShort, phone: SALON.phone, email: SALON.email,
-      instagram: SALON.instagram, mapsUrl: SALON.mapsUrl,
+      instagram: SALON.instagram, mapsUrl: SALON.mapsUrl, placeUrl: SALON.placeUrl,
+      lat: SALON.lat, lng: SALON.lng,
     },
     categories: CATEGORIES,
   };
