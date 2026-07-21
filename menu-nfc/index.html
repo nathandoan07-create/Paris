@@ -118,9 +118,10 @@
       background: #0f1218; position: relative;
       display: flex; flex-direction: column;
     }
-    .ps-top { height: 130px; background: linear-gradient(135deg,var(--accent),var(--accent-2)); position:relative; display:flex; align-items:flex-end; padding:16px; }
-    .ps-top .nfc-badge { position:absolute; top:16px; right:16px; font-size:.65rem; background:rgba(0,0,0,.25); padding:4px 9px; border-radius:999px; font-weight:600; color:#fff; }
-    .ps-top h4 { color:#fff; font-family:'Playfair Display',serif; font-size:1.3rem; }
+    .ps-top { height: 130px; background: linear-gradient(135deg,var(--accent),var(--accent-2)); position:relative; display:flex; align-items:flex-end; padding:16px; overflow:hidden; }
+    .ps-top .ps-photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.55; }
+    .ps-top .nfc-badge { position:absolute; top:16px; right:16px; font-size:.65rem; background:rgba(0,0,0,.35); padding:4px 9px; border-radius:999px; font-weight:600; color:#fff; z-index:2; }
+    .ps-top h4 { color:#fff; font-family:'Playfair Display',serif; font-size:1.3rem; position:relative; z-index:2; text-shadow:0 2px 8px rgba(0,0,0,.5); }
     .ps-body { flex:1; padding:14px; overflow:hidden; }
     .ps-row { display:flex; justify-content:space-between; gap:10px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,.06); }
     .ps-row .n { font-size:.82rem; font-weight:600; }
@@ -157,10 +158,11 @@
       isolation:isolate;
     }
     .cuisine-card:hover { transform:translateY(-6px); box-shadow:var(--shadow); border-color:rgba(255,255,255,.2); }
-    .cc-bg { position:absolute; inset:0; z-index:-2; opacity:.9; transition:transform .4s; }
-    .cuisine-card:hover .cc-bg { transform:scale(1.08); }
-    .cuisine-card::after { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(to top, rgba(8,9,13,.92) 12%, rgba(8,9,13,.35) 55%, rgba(8,9,13,.15)); }
-    .cc-emoji { position:absolute; top:16px; left:16px; font-size:1.9rem; filter:drop-shadow(0 3px 6px rgba(0,0,0,.5)); }
+    .cc-bg { position:absolute; inset:0; z-index:-3; opacity:.95; }
+    .cc-photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:.92; transition:transform .4s; }
+    .cuisine-card:hover .cc-photo { transform:scale(1.08); }
+    .cuisine-card::after { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(to top, rgba(8,9,13,.94) 12%, rgba(8,9,13,.35) 55%, rgba(8,9,13,.12)); }
+    .cc-emoji { position:absolute; top:16px; left:16px; font-size:1.9rem; filter:drop-shadow(0 3px 6px rgba(0,0,0,.6)); }
     .cc-body { padding:16px; }
     .cc-body h3 { font-size:1.08rem; font-weight:700; margin-bottom:3px; }
     .cc-body p { font-size:.78rem; color:var(--muted); }
@@ -203,22 +205,23 @@
     .menu-doc { min-height:100%; color:var(--m-fg,#efe9df); font-family:var(--m-font,'Inter',sans-serif); }
     .m-close {
       position:fixed; top:16px; left:16px; z-index:110;
-      background:rgba(0,0,0,.4); color:#fff; border:1px solid rgba(255,255,255,.2);
+      background:rgba(0,0,0,.45); color:#fff; border:1px solid rgba(255,255,255,.2);
       width:42px; height:42px; border-radius:50%; cursor:pointer; font-size:1.2rem; backdrop-filter:blur(6px);
       display:grid; place-items:center; transition:background .2s;
     }
-    .m-close:hover { background:rgba(0,0,0,.65); }
+    .m-close:hover { background:rgba(0,0,0,.7); }
     .m-hero {
       position:relative; padding:70px 24px 40px; text-align:center;
       background:var(--m-hero-bg); border-bottom:3px solid var(--m-accent,#c9a24b);
       overflow:hidden;
     }
-    .m-hero::after{ content:""; position:absolute; inset:0; background:var(--m-hero-tint, linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.5))); z-index:0; }
-    .m-hero > * { position:relative; z-index:1; }
-    .m-nfc { display:inline-flex; align-items:center; gap:7px; font-size:.72rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; padding:6px 13px; border-radius:999px; background:rgba(255,255,255,.14); backdrop-filter:blur(4px); margin-bottom:16px; }
-    .m-hero h1 { font-family:var(--m-title,'Playfair Display',serif); font-size:clamp(2rem,7vw,3.2rem); font-weight:700; letter-spacing:var(--m-title-spacing,0); line-height:1.05; }
-    .m-hero .m-sub { margin-top:10px; font-size:1rem; opacity:.85; max-width:460px; margin-left:auto; margin-right:auto; }
-    .m-hero .m-meta { margin-top:16px; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; font-size:.8rem; opacity:.8; }
+    .m-hero > * { position:relative; z-index:2; }
+    .m-hero-photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; opacity:.42; }
+    .m-hero::after{ content:""; position:absolute; inset:0; z-index:1; background:linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.55)); }
+    .m-nfc { display:inline-flex; align-items:center; gap:7px; font-size:.72rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; padding:6px 13px; border-radius:999px; background:rgba(255,255,255,.18); backdrop-filter:blur(4px); margin-bottom:16px; }
+    .m-hero h1 { font-family:var(--m-title,'Playfair Display',serif); font-size:clamp(2rem,7vw,3.2rem); font-weight:700; letter-spacing:var(--m-title-spacing,0); line-height:1.05; text-shadow:0 2px 14px rgba(0,0,0,.4); }
+    .m-hero .m-sub { margin-top:10px; font-size:1rem; opacity:.9; max-width:460px; margin-left:auto; margin-right:auto; }
+    .m-hero .m-meta { margin-top:16px; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; font-size:.8rem; opacity:.9; }
     .m-hero .m-meta span { display:inline-flex; align-items:center; gap:6px; }
 
     .m-tabs { position:sticky; top:0; z-index:5; display:flex; gap:8px; overflow-x:auto; padding:14px 18px; background:var(--m-bg-2, rgba(0,0,0,.25)); backdrop-filter:blur(10px); border-bottom:1px solid rgba(255,255,255,.08); scrollbar-width:none; }
@@ -230,17 +233,20 @@
     .m-section { margin-bottom:42px; scroll-margin-top:80px; }
     .m-section h2 { font-family:var(--m-title,'Playfair Display',serif); font-size:1.5rem; margin-bottom:4px; display:flex; align-items:center; gap:10px; }
     .m-section .sec-line { height:2px; background:linear-gradient(90deg,var(--m-accent,#c9a24b),transparent); margin:12px 0 20px; border-radius:2px; }
-    .m-item { display:flex; gap:16px; padding:16px 0; border-bottom:1px dashed rgba(255,255,255,.1); }
+    .m-item { display:flex; gap:15px; padding:15px 0; border-bottom:1px dashed rgba(255,255,255,.1); align-items:center; }
     .m-item:last-child{ border-bottom:none; }
-    .m-item .mi-main { flex:1; }
+    .mi-thumb { position:relative; width:80px; height:80px; flex:0 0 80px; border-radius:14px; overflow:hidden; display:grid; place-items:center; box-shadow:0 6px 16px rgba(0,0,0,.35); }
+    .mi-thumb .mi-emoji { font-size:1.8rem; filter:drop-shadow(0 2px 4px rgba(0,0,0,.4)); }
+    .mi-thumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+    .m-item .mi-main { flex:1; min-width:0; }
     .m-item .mi-name { font-weight:700; font-size:1.02rem; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-    .m-item .mi-desc { font-size:.86rem; opacity:.7; margin-top:3px; }
+    .m-item .mi-desc { font-size:.86rem; opacity:.72; margin-top:3px; }
     .m-item .mi-tags { margin-top:7px; display:flex; gap:6px; flex-wrap:wrap; }
     .m-tag { font-size:.65rem; font-weight:600; padding:3px 8px; border-radius:6px; background:rgba(255,255,255,.09); opacity:.9; }
     .m-tag.veg { background:rgba(52,211,153,.16); color:#7ff0c4; }
     .m-tag.spicy { background:rgba(248,113,113,.16); color:#ffb0b0; }
     .m-tag.star { background:var(--m-accent,#c9a24b); color:var(--m-accent-fg,#1a1206); }
-    .m-item .mi-price { font-weight:800; font-size:1.02rem; color:var(--m-accent-bright,var(--m-accent,#c9a24b)); white-space:nowrap; }
+    .m-item .mi-price { font-weight:800; font-size:1.02rem; color:var(--m-accent-bright,var(--m-accent,#c9a24b)); white-space:nowrap; align-self:flex-start; padding-top:2px; }
 
     .m-actionbar { position:fixed; bottom:0; left:0; right:0; z-index:8; display:flex; gap:10px; padding:14px 18px calc(14px + env(safe-area-inset-bottom)); background:var(--m-bg-2, rgba(0,0,0,.55)); backdrop-filter:blur(12px); border-top:1px solid rgba(255,255,255,.1); }
     .m-actionbar .btn { flex:1; justify-content:center; }
@@ -251,7 +257,7 @@
     .toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px); z-index:120; background:#fff; color:#111; padding:12px 22px; border-radius:999px; font-weight:600; font-size:.9rem; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:all .3s; }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-    .demo-banner { text-align:center; font-size:.72rem; padding:7px; background:rgba(0,0,0,.3); opacity:.7; letter-spacing:.05em; }
+    @media (max-width:480px){ .mi-thumb{ width:66px; height:66px; flex-basis:66px; } }
   </style>
 </head>
 <body>
@@ -292,6 +298,7 @@
         <div class="phone">
           <div class="phone-screen">
             <div class="ps-top">
+              <img class="ps-photo" src="https://loremflickr.com/560/300/italian,pasta?lock=71" alt="" onerror="this.remove()">
               <span class="nfc-badge">📶 Table 12</span>
               <h4>Trattoria Bella</h4>
             </div>
@@ -387,367 +394,365 @@
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
+    /* Build a keyword-based food photo URL (LoremFlickr). `lock` makes the
+       image stable so it doesn't change on reload. Falls back gracefully via
+       onerror to the coloured gradient + emoji if the network/image fails. */
+    function photoUrl(keywords, w, h){
+      let hash = 0;
+      for (let i=0; i<keywords.length; i++){ hash = (hash*31 + keywords.charCodeAt(i)) >>> 0; }
+      const lock = hash % 100000;
+      return `https://loremflickr.com/${w}/${h}/${encodeURIComponent(keywords)}?lock=${lock}`;
+    }
+
     /* ============================================================
        DATA — one entry per restaurant style.
-       Each has a theme (colors/fonts) + a full sample menu.
+       `photo` = hero/card keyword ; each dish `img` = photo keyword.
        ============================================================ */
     const CUISINES = [
       {
         id:'italien', name:'Italien', emoji:'🍝', tagline:'Trattoria, pizzeria, cucina',
-        cardBg:'linear-gradient(135deg,#2e7d32,#c62828)',
-        restaurant:'Trattoria Bella',
-        sub:'Cucina italiana · Depuis 1987',
+        cardBg:'linear-gradient(135deg,#2e7d32,#c62828)', photo:'italian,pasta',
+        restaurant:'Trattoria Bella', sub:'Cucina italiana · Depuis 1987',
         meta:['📍 Table 12','⭐ 4,8','🕐 12h – 23h'],
         theme:{ bg:'#14100c', bg2:'rgba(20,15,10,.6)', fg:'#f3ead9', accent:'#2e7d32', accentBright:'#8bc34a', accentFg:'#0d1f0a',
                 heroBg:'linear-gradient(135deg,#1b5e20,#2e7d32)', title:"'Playfair Display',serif" },
         sections:[
           {name:'Antipasti', icon:'🫒', items:[
-            {n:'Burrata di Puglia', d:'Burrata crémeuse, tomates confites, basilic frais, huile d\'olive extra vierge', p:'14€', tags:['veg','star']},
-            {n:'Vitello Tonnato', d:'Fines tranches de veau, sauce au thon et câpres', p:'13€'},
-            {n:'Antipasto della Casa', d:'Assortiment de charcuteries, olives, légumes grillés', p:'16€'},
+            {n:'Burrata di Puglia', d:'Burrata crémeuse, tomates confites, basilic frais, huile d\'olive extra vierge', p:'14€', img:'burrata,cheese', tags:['veg','star']},
+            {n:'Vitello Tonnato', d:'Fines tranches de veau, sauce au thon et câpres', p:'13€', img:'veal,carpaccio'},
+            {n:'Antipasto della Casa', d:'Assortiment de charcuteries, olives, légumes grillés', p:'16€', img:'antipasto,platter'},
           ]},
           {name:'Primi — Pasta', icon:'🍝', items:[
-            {n:'Tagliatelle al Tartufo', d:'Tagliatelle fraîches, crème, truffe noire râpée', p:'22€', tags:['star']},
-            {n:'Spaghetti alle Vongole', d:'Palourdes, ail, persil, vin blanc, piment', p:'19€', tags:['spicy']},
-            {n:'Lasagne della Nonna', d:'Bœuf mijoté, béchamel, parmesan, cuisson 4 h', p:'17€'},
-            {n:'Risotto ai Funghi', d:'Riz carnaroli, cèpes, mascarpone, parmesan', p:'18€', tags:['veg']},
+            {n:'Tagliatelle al Tartufo', d:'Tagliatelle fraîches, crème, truffe noire râpée', p:'22€', img:'truffle,pasta', tags:['star']},
+            {n:'Spaghetti alle Vongole', d:'Palourdes, ail, persil, vin blanc, piment', p:'19€', img:'spaghetti,clams', tags:['spicy']},
+            {n:'Lasagne della Nonna', d:'Bœuf mijoté, béchamel, parmesan, cuisson 4 h', p:'17€', img:'lasagna'},
+            {n:'Risotto ai Funghi', d:'Riz carnaroli, cèpes, mascarpone, parmesan', p:'18€', img:'mushroom,risotto', tags:['veg']},
           ]},
           {name:'Pizze', icon:'🍕', items:[
-            {n:'Margherita D.O.P.', d:'San Marzano, mozzarella di bufala, basilic', p:'13€', tags:['veg']},
-            {n:'Regina', d:'Mozzarella, jambon cuit, champignons frais', p:'16€'},
-            {n:'Diavola', d:'Tomate, mozzarella, salami piquant, huile pimentée', p:'15€', tags:['spicy']},
+            {n:'Margherita D.O.P.', d:'San Marzano, mozzarella di bufala, basilic', p:'13€', img:'margherita,pizza', tags:['veg']},
+            {n:'Regina', d:'Mozzarella, jambon cuit, champignons frais', p:'16€', img:'pizza'},
+            {n:'Diavola', d:'Tomate, mozzarella, salami piquant, huile pimentée', p:'15€', img:'pepperoni,pizza', tags:['spicy']},
           ]},
           {name:'Dolci', icon:'🍰', items:[
-            {n:'Tiramisù della Casa', d:'Mascarpone, café espresso, cacao amer', p:'9€', tags:['star']},
-            {n:'Panna Cotta', d:'Vanille de Madagascar, coulis de fruits rouges', p:'8€', tags:['veg']},
+            {n:'Tiramisù della Casa', d:'Mascarpone, café espresso, cacao amer', p:'9€', img:'tiramisu', tags:['star']},
+            {n:'Panna Cotta', d:'Vanille de Madagascar, coulis de fruits rouges', p:'8€', img:'panna,cotta', tags:['veg']},
           ]},
         ],
       },
       {
         id:'asiatique', name:'Asiatique', emoji:'🥢', tagline:'Wok, nouilles, dim sum',
-        cardBg:'linear-gradient(135deg,#b71c1c,#f57f17)',
-        restaurant:'Golden Wok',
-        sub:'Saveurs d\'Asie · Cantonais & Thaï',
+        cardBg:'linear-gradient(135deg,#b71c1c,#f57f17)', photo:'asian,food',
+        restaurant:'Golden Wok', sub:'Saveurs d\'Asie · Cantonais & Thaï',
         meta:['📍 Table 7','⭐ 4,7','🕐 11h30 – 22h30'],
         theme:{ bg:'#160d0d', bg2:'rgba(22,13,13,.6)', fg:'#f7ecdf', accent:'#e53935', accentBright:'#ffb300', accentFg:'#1c0505',
                 heroBg:'linear-gradient(135deg,#8e0000,#c62828)', title:"'Poppins',sans-serif" },
         sections:[
           {name:'Entrées & Dim Sum', icon:'🥟', items:[
-            {n:'Raviolis vapeur (x6)', d:'Porc & crevettes, sauce soja-gingembre', p:'8€', tags:['star']},
-            {n:'Nems croustillants (x4)', d:'Poulet, vermicelles, menthe fraîche', p:'7€'},
-            {n:'Soupe Tom Yum', d:'Crevettes, citronnelle, galanga, piment', p:'9€', tags:['spicy']},
-            {n:'Edamame', d:'Fèves de soja, fleur de sel', p:'5€', tags:['veg']},
+            {n:'Raviolis vapeur (x6)', d:'Porc & crevettes, sauce soja-gingembre', p:'8€', img:'dumplings', tags:['star']},
+            {n:'Nems croustillants (x4)', d:'Poulet, vermicelles, menthe fraîche', p:'7€', img:'spring,rolls'},
+            {n:'Soupe Tom Yum', d:'Crevettes, citronnelle, galanga, piment', p:'9€', img:'tom,yum,soup', tags:['spicy']},
+            {n:'Edamame', d:'Fèves de soja, fleur de sel', p:'5€', img:'edamame', tags:['veg']},
           ]},
           {name:'Woks & Nouilles', icon:'🍜', items:[
-            {n:'Pad Thaï au poulet', d:'Nouilles de riz, cacahuètes, tamarin, citron vert', p:'15€', tags:['star']},
-            {n:'Bœuf sauté aux oignons', d:'Wok de bœuf, poivrons, sauce huître', p:'16€'},
-            {n:'Nouilles sautées légumes', d:'Wok de saison, tofu, sauce soja', p:'13€', tags:['veg']},
-            {n:'Curry vert thaï', d:'Poulet, lait de coco, aubergines, basilic thaï', p:'16€', tags:['spicy']},
+            {n:'Pad Thaï au poulet', d:'Nouilles de riz, cacahuètes, tamarin, citron vert', p:'15€', img:'pad,thai', tags:['star']},
+            {n:'Bœuf sauté aux oignons', d:'Wok de bœuf, poivrons, sauce huître', p:'16€', img:'beef,stirfry'},
+            {n:'Nouilles sautées légumes', d:'Wok de saison, tofu, sauce soja', p:'13€', img:'fried,noodles', tags:['veg']},
+            {n:'Curry vert thaï', d:'Poulet, lait de coco, aubergines, basilic thaï', p:'16€', img:'green,curry', tags:['spicy']},
           ]},
           {name:'Riz & Spécialités', icon:'🍚', items:[
-            {n:'Canard laqué', d:'Demi-canard, crêpes, concombre, sauce hoisin', p:'24€', tags:['star']},
-            {n:'Riz cantonais', d:'Riz sauté, œuf, jambon, petits pois', p:'11€'},
+            {n:'Canard laqué', d:'Demi-canard, crêpes, concombre, sauce hoisin', p:'24€', img:'peking,duck', tags:['star']},
+            {n:'Riz cantonais', d:'Riz sauté, œuf, jambon, petits pois', p:'11€', img:'fried,rice'},
           ]},
           {name:'Desserts', icon:'🍧', items:[
-            {n:'Perles de coco', d:'Boules de riz gluant, noix de coco', p:'6€', tags:['veg']},
-            {n:'Beignets de banane', d:'Banane frite, miel, sésame', p:'7€', tags:['veg']},
+            {n:'Perles de coco', d:'Boules de riz gluant, noix de coco', p:'6€', img:'coconut,dessert', tags:['veg']},
+            {n:'Beignets de banane', d:'Banane frite, miel, sésame', p:'7€', img:'fried,banana', tags:['veg']},
           ]},
         ],
       },
       {
         id:'brasserie', name:'Bar / Brasserie', emoji:'🍺', tagline:'Bistrot, bières, cocktails',
-        cardBg:'linear-gradient(135deg,#4e342e,#d4a017)',
-        restaurant:'Le Comptoir',
-        sub:'Bar · Brasserie · Depuis 1932',
+        cardBg:'linear-gradient(135deg,#4e342e,#d4a017)', photo:'bistro,beer',
+        restaurant:'Le Comptoir', sub:'Bar · Brasserie · Depuis 1932',
         meta:['📍 Table 4','⭐ 4,6','🕐 8h – 2h'],
         theme:{ bg:'#100d0a', bg2:'rgba(16,13,10,.6)', fg:'#efe6d6', accent:'#c9a24b', accentBright:'#e7c878', accentFg:'#1a1206',
                 heroBg:'linear-gradient(135deg,#3e2723,#5d4037)', title:"'Playfair Display',serif" },
         sections:[
           {name:'À grignoter', icon:'🥨', items:[
-            {n:'Planche mixte', d:'Charcuterie, fromages affinés, cornichons, pain', p:'16€', tags:['star']},
-            {n:'Frites maison', d:'Pommes de terre fraîches, sauce du chef', p:'6€', tags:['veg']},
-            {n:'Œuf mayo', d:'Le grand classique du zinc', p:'5€', tags:['veg']},
+            {n:'Planche mixte', d:'Charcuterie, fromages affinés, cornichons, pain', p:'16€', img:'charcuterie,board', tags:['star']},
+            {n:'Frites maison', d:'Pommes de terre fraîches, sauce du chef', p:'6€', img:'french,fries', tags:['veg']},
+            {n:'Œuf mayo', d:'Le grand classique du zinc', p:'5€', img:'egg,mayonnaise', tags:['veg']},
           ]},
           {name:'Les Classiques', icon:'🍽️', items:[
-            {n:'Croque-Monsieur', d:'Jambon, emmental, béchamel, salade', p:'12€'},
-            {n:'Steak-frites', d:'Bavette, sauce au poivre, frites maison', p:'19€', tags:['star']},
-            {n:'Burger du Comptoir', d:'Bœuf charolais, cheddar, oignons confits', p:'17€'},
-            {n:'Salade César', d:'Poulet grillé, parmesan, croûtons', p:'14€'},
+            {n:'Croque-Monsieur', d:'Jambon, emmental, béchamel, salade', p:'12€', img:'croque,monsieur'},
+            {n:'Steak-frites', d:'Bavette, sauce au poivre, frites maison', p:'19€', img:'steak,fries', tags:['star']},
+            {n:'Burger du Comptoir', d:'Bœuf charolais, cheddar, oignons confits', p:'17€', img:'burger'},
+            {n:'Salade César', d:'Poulet grillé, parmesan, croûtons', p:'14€', img:'caesar,salad'},
           ]},
           {name:'Bières pression', icon:'🍺', items:[
-            {n:'Blonde de la maison', d:'25cl / 50cl', p:'4€ / 7€', tags:['star']},
-            {n:'IPA artisanale', d:'Houblonnée, amère, 6,5°', p:'5€ / 8€'},
-            {n:'Blanche', d:'Légère, notes d\'agrumes', p:'4,5€ / 7,5€'},
+            {n:'Blonde de la maison', d:'25cl / 50cl', p:'4€ / 7€', img:'beer,glass', tags:['star']},
+            {n:'IPA artisanale', d:'Houblonnée, amère, 6,5°', p:'5€ / 8€', img:'craft,beer'},
+            {n:'Blanche', d:'Légère, notes d\'agrumes', p:'4,5€ / 7,5€', img:'wheat,beer'},
           ]},
           {name:'Cocktails', icon:'🍸', items:[
-            {n:'Spritz Aperol', d:'Aperol, prosecco, eau pétillante, orange', p:'9€', tags:['star']},
-            {n:'Mojito', d:'Rhum, menthe fraîche, citron vert, sucre de canne', p:'10€'},
-            {n:'Vin au verre', d:'Rouge, blanc ou rosé — sélection du jour', p:'6€'},
+            {n:'Spritz Aperol', d:'Aperol, prosecco, eau pétillante, orange', p:'9€', img:'aperol,spritz', tags:['star']},
+            {n:'Mojito', d:'Rhum, menthe fraîche, citron vert, sucre de canne', p:'10€', img:'mojito'},
+            {n:'Vin au verre', d:'Rouge, blanc ou rosé — sélection du jour', p:'6€', img:'wine,glass'},
           ]},
         ],
       },
       {
         id:'africain', name:'Africain', emoji:'🍲', tagline:'Mafé, yassa, thieboudienne',
-        cardBg:'linear-gradient(135deg,#e65100,#2e7d32)',
-        restaurant:'Le Baobab',
-        sub:'Cuisine d\'Afrique de l\'Ouest',
+        cardBg:'linear-gradient(135deg,#e65100,#2e7d32)', photo:'african,food',
+        restaurant:'Le Baobab', sub:'Cuisine d\'Afrique de l\'Ouest',
         meta:['📍 Table 9','⭐ 4,9','🕐 12h – 23h'],
         theme:{ bg:'#150f08', bg2:'rgba(21,15,8,.6)', fg:'#f6ead6', accent:'#e65100', accentBright:'#ffb74d', accentFg:'#1c0c00',
                 heroBg:'linear-gradient(135deg,#bf360c,#e65100)', title:"'Poppins',sans-serif" },
         sections:[
           {name:'Entrées', icon:'🥘', items:[
-            {n:'Accras de morue', d:'Beignets de poisson épicés, sauce piment', p:'8€', tags:['spicy']},
-            {n:'Pastels (x4)', d:'Chaussons frits au thon et à la menthe', p:'7€', tags:['star']},
-            {n:'Salade d\'avocat', d:'Avocat, crevettes, sauce citron-gingembre', p:'9€'},
+            {n:'Accras de morue', d:'Beignets de poisson épicés, sauce piment', p:'8€', img:'fish,fritters', tags:['spicy']},
+            {n:'Pastels (x4)', d:'Chaussons frits au thon et à la menthe', p:'7€', img:'fried,pastry', tags:['star']},
+            {n:'Salade d\'avocat', d:'Avocat, crevettes, sauce citron-gingembre', p:'9€', img:'avocado,shrimp,salad'},
           ]},
           {name:'Plats', icon:'🍲', items:[
-            {n:'Thiéboudiène', d:'Riz au poisson, légumes mijotés — le plat national sénégalais', p:'18€', tags:['star']},
-            {n:'Poulet Yassa', d:'Poulet mariné au citron et oignons confits, riz', p:'16€'},
-            {n:'Mafé de bœuf', d:'Bœuf mijoté à la sauce d\'arachide, riz blanc', p:'17€', tags:['star']},
-            {n:'Attiéké poisson braisé', d:'Semoule de manioc, poisson grillé, sauce tomate', p:'18€', tags:['spicy']},
-            {n:'Alloco', d:'Bananes plantains frites, sauce pimentée', p:'8€', tags:['veg','spicy']},
+            {n:'Thiéboudiène', d:'Riz au poisson, légumes mijotés — le plat national sénégalais', p:'18€', img:'jollof,rice,fish', tags:['star']},
+            {n:'Poulet Yassa', d:'Poulet mariné au citron et oignons confits, riz', p:'16€', img:'chicken,rice'},
+            {n:'Mafé de bœuf', d:'Bœuf mijoté à la sauce d\'arachide, riz blanc', p:'17€', img:'peanut,stew', tags:['star']},
+            {n:'Attiéké poisson braisé', d:'Semoule de manioc, poisson grillé, sauce tomate', p:'18€', img:'grilled,fish', tags:['spicy']},
+            {n:'Alloco', d:'Bananes plantains frites, sauce pimentée', p:'8€', img:'fried,plantain', tags:['veg','spicy']},
           ]},
           {name:'Desserts & Boissons', icon:'🥭', items:[
-            {n:'Thiakry', d:'Couscous de mil, lait fermenté sucré, vanille', p:'6€', tags:['veg']},
-            {n:'Bissap maison', d:'Infusion glacée d\'hibiscus, menthe', p:'4€', tags:['veg','star']},
-            {n:'Jus de gingembre', d:'Frais, épicé, fait maison', p:'4€', tags:['veg']},
+            {n:'Thiakry', d:'Couscous de mil, lait fermenté sucré, vanille', p:'6€', img:'millet,pudding', tags:['veg']},
+            {n:'Bissap maison', d:'Infusion glacée d\'hibiscus, menthe', p:'4€', img:'hibiscus,drink', tags:['veg','star']},
+            {n:'Jus de gingembre', d:'Frais, épicé, fait maison', p:'4€', img:'ginger,juice', tags:['veg']},
           ]},
         ],
       },
       {
         id:'indien', name:'Indien', emoji:'🍛', tagline:'Curry, tandoori, naan',
-        cardBg:'linear-gradient(135deg,#ff6f00,#6a1b9a)',
-        restaurant:'Maharaja',
-        sub:'Cuisine indienne authentique',
+        cardBg:'linear-gradient(135deg,#ff6f00,#6a1b9a)', photo:'indian,curry',
+        restaurant:'Maharaja', sub:'Cuisine indienne authentique',
         meta:['📍 Table 3','⭐ 4,8','🕐 12h – 14h30 · 19h – 23h'],
         theme:{ bg:'#130b13', bg2:'rgba(19,11,19,.6)', fg:'#f6e9dd', accent:'#ff8f00', accentBright:'#ffca28', accentFg:'#1a0c00',
                 heroBg:'linear-gradient(135deg,#4a148c,#ff6f00)', title:"'Playfair Display',serif" },
         sections:[
           {name:'Entrées', icon:'🧅', items:[
-            {n:'Samoussas (x3)', d:'Chaussons croustillants aux légumes épicés', p:'6€', tags:['veg']},
-            {n:'Pakoras', d:'Beignets d\'oignon et pois chiche', p:'6€', tags:['veg','spicy']},
-            {n:'Poulet Tikka', d:'Morceaux marinés au yaourt et épices, tandoor', p:'9€', tags:['star']},
+            {n:'Samoussas (x3)', d:'Chaussons croustillants aux légumes épicés', p:'6€', img:'samosa', tags:['veg']},
+            {n:'Pakoras', d:'Beignets d\'oignon et pois chiche', p:'6€', img:'pakora', tags:['veg','spicy']},
+            {n:'Poulet Tikka', d:'Morceaux marinés au yaourt et épices, tandoor', p:'9€', img:'chicken,tikka', tags:['star']},
           ]},
           {name:'Curries', icon:'🍛', items:[
-            {n:'Butter Chicken', d:'Poulet, sauce tomate crémeuse au beurre, fenugrec', p:'16€', tags:['star']},
-            {n:'Agneau Rogan Josh', d:'Agneau mijoté, épices du Cachemire', p:'18€', tags:['spicy']},
-            {n:'Dal Makhani', d:'Lentilles noires mijotées, crème, beurre', p:'13€', tags:['veg']},
-            {n:'Palak Paneer', d:'Fromage frais, épinards, épices douces', p:'14€', tags:['veg']},
-            {n:'Vindaloo de porc', d:'Curry très relevé de Goa, vinaigre, piment', p:'17€', tags:['spicy']},
+            {n:'Butter Chicken', d:'Poulet, sauce tomate crémeuse au beurre, fenugrec', p:'16€', img:'butter,chicken', tags:['star']},
+            {n:'Agneau Rogan Josh', d:'Agneau mijoté, épices du Cachemire', p:'18€', img:'lamb,curry', tags:['spicy']},
+            {n:'Dal Makhani', d:'Lentilles noires mijotées, crème, beurre', p:'13€', img:'dal,curry', tags:['veg']},
+            {n:'Palak Paneer', d:'Fromage frais, épinards, épices douces', p:'14€', img:'palak,paneer', tags:['veg']},
+            {n:'Vindaloo de porc', d:'Curry très relevé de Goa, vinaigre, piment', p:'17€', img:'pork,curry', tags:['spicy']},
           ]},
           {name:'Tandoori & Pains', icon:'🔥', items:[
-            {n:'Poulet Tandoori', d:'Demi-poulet mariné, cuit au four d\'argile', p:'17€', tags:['star']},
-            {n:'Naan au fromage', d:'Pain indien fourré, cuit au tandoor', p:'4€', tags:['veg']},
-            {n:'Riz Biryani', d:'Riz basmati parfumé, safran, légumes', p:'12€', tags:['veg']},
+            {n:'Poulet Tandoori', d:'Demi-poulet mariné, cuit au four d\'argile', p:'17€', img:'tandoori,chicken', tags:['star']},
+            {n:'Naan au fromage', d:'Pain indien fourré, cuit au tandoor', p:'4€', img:'naan,bread', tags:['veg']},
+            {n:'Riz Biryani', d:'Riz basmati parfumé, safran, légumes', p:'12€', img:'biryani', tags:['veg']},
           ]},
           {name:'Desserts', icon:'🍮', items:[
-            {n:'Gulab Jamun', d:'Beignets au lait, sirop de rose et cardamome', p:'6€', tags:['veg','star']},
-            {n:'Mangue Lassi', d:'Boisson au yaourt et à la mangue', p:'5€', tags:['veg']},
+            {n:'Gulab Jamun', d:'Beignets au lait, sirop de rose et cardamome', p:'6€', img:'gulab,jamun', tags:['veg','star']},
+            {n:'Mangue Lassi', d:'Boisson au yaourt et à la mangue', p:'5€', img:'mango,lassi', tags:['veg']},
           ]},
         ],
       },
       {
         id:'francais', name:'Gastronomie FR', emoji:'🥖', tagline:'Bistronomie française',
-        cardBg:'linear-gradient(135deg,#1a237e,#b71c1c)',
-        restaurant:'Chez Auguste',
-        sub:'Cuisine française · Bistronomique',
+        cardBg:'linear-gradient(135deg,#1a237e,#b71c1c)', photo:'gourmet,french,food',
+        restaurant:'Chez Auguste', sub:'Cuisine française · Bistronomique',
         meta:['📍 Table 2','⭐ 4,9','🕐 19h – 22h30'],
         theme:{ bg:'#0d0f16', bg2:'rgba(13,15,22,.6)', fg:'#eef0f5', accent:'#9e7d3b', accentBright:'#d4b25f', accentFg:'#15110a',
                 heroBg:'linear-gradient(135deg,#0d1440,#1a237e)', title:"'Playfair Display',serif" },
         sections:[
           {name:'Entrées', icon:'🥂', items:[
-            {n:'Foie gras mi-cuit', d:'Chutney de figues, pain brioché toasté', p:'19€', tags:['star']},
-            {n:'Œuf parfait 63°', d:'Crème de champignons, lard croustillant', p:'15€'},
-            {n:'Tartare de Saint-Jacques', d:'Agrumes, huile de noisette, aneth', p:'18€'},
+            {n:'Foie gras mi-cuit', d:'Chutney de figues, pain brioché toasté', p:'19€', img:'foie,gras', tags:['star']},
+            {n:'Œuf parfait 63°', d:'Crème de champignons, lard croustillant', p:'15€', img:'poached,egg'},
+            {n:'Tartare de Saint-Jacques', d:'Agrumes, huile de noisette, aneth', p:'18€', img:'scallop,tartare'},
           ]},
           {name:'Plats', icon:'🍷', items:[
-            {n:'Filet de bœuf Rossini', d:'Foie gras poêlé, sauce Périgueux, gratin dauphinois', p:'34€', tags:['star']},
-            {n:'Suprême de volaille', d:'Volaille fermière, morilles, vin jaune', p:'27€'},
-            {n:'Dos de cabillaud', d:'Beurre blanc, légumes de saison glacés', p:'26€'},
-            {n:'Risotto aux truffes', d:'Carnaroli, parmesan 24 mois, truffe fraîche', p:'24€', tags:['veg']},
+            {n:'Filet de bœuf Rossini', d:'Foie gras poêlé, sauce Périgueux, gratin dauphinois', p:'34€', img:'beef,fillet', tags:['star']},
+            {n:'Suprême de volaille', d:'Volaille fermière, morilles, vin jaune', p:'27€', img:'roast,chicken'},
+            {n:'Dos de cabillaud', d:'Beurre blanc, légumes de saison glacés', p:'26€', img:'cod,fish,plate'},
+            {n:'Risotto aux truffes', d:'Carnaroli, parmesan 24 mois, truffe fraîche', p:'24€', img:'truffle,risotto', tags:['veg']},
           ]},
           {name:'Fromages & Desserts', icon:'🧀', items:[
-            {n:'Plateau de fromages affinés', d:'Sélection du maître fromager', p:'14€', tags:['veg']},
-            {n:'Soufflé au Grand Marnier', d:'Minute, cœur coulant', p:'13€', tags:['star']},
-            {n:'Tarte Tatin', d:'Pommes caramélisées, crème fraîche d\'Isigny', p:'11€', tags:['veg']},
+            {n:'Plateau de fromages affinés', d:'Sélection du maître fromager', p:'14€', img:'cheese,platter', tags:['veg']},
+            {n:'Soufflé au Grand Marnier', d:'Minute, cœur coulant', p:'13€', img:'souffle,dessert', tags:['star']},
+            {n:'Tarte Tatin', d:'Pommes caramélisées, crème fraîche d\'Isigny', p:'11€', img:'tarte,tatin', tags:['veg']},
           ]},
         ],
       },
       {
         id:'japonais', name:'Japonais', emoji:'🍣', tagline:'Sushi, ramen, izakaya',
-        cardBg:'linear-gradient(135deg,#b71c1c,#212121)',
-        restaurant:'Sakura',
-        sub:'Sushi & Cuisine japonaise',
+        cardBg:'linear-gradient(135deg,#b71c1c,#212121)', photo:'sushi',
+        restaurant:'Sakura', sub:'Sushi & Cuisine japonaise',
         meta:['📍 Table 6','⭐ 4,8','🕐 12h – 22h'],
         theme:{ bg:'#0e0e10', bg2:'rgba(14,14,16,.6)', fg:'#f2f0ee', accent:'#c62828', accentBright:'#ef5350', accentFg:'#fff',
                 heroBg:'linear-gradient(135deg,#1a1a1a,#b71c1c)', title:"'Poppins',sans-serif" },
         sections:[
           {name:'Entrées', icon:'🥢', items:[
-            {n:'Edamame', d:'Fèves de soja, sel', p:'5€', tags:['veg']},
-            {n:'Gyoza (x5)', d:'Raviolis grillés au porc et légumes', p:'7€', tags:['star']},
-            {n:'Soupe miso', d:'Tofu, wakamé, oignon vert', p:'4€', tags:['veg']},
-            {n:'Salade de chou wakamé', d:'Algues, sésame, vinaigre de riz', p:'6€', tags:['veg']},
+            {n:'Edamame', d:'Fèves de soja, sel', p:'5€', img:'edamame', tags:['veg']},
+            {n:'Gyoza (x5)', d:'Raviolis grillés au porc et légumes', p:'7€', img:'gyoza', tags:['star']},
+            {n:'Soupe miso', d:'Tofu, wakamé, oignon vert', p:'4€', img:'miso,soup', tags:['veg']},
+            {n:'Salade de chou wakamé', d:'Algues, sésame, vinaigre de riz', p:'6€', img:'seaweed,salad', tags:['veg']},
           ]},
           {name:'Sushi & Sashimi', icon:'🍣', items:[
-            {n:'Assortiment Sakura (12 pièces)', d:'Sushi, maki et sashimi du chef', p:'22€', tags:['star']},
-            {n:'California Roll (x6)', d:'Surimi, avocat, concombre, sésame', p:'8€'},
-            {n:'Sashimi saumon (x6)', d:'Saumon frais tranché', p:'12€'},
-            {n:'Maki avocat (x6)', d:'Avocat, riz vinaigré, nori', p:'6€', tags:['veg']},
+            {n:'Assortiment Sakura (12 pièces)', d:'Sushi, maki et sashimi du chef', p:'22€', img:'sushi,platter', tags:['star']},
+            {n:'California Roll (x6)', d:'Surimi, avocat, concombre, sésame', p:'8€', img:'california,roll'},
+            {n:'Sashimi saumon (x6)', d:'Saumon frais tranché', p:'12€', img:'salmon,sashimi'},
+            {n:'Maki avocat (x6)', d:'Avocat, riz vinaigré, nori', p:'6€', img:'avocado,maki', tags:['veg']},
           ]},
           {name:'Ramen & Chauds', icon:'🍜', items:[
-            {n:'Ramen Tonkotsu', d:'Bouillon de porc, chashu, œuf mollet, nouilles', p:'15€', tags:['star']},
-            {n:'Yakitori poulet (x3)', d:'Brochettes grillées, sauce teriyaki', p:'9€'},
-            {n:'Tempura crevettes', d:'Crevettes en beignet léger, sauce', p:'12€'},
+            {n:'Ramen Tonkotsu', d:'Bouillon de porc, chashu, œuf mollet, nouilles', p:'15€', img:'ramen', tags:['star']},
+            {n:'Yakitori poulet (x3)', d:'Brochettes grillées, sauce teriyaki', p:'9€', img:'yakitori'},
+            {n:'Tempura crevettes', d:'Crevettes en beignet léger, sauce', p:'12€', img:'tempura,shrimp'},
           ]},
           {name:'Desserts', icon:'🍡', items:[
-            {n:'Mochi glacé (x3)', d:'Thé matcha, mangue, sésame noir', p:'7€', tags:['veg','star']},
-            {n:'Dorayaki', d:'Pancake fourré à la pâte de haricot rouge', p:'6€', tags:['veg']},
+            {n:'Mochi glacé (x3)', d:'Thé matcha, mangue, sésame noir', p:'7€', img:'mochi', tags:['veg','star']},
+            {n:'Dorayaki', d:'Pancake fourré à la pâte de haricot rouge', p:'6€', img:'dorayaki', tags:['veg']},
           ]},
         ],
       },
       {
         id:'oriental', name:'Libanais / Oriental', emoji:'🧆', tagline:'Mezze, grillades, houmous',
-        cardBg:'linear-gradient(135deg,#00695c,#c9a227)',
-        restaurant:'Beyrouth',
-        sub:'Mezze & Grillades libanaises',
+        cardBg:'linear-gradient(135deg,#00695c,#c9a227)', photo:'mezze,lebanese',
+        restaurant:'Beyrouth', sub:'Mezze & Grillades libanaises',
         meta:['📍 Table 8','⭐ 4,7','🕐 12h – 23h'],
         theme:{ bg:'#0c1310', bg2:'rgba(12,19,16,.6)', fg:'#f0ecdf', accent:'#0f8a7c', accentBright:'#4db6ac', accentFg:'#04120f',
                 heroBg:'linear-gradient(135deg,#004d40,#00695c)', title:"'Playfair Display',serif" },
         sections:[
           {name:'Mezze froids', icon:'🫓', items:[
-            {n:'Houmous', d:'Purée de pois chiche, tahini, huile d\'olive', p:'7€', tags:['veg','star']},
-            {n:'Moutabal', d:'Caviar d\'aubergine fumé, tahini', p:'7€', tags:['veg']},
-            {n:'Taboulé libanais', d:'Persil, menthe, boulgour, tomate, citron', p:'7€', tags:['veg']},
-            {n:'Feuilles de vigne (x5)', d:'Riz, herbes, citron', p:'8€', tags:['veg']},
+            {n:'Houmous', d:'Purée de pois chiche, tahini, huile d\'olive', p:'7€', img:'hummus', tags:['veg','star']},
+            {n:'Moutabal', d:'Caviar d\'aubergine fumé, tahini', p:'7€', img:'baba,ganoush', tags:['veg']},
+            {n:'Taboulé libanais', d:'Persil, menthe, boulgour, tomate, citron', p:'7€', img:'tabbouleh', tags:['veg']},
+            {n:'Feuilles de vigne (x5)', d:'Riz, herbes, citron', p:'8€', img:'grape,leaves', tags:['veg']},
           ]},
           {name:'Mezze chauds', icon:'🧆', items:[
-            {n:'Falafels (x5)', d:'Beignets de pois chiche, sauce tahini', p:'8€', tags:['veg','star']},
-            {n:'Kebbé (x3)', d:'Boulettes de boulgour farcies à la viande', p:'9€'},
-            {n:'Halloumi grillé', d:'Fromage grillé, miel, thym', p:'9€', tags:['veg']},
+            {n:'Falafels (x5)', d:'Beignets de pois chiche, sauce tahini', p:'8€', img:'falafel', tags:['veg','star']},
+            {n:'Kebbé (x3)', d:'Boulettes de boulgour farcies à la viande', p:'9€', img:'kibbeh'},
+            {n:'Halloumi grillé', d:'Fromage grillé, miel, thym', p:'9€', img:'grilled,halloumi', tags:['veg']},
           ]},
           {name:'Grillades', icon:'🔥', items:[
-            {n:'Chich Taouk', d:'Brochettes de poulet mariné, ail, riz, salade', p:'17€', tags:['star']},
-            {n:'Kafta d\'agneau', d:'Brochettes hachées épicées, boulgour', p:'18€'},
-            {n:'Assortiment de grillades', d:'Poulet, agneau, kafta, pour 2', p:'34€', tags:['star']},
+            {n:'Chich Taouk', d:'Brochettes de poulet mariné, ail, riz, salade', p:'17€', img:'chicken,skewers', tags:['star']},
+            {n:'Kafta d\'agneau', d:'Brochettes hachées épicées, boulgour', p:'18€', img:'kofta'},
+            {n:'Assortiment de grillades', d:'Poulet, agneau, kafta, pour 2', p:'34€', img:'mixed,grill', tags:['star']},
           ]},
           {name:'Desserts', icon:'🍯', items:[
-            {n:'Baklava (x3)', d:'Pâte filo, pistache, miel', p:'6€', tags:['veg','star']},
-            {n:'Mouhalabieh', d:'Crème de lait à la fleur d\'oranger', p:'5€', tags:['veg']},
+            {n:'Baklava (x3)', d:'Pâte filo, pistache, miel', p:'6€', img:'baklava', tags:['veg','star']},
+            {n:'Mouhalabieh', d:'Crème de lait à la fleur d\'oranger', p:'5€', img:'milk,pudding', tags:['veg']},
           ]},
         ],
       },
       {
         id:'mexicain', name:'Mexicain', emoji:'🌮', tagline:'Tacos, burritos, guacamole',
-        cardBg:'linear-gradient(135deg,#2e7d32,#e53935)',
-        restaurant:'El Sombrero',
-        sub:'Cantina mexicaine',
+        cardBg:'linear-gradient(135deg,#2e7d32,#e53935)', photo:'mexican,tacos',
+        restaurant:'El Sombrero', sub:'Cantina mexicaine',
         meta:['📍 Table 5','⭐ 4,6','🕐 12h – minuit'],
         theme:{ bg:'#12110a', bg2:'rgba(18,17,10,.6)', fg:'#f5efdc', accent:'#e53935', accentBright:'#ffca28', accentFg:'#fff',
                 heroBg:'linear-gradient(135deg,#1b5e20,#e53935)', title:"'Poppins',sans-serif" },
         sections:[
           {name:'Para empezar', icon:'🥑', items:[
-            {n:'Guacamole & totopos', d:'Avocat écrasé, citron vert, coriandre, chips maison', p:'9€', tags:['veg','star']},
-            {n:'Nachos supremos', d:'Cheddar fondu, jalapeños, crème, haricots', p:'11€', tags:['spicy']},
-            {n:'Quesadilla', d:'Tortilla, fromage fondu, poulet ou légumes', p:'10€'},
+            {n:'Guacamole & totopos', d:'Avocat écrasé, citron vert, coriandre, chips maison', p:'9€', img:'guacamole', tags:['veg','star']},
+            {n:'Nachos supremos', d:'Cheddar fondu, jalapeños, crème, haricots', p:'11€', img:'nachos', tags:['spicy']},
+            {n:'Quesadilla', d:'Tortilla, fromage fondu, poulet ou légumes', p:'10€', img:'quesadilla'},
           ]},
           {name:'Tacos & Burritos', icon:'🌮', items:[
-            {n:'Tacos al Pastor (x3)', d:'Porc mariné, ananas, oignon, coriandre', p:'14€', tags:['star']},
-            {n:'Burrito Grande', d:'Bœuf, riz, haricots, fromage, guacamole', p:'15€'},
-            {n:'Tacos de légumes (x3)', d:'Légumes grillés, haricots noirs, avocat', p:'12€', tags:['veg']},
-            {n:'Chili con Carne', d:'Bœuf haché, haricots rouges, épices, riz', p:'14€', tags:['spicy']},
+            {n:'Tacos al Pastor (x3)', d:'Porc mariné, ananas, oignon, coriandre', p:'14€', img:'tacos', tags:['star']},
+            {n:'Burrito Grande', d:'Bœuf, riz, haricots, fromage, guacamole', p:'15€', img:'burrito'},
+            {n:'Tacos de légumes (x3)', d:'Légumes grillés, haricots noirs, avocat', p:'12€', img:'vegetable,tacos', tags:['veg']},
+            {n:'Chili con Carne', d:'Bœuf haché, haricots rouges, épices, riz', p:'14€', img:'chili,con,carne', tags:['spicy']},
           ]},
           {name:'Boissons', icon:'🍹', items:[
-            {n:'Margarita', d:'Tequila, triple sec, citron vert', p:'10€', tags:['star']},
-            {n:'Corona', d:'Bière mexicaine, quartier de citron', p:'5€'},
-            {n:'Agua de Jamaica', d:'Infusion d\'hibiscus glacée, sans alcool', p:'4€', tags:['veg']},
+            {n:'Margarita', d:'Tequila, triple sec, citron vert', p:'10€', img:'margarita,cocktail', tags:['star']},
+            {n:'Corona', d:'Bière mexicaine, quartier de citron', p:'5€', img:'beer,lime'},
+            {n:'Agua de Jamaica', d:'Infusion d\'hibiscus glacée, sans alcool', p:'4€', img:'hibiscus,drink', tags:['veg']},
           ]},
           {name:'Postres', icon:'🍮', items:[
-            {n:'Churros', d:'Beignets, sucre cannelle, sauce chocolat', p:'7€', tags:['veg','star']},
-            {n:'Flan mexicain', d:'Crème caramel à la vanille', p:'6€', tags:['veg']},
+            {n:'Churros', d:'Beignets, sucre cannelle, sauce chocolat', p:'7€', img:'churros', tags:['veg','star']},
+            {n:'Flan mexicain', d:'Crème caramel à la vanille', p:'6€', img:'flan,dessert', tags:['veg']},
           ]},
         ],
       },
       {
         id:'burger', name:'Burger / Street', emoji:'🍔', tagline:'Smash, frites, milkshakes',
-        cardBg:'linear-gradient(135deg,#f57f17,#c62828)',
-        restaurant:'Smash & Co',
-        sub:'Burgers & Street Food',
+        cardBg:'linear-gradient(135deg,#f57f17,#c62828)', photo:'burger,fries',
+        restaurant:'Smash & Co', sub:'Burgers & Street Food',
         meta:['📍 Table 11','⭐ 4,7','🕐 11h30 – 23h'],
         theme:{ bg:'#111112', bg2:'rgba(17,17,18,.6)', fg:'#f4f2ec', accent:'#ff6d00', accentBright:'#ffab40', accentFg:'#1a0d00',
                 heroBg:'linear-gradient(135deg,#bf360c,#f57f17)', title:"'Bebas Neue',sans-serif", titleSpacing:'.03em' },
         sections:[
           {name:'Les Burgers', icon:'🍔', items:[
-            {n:'Le Smash Classic', d:'2 steaks smashés, cheddar, oignons, sauce maison', p:'13€', tags:['star']},
-            {n:'Le Bacon BBQ', d:'Bœuf, bacon croustillant, cheddar, sauce BBQ, oignons frits', p:'15€'},
-            {n:'Le Chicken Crispy', d:'Poulet pané croustillant, coleslaw, sauce ranch', p:'14€'},
-            {n:'Le Veggie', d:'Steak végétal, avocat, roquette, tomate', p:'13€', tags:['veg']},
-            {n:'Le Spicy', d:'Bœuf, jalapeños, pepper jack, sauce feu', p:'14€', tags:['spicy']},
+            {n:'Le Smash Classic', d:'2 steaks smashés, cheddar, oignons, sauce maison', p:'13€', img:'cheeseburger', tags:['star']},
+            {n:'Le Bacon BBQ', d:'Bœuf, bacon croustillant, cheddar, sauce BBQ, oignons frits', p:'15€', img:'bacon,burger'},
+            {n:'Le Chicken Crispy', d:'Poulet pané croustillant, coleslaw, sauce ranch', p:'14€', img:'chicken,burger'},
+            {n:'Le Veggie', d:'Steak végétal, avocat, roquette, tomate', p:'13€', img:'veggie,burger', tags:['veg']},
+            {n:'Le Spicy', d:'Bœuf, jalapeños, pepper jack, sauce feu', p:'14€', img:'spicy,burger', tags:['spicy']},
           ]},
           {name:'À côté', icon:'🍟', items:[
-            {n:'Frites maison', d:'Coupées à la main, fleur de sel', p:'5€', tags:['veg','star']},
-            {n:'Frites cheddar-bacon', d:'Cheddar fondu, éclats de bacon', p:'8€'},
-            {n:'Onion rings (x6)', d:'Beignets d\'oignon, sauce ranch', p:'6€', tags:['veg']},
-            {n:'Tenders de poulet (x4)', d:'Poulet pané, sauce au choix', p:'8€'},
+            {n:'Frites maison', d:'Coupées à la main, fleur de sel', p:'5€', img:'french,fries', tags:['veg','star']},
+            {n:'Frites cheddar-bacon', d:'Cheddar fondu, éclats de bacon', p:'8€', img:'loaded,fries'},
+            {n:'Onion rings (x6)', d:'Beignets d\'oignon, sauce ranch', p:'6€', img:'onion,rings', tags:['veg']},
+            {n:'Tenders de poulet (x4)', d:'Poulet pané, sauce au choix', p:'8€', img:'chicken,tenders'},
           ]},
           {name:'Milkshakes & Boissons', icon:'🥤', items:[
-            {n:'Milkshake Oreo', d:'Glace vanille, Oreo, chantilly', p:'7€', tags:['veg','star']},
-            {n:'Milkshake caramel beurre salé', d:'Onctueux, chantilly, éclats de caramel', p:'7€', tags:['veg']},
-            {n:'Limonade artisanale', d:'Citron pressé, menthe', p:'4€', tags:['veg']},
+            {n:'Milkshake Oreo', d:'Glace vanille, Oreo, chantilly', p:'7€', img:'oreo,milkshake', tags:['veg','star']},
+            {n:'Milkshake caramel beurre salé', d:'Onctueux, chantilly, éclats de caramel', p:'7€', img:'caramel,milkshake', tags:['veg']},
+            {n:'Limonade artisanale', d:'Citron pressé, menthe', p:'4€', img:'lemonade', tags:['veg']},
           ]},
         ],
       },
       {
         id:'vegan', name:'Végé / Vegan', emoji:'🥗', tagline:'Bowls, bio, healthy',
-        cardBg:'linear-gradient(135deg,#2e7d32,#9ccc65)',
-        restaurant:'Green Garden',
-        sub:'Cuisine végétale · Bio & de saison',
+        cardBg:'linear-gradient(135deg,#2e7d32,#9ccc65)', photo:'vegan,bowl',
+        restaurant:'Green Garden', sub:'Cuisine végétale · Bio & de saison',
         meta:['📍 Table 10','⭐ 4,8','🕐 11h30 – 21h'],
         theme:{ bg:'#0c1310', bg2:'rgba(12,19,16,.6)', fg:'#eef3e9', accent:'#43a047', accentBright:'#9ccc65', accentFg:'#0b1a09',
                 heroBg:'linear-gradient(135deg,#1b5e20,#43a047)', title:"'Poppins',sans-serif" },
         sections:[
           {name:'Entrées', icon:'🥬', items:[
-            {n:'Houmous de betterave', d:'Pois chiche, betterave rôtie, graines, pain pita', p:'8€', tags:['veg','star']},
-            {n:'Velouté de saison', d:'Légumes bio du maraîcher, huile de courge', p:'7€', tags:['veg']},
-            {n:'Rouleaux de printemps', d:'Tofu mariné, mangue, menthe, sauce cacahuète', p:'8€', tags:['veg']},
+            {n:'Houmous de betterave', d:'Pois chiche, betterave rôtie, graines, pain pita', p:'8€', img:'beetroot,hummus', tags:['veg','star']},
+            {n:'Velouté de saison', d:'Légumes bio du maraîcher, huile de courge', p:'7€', img:'vegetable,soup', tags:['veg']},
+            {n:'Rouleaux de printemps', d:'Tofu mariné, mangue, menthe, sauce cacahuète', p:'8€', img:'spring,rolls', tags:['veg']},
           ]},
           {name:'Buddha Bowls', icon:'🥗', items:[
-            {n:'Bowl Rainbow', d:'Quinoa, avocat, patate douce, edamame, tahini', p:'15€', tags:['veg','star']},
-            {n:'Bowl Falafel', d:'Falafels maison, houmous, chou rouge, boulgour', p:'14€', tags:['veg']},
-            {n:'Curry de légumes', d:'Lait de coco, patate douce, pois chiche, riz complet', p:'14€', tags:['veg','spicy']},
-            {n:'Dahl de lentilles corail', d:'Lentilles, épices douces, coriandre, riz basmati', p:'13€', tags:['veg']},
+            {n:'Bowl Rainbow', d:'Quinoa, avocat, patate douce, edamame, tahini', p:'15€', img:'buddha,bowl', tags:['veg','star']},
+            {n:'Bowl Falafel', d:'Falafels maison, houmous, chou rouge, boulgour', p:'14€', img:'falafel,bowl', tags:['veg']},
+            {n:'Curry de légumes', d:'Lait de coco, patate douce, pois chiche, riz complet', p:'14€', img:'vegetable,curry', tags:['veg','spicy']},
+            {n:'Dahl de lentilles corail', d:'Lentilles, épices douces, coriandre, riz basmati', p:'13€', img:'lentil,dahl', tags:['veg']},
           ]},
           {name:'Desserts & Jus', icon:'🍓', items:[
-            {n:'Cheesecake vegan', d:'Base noix de cajou, coulis de fruits rouges', p:'8€', tags:['veg','star']},
-            {n:'Energy balls (x3)', d:'Dattes, cacao cru, noix', p:'5€', tags:['veg']},
-            {n:'Jus vert pressé', d:'Épinard, pomme, concombre, gingembre', p:'6€', tags:['veg']},
+            {n:'Cheesecake vegan', d:'Base noix de cajou, coulis de fruits rouges', p:'8€', img:'vegan,cheesecake', tags:['veg','star']},
+            {n:'Energy balls (x3)', d:'Dattes, cacao cru, noix', p:'5€', img:'energy,balls', tags:['veg']},
+            {n:'Jus vert pressé', d:'Épinard, pomme, concombre, gingembre', p:'6€', img:'green,juice', tags:['veg']},
           ]},
         ],
       },
       {
         id:'brunch', name:'Café / Brunch', emoji:'🥐', tagline:'Coffee shop, pancakes',
-        cardBg:'linear-gradient(135deg,#8d6e63,#ffb300)',
-        restaurant:'Sunday Coffee',
-        sub:'Coffee Shop & Brunch',
+        cardBg:'linear-gradient(135deg,#8d6e63,#ffb300)', photo:'brunch,coffee',
+        restaurant:'Sunday Coffee', sub:'Coffee Shop & Brunch',
         meta:['📍 Table 1','⭐ 4,9','🕐 8h – 17h'],
         theme:{ bg:'#12100d', bg2:'rgba(18,16,13,.6)', fg:'#f3ece1', accent:'#a97449', accentBright:'#e0a96d', accentFg:'#1a1108',
                 heroBg:'linear-gradient(135deg,#5d4037,#8d6e63)', title:"'Playfair Display',serif" },
         sections:[
           {name:'Cafés & Boissons', icon:'☕', items:[
-            {n:'Cappuccino', d:'Espresso, lait micro-moussé, art latte', p:'4€', tags:['star']},
-            {n:'Flat White', d:'Double ristretto, lait velouté', p:'4,5€'},
-            {n:'Chai Latte', d:'Thé épicé, lait moussé, cannelle', p:'5€', tags:['veg']},
-            {n:'Matcha Latte', d:'Thé matcha cérémonial, lait d\'avoine', p:'5,5€', tags:['veg']},
+            {n:'Cappuccino', d:'Espresso, lait micro-moussé, art latte', p:'4€', img:'cappuccino', tags:['star']},
+            {n:'Flat White', d:'Double ristretto, lait velouté', p:'4,5€', img:'flat,white,coffee'},
+            {n:'Chai Latte', d:'Thé épicé, lait moussé, cannelle', p:'5€', img:'chai,latte', tags:['veg']},
+            {n:'Matcha Latte', d:'Thé matcha cérémonial, lait d\'avoine', p:'5,5€', img:'matcha,latte', tags:['veg']},
           ]},
           {name:'Le Brunch', icon:'🍳', items:[
-            {n:'Formule Brunch complet', d:'Boisson chaude, jus, œufs, avocado toast, viennoiserie, fruits', p:'24€', tags:['star']},
-            {n:'Avocado Toast', d:'Pain au levain, avocat, œuf poché, graines, piment', p:'12€', tags:['veg']},
-            {n:'Œufs Benedict', d:'Muffin, œufs pochés, saumon fumé, hollandaise', p:'14€'},
-            {n:'Shakshuka', d:'Œufs pochés, sauce tomate épicée, feta, pain', p:'13€', tags:['veg','spicy']},
+            {n:'Formule Brunch complet', d:'Boisson chaude, jus, œufs, avocado toast, viennoiserie, fruits', p:'24€', img:'brunch,table', tags:['star']},
+            {n:'Avocado Toast', d:'Pain au levain, avocat, œuf poché, graines, piment', p:'12€', img:'avocado,toast', tags:['veg']},
+            {n:'Œufs Benedict', d:'Muffin, œufs pochés, saumon fumé, hollandaise', p:'14€', img:'eggs,benedict'},
+            {n:'Shakshuka', d:'Œufs pochés, sauce tomate épicée, feta, pain', p:'13€', img:'shakshuka', tags:['veg','spicy']},
           ]},
           {name:'Sucré', icon:'🥞', items:[
-            {n:'Pancakes stack', d:'Pile de pancakes, sirop d\'érable, fruits rouges', p:'11€', tags:['veg','star']},
-            {n:'Açaï Bowl', d:'Açaï, granola, banane, fruits frais, coco', p:'12€', tags:['veg']},
-            {n:'Cookie maison', d:'Chocolat, cœur fondant', p:'3,5€', tags:['veg']},
+            {n:'Pancakes stack', d:'Pile de pancakes, sirop d\'érable, fruits rouges', p:'11€', img:'pancakes', tags:['veg','star']},
+            {n:'Açaï Bowl', d:'Açaï, granola, banane, fruits frais, coco', p:'12€', img:'acai,bowl', tags:['veg']},
+            {n:'Cookie maison', d:'Chocolat, cœur fondant', p:'3,5€', img:'chocolate,cookie', tags:['veg']},
           ]},
         ],
       },
@@ -762,6 +767,7 @@
       card.className = 'cuisine-card';
       card.innerHTML = `
         <div class="cc-bg" style="background:${c.cardBg}"></div>
+        <img class="cc-photo" src="${photoUrl(c.photo,420,420)}" loading="lazy" alt="" onerror="this.remove()">
         <div class="cc-emoji">${c.emoji}</div>
         <div class="cc-body">
           <h3>${c.name}</h3>
@@ -785,7 +791,6 @@
       const c = CUISINES.find(x => x.id === id);
       if(!c) return;
       const t = c.theme;
-      // apply theme vars to overlay
       overlay.style.setProperty('--m-bg', t.bg);
       overlay.style.setProperty('--m-bg-2', t.bg2);
       overlay.style.setProperty('--m-fg', t.fg);
@@ -807,6 +812,10 @@
           <div class="sec-line"></div>
           ${s.items.map(it => `
             <div class="m-item">
+              <div class="mi-thumb" style="background:${c.cardBg}">
+                <span class="mi-emoji">${s.icon}</span>
+                <img src="${photoUrl(it.img || it.n, 160, 160)}" loading="lazy" alt="" onerror="this.remove()">
+              </div>
               <div class="mi-main">
                 <div class="mi-name">${esc(it.n)}</div>
                 <div class="mi-desc">${esc(it.d)}</div>
@@ -818,6 +827,7 @@
 
       doc.innerHTML = `
         <div class="m-hero">
+          <img class="m-hero-photo" src="${photoUrl(c.photo,1000,560)}" alt="" onerror="this.remove()">
           <span class="m-nfc">📶 Menu ouvert via NFC</span>
           <h1>${esc(c.restaurant)}</h1>
           <div class="m-sub">${esc(c.sub)}</div>
@@ -833,7 +843,6 @@
           <button class="btn m-btn-a" data-act="addition">🧾 Demander l'addition</button>
         </div>`;
 
-      // tab scroll behaviour
       doc.querySelectorAll('.m-tab').forEach(tab => {
         tab.addEventListener('click', () => {
           doc.querySelectorAll('.m-tab').forEach(x=>x.classList.remove('active'));
@@ -842,7 +851,6 @@
           if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
         });
       });
-      // action buttons (demo)
       doc.querySelectorAll('[data-act]').forEach(b => {
         b.addEventListener('click', () => {
           const msg = b.dataset.act === 'serveur' ? 'Un serveur arrive à votre table 👋' : 'Votre addition est en préparation 🧾';
@@ -882,7 +890,6 @@
       toastTimer = setTimeout(()=>toastEl.classList.remove('show'), 2600);
     }
 
-    // deep-link: open a menu directly via #menu-<id>
     if(location.hash.startsWith('#menu-')){
       const id = location.hash.replace('#menu-','');
       if(CUISINES.some(c=>c.id===id)) openMenu(id);
