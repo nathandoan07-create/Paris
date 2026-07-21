@@ -31,6 +31,32 @@ python3 -m http.server 8000
 Lien direct vers un menu : ajoutez `#menu-<id>` à l'URL, par exemple
 `index.html#menu-italien` ou `#menu-japonais`.
 
+## Mettre en ligne sur Render (lien ouvrable)
+
+Le dépôt contient un blueprint `render.yaml` qui déclare **deux services** :
+`paname-roof` (l'ancien projet, inchangé) et **`tapmenu`** (ce site statique).
+
+### Option A — la plus simple : « New → Static Site »
+
+1. Va sur https://render.com et connecte ton compte GitHub.
+2. **New → Static Site**, choisis le dépôt `nathandoan07-create/Paris`.
+3. Renseigne :
+   - **Branch** : `claude/session-dbhalc` (ou `main` après fusion).
+   - **Build Command** : *(laisse vide)*
+   - **Publish Directory** : `menu-nfc`
+4. **Create Static Site**. En ~1 minute tu obtiens un lien du type
+   `https://tapmenu.onrender.com` — **ouvrable et partageable**.
+
+### Option B — via le Blueprint (déploie les deux projets d'un coup)
+
+1. Sur Render : **New → Blueprint**, choisis le dépôt et la branche.
+2. Render lit `render.yaml` et crée les services `paname-roof` **et** `tapmenu`.
+3. Le service `tapmenu` te donne l'URL publique du menu.
+
+> 💡 C'est un site **statique** : pas de mise en veille, chargement rapide, et
+> le plan gratuit suffit. Les photos des plats se chargent depuis internet
+> (comme dans n'importe quel site) ; le visiteur a juste besoin d'une connexion.
+
 ## Personnaliser
 
 Toutes les données (restaurants, plats, prix, couleurs de chaque style) sont

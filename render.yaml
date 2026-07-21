@@ -1,6 +1,7 @@
-# Render Blueprint — deploys the Paname Roof Node server (which also serves the site).
+# Render Blueprint.
 # Docs: https://render.com/docs/blueprint-spec
 services:
+  # --- Projet 1 : Paname Roof (serveur Node, inchangé) ---
   - type: web
     name: paname-roof
     runtime: node
@@ -17,3 +18,13 @@ services:
       - key: STRIPE_WEBHOOK_SECRET
         sync: false
       # BASE_URL is auto-filled from RENDER_EXTERNAL_URL; no need to set it.
+
+  # --- Projet 2 : TapMenu (site statique, dossier menu-nfc/) ---
+  # Aucune compilation : Render sert directement les fichiers du dossier.
+  - type: web
+    name: tapmenu
+    runtime: static
+    plan: free
+    buildCommand: "echo 'Site statique, aucune compilation'"
+    staticPublishPath: ./menu-nfc
+    autoDeploy: true
