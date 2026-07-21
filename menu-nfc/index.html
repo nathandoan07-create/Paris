@@ -1,0 +1,892 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TapMenu — Le menu de vos tables en un tap NFC</title>
+  <meta name="description" content="Menu digital par puce NFC sur les tables. Le client scanne, le menu s'ouvre. Choisissez un style de restaurant et découvrez un exemple de menu." />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="TapMenu" />
+  <meta property="og:locale" content="fr_FR" />
+  <meta property="og:title" content="TapMenu — Le menu de vos tables en un tap NFC" />
+  <meta property="og:description" content="Menu digital par puce NFC. Choisissez un style de restaurant et découvrez un exemple de menu interactif." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Bebas+Neue&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --bg-2: #141821;
+      --surface: #1a1f2b;
+      --surface-2: #212836;
+      --border: rgba(255,255,255,.09);
+      --fg: #f4f5f7;
+      --muted: #9aa3b2;
+      --muted-2: #6b7488;
+      --accent: #ff7a45;
+      --accent-2: #ffb35c;
+      --radius: 18px;
+      --radius-sm: 12px;
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --maxw: 1180px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 22px; }
+
+    /* ---------- Top bar ---------- */
+    header.nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(13,15,20,.72);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.15rem; letter-spacing: -.02em; }
+    .logo .mark {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid; place-items: center; font-size: 1.05rem;
+      box-shadow: 0 6px 18px rgba(255,122,69,.4);
+    }
+    .nav-links { display: flex; gap: 26px; align-items: center; }
+    .nav-links a { color: var(--muted); font-size: .93rem; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover { color: var(--fg); }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 20px; border-radius: 999px; font-weight: 600; font-size: .92rem;
+      cursor: pointer; border: none; transition: transform .15s, box-shadow .2s, background .2s;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #1a1005; box-shadow: 0 8px 24px rgba(255,122,69,.35); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(255,122,69,.5); }
+    .btn-ghost { background: var(--surface-2); color: var(--fg); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--surface); }
+    @media (max-width: 720px){ .nav-links { display: none; } }
+
+    /* ---------- Hero ---------- */
+    .hero { position: relative; padding: 84px 0 60px; overflow: hidden; }
+    .hero::before {
+      content: ""; position: absolute; inset: 0;
+      background:
+        radial-gradient(700px 400px at 80% -10%, rgba(255,122,69,.22), transparent 60%),
+        radial-gradient(600px 400px at 10% 20%, rgba(90,120,255,.14), transparent 60%);
+      pointer-events: none;
+    }
+    .hero-grid { position: relative; display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 7px 14px; border-radius: 999px; font-size: .8rem; font-weight: 600;
+      background: rgba(255,122,69,.12); color: var(--accent-2); border: 1px solid rgba(255,122,69,.28);
+      margin-bottom: 22px;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif; font-weight: 700;
+      font-size: clamp(2.3rem, 5vw, 3.7rem); line-height: 1.05; letter-spacing: -.02em;
+      margin-bottom: 20px;
+    }
+    .hero h1 .grad { background: linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero p.lead { font-size: 1.12rem; color: var(--muted); max-width: 520px; margin-bottom: 28px; }
+    .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
+    .hero-stats { display: flex; gap: 30px; margin-top: 36px; }
+    .hero-stats .s b { display: block; font-size: 1.55rem; font-weight: 800; }
+    .hero-stats .s span { font-size: .82rem; color: var(--muted-2); }
+
+    /* Phone mockup */
+    .phone-wrap { display: grid; place-items: center; }
+    .phone {
+      width: 278px; height: 560px; border-radius: 42px; padding: 12px;
+      background: linear-gradient(160deg,#2a3040,#12151d);
+      box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,255,255,.06);
+      position: relative;
+    }
+    .phone::before { content:""; position:absolute; top:20px; left:50%; transform:translateX(-50%); width:90px; height:6px; border-radius:3px; background:rgba(255,255,255,.15); z-index:3; }
+    .phone-screen {
+      width: 100%; height: 100%; border-radius: 32px; overflow: hidden;
+      background: #0f1218; position: relative;
+      display: flex; flex-direction: column;
+    }
+    .ps-top { height: 130px; background: linear-gradient(135deg,var(--accent),var(--accent-2)); position:relative; display:flex; align-items:flex-end; padding:16px; }
+    .ps-top .nfc-badge { position:absolute; top:16px; right:16px; font-size:.65rem; background:rgba(0,0,0,.25); padding:4px 9px; border-radius:999px; font-weight:600; color:#fff; }
+    .ps-top h4 { color:#fff; font-family:'Playfair Display',serif; font-size:1.3rem; }
+    .ps-body { flex:1; padding:14px; overflow:hidden; }
+    .ps-row { display:flex; justify-content:space-between; gap:10px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,.06); }
+    .ps-row .n { font-size:.82rem; font-weight:600; }
+    .ps-row .d { font-size:.68rem; color:var(--muted-2); }
+    .ps-row .p { font-size:.8rem; font-weight:700; color:var(--accent-2); white-space:nowrap; }
+    .float-tap {
+      position:absolute; bottom:-14px; right:-10px; z-index:4;
+      background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:10px 14px;
+      display:flex; align-items:center; gap:10px; box-shadow:var(--shadow);
+      animation: bob 3s ease-in-out infinite;
+    }
+    @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    .float-tap .dot { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent-2)); display:grid; place-items:center; font-size:1rem; }
+    .float-tap b { font-size:.8rem; } .float-tap span { display:block; font-size:.68rem; color:var(--muted-2); }
+    @media (max-width: 900px){ .hero-grid { grid-template-columns: 1fr; } .phone-wrap { order:-1; margin-bottom:10px; } }
+
+    /* ---------- Section heads ---------- */
+    section { padding: 62px 0; }
+    .sec-head { text-align:center; max-width:640px; margin:0 auto 42px; }
+    .sec-head .kicker { font-size:.82rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:12px; }
+    .sec-head h2 { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,3.6vw,2.6rem); font-weight:700; letter-spacing:-.02em; margin-bottom:14px; }
+    .sec-head p { color:var(--muted); font-size:1.05rem; }
+
+    /* ---------- Cuisine grid ---------- */
+    #styles { background: linear-gradient(180deg, transparent, rgba(255,255,255,.015)); }
+    .cuisine-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
+    @media (max-width:980px){ .cuisine-grid{ grid-template-columns:repeat(3,1fr);} }
+    @media (max-width:680px){ .cuisine-grid{ grid-template-columns:repeat(2,1fr); gap:13px;} }
+    .cuisine-card {
+      position:relative; border-radius:var(--radius); overflow:hidden; cursor:pointer;
+      border:1px solid var(--border); background:var(--surface);
+      aspect-ratio: 1/1.02; display:flex; flex-direction:column; justify-content:flex-end;
+      transition:transform .2s, box-shadow .25s, border-color .2s;
+      isolation:isolate;
+    }
+    .cuisine-card:hover { transform:translateY(-6px); box-shadow:var(--shadow); border-color:rgba(255,255,255,.2); }
+    .cc-bg { position:absolute; inset:0; z-index:-2; opacity:.9; transition:transform .4s; }
+    .cuisine-card:hover .cc-bg { transform:scale(1.08); }
+    .cuisine-card::after { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(to top, rgba(8,9,13,.92) 12%, rgba(8,9,13,.35) 55%, rgba(8,9,13,.15)); }
+    .cc-emoji { position:absolute; top:16px; left:16px; font-size:1.9rem; filter:drop-shadow(0 3px 6px rgba(0,0,0,.5)); }
+    .cc-body { padding:16px; }
+    .cc-body h3 { font-size:1.08rem; font-weight:700; margin-bottom:3px; }
+    .cc-body p { font-size:.78rem; color:var(--muted); }
+    .cc-open { display:inline-flex; align-items:center; gap:6px; margin-top:10px; font-size:.78rem; font-weight:600; color:var(--accent-2); }
+
+    /* ---------- How it works ---------- */
+    .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+    @media (max-width:820px){ .steps{ grid-template-columns:1fr;} }
+    .step { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:28px 24px; }
+    .step .num { width:44px; height:44px; border-radius:12px; background:rgba(255,122,69,.12); color:var(--accent-2); display:grid; place-items:center; font-weight:800; font-size:1.2rem; margin-bottom:16px; }
+    .step h3 { font-size:1.15rem; margin-bottom:8px; }
+    .step p { color:var(--muted); font-size:.95rem; }
+
+    /* ---------- Features ---------- */
+    .feat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+    @media (max-width:820px){ .feat-grid{ grid-template-columns:1fr;} }
+    .feat { padding:24px; border:1px solid var(--border); border-radius:var(--radius); background:linear-gradient(180deg,var(--surface),var(--bg-2)); }
+    .feat .ico { font-size:1.6rem; margin-bottom:12px; }
+    .feat h4 { font-size:1.05rem; margin-bottom:6px; }
+    .feat p { color:var(--muted); font-size:.92rem; }
+
+    /* ---------- CTA band ---------- */
+    .cta-band { background:linear-gradient(135deg, rgba(255,122,69,.16), rgba(255,179,92,.08)); border:1px solid rgba(255,122,69,.25); border-radius:26px; padding:48px 40px; text-align:center; }
+    .cta-band h2 { font-family:'Playfair Display',serif; font-size:clamp(1.7rem,3.4vw,2.4rem); margin-bottom:12px; }
+    .cta-band p { color:var(--muted); max-width:520px; margin:0 auto 24px; }
+
+    /* ---------- Footer ---------- */
+    footer { border-top:1px solid var(--border); padding:40px 0; color:var(--muted-2); }
+    .foot-inner { display:flex; justify-content:space-between; flex-wrap:wrap; gap:18px; align-items:center; }
+    footer .logo { font-size:1rem; }
+
+    /* ---------- MENU OVERLAY (the demo the guest sees after NFC tap) ---------- */
+    .menu-overlay {
+      position:fixed; inset:0; z-index:100; display:none;
+      background:var(--m-bg, #12100e);
+      overflow-y:auto;
+    }
+    .menu-overlay.open { display:block; animation:fadeIn .35s ease; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    .menu-doc { min-height:100%; color:var(--m-fg,#efe9df); font-family:var(--m-font,'Inter',sans-serif); }
+    .m-close {
+      position:fixed; top:16px; left:16px; z-index:110;
+      background:rgba(0,0,0,.4); color:#fff; border:1px solid rgba(255,255,255,.2);
+      width:42px; height:42px; border-radius:50%; cursor:pointer; font-size:1.2rem; backdrop-filter:blur(6px);
+      display:grid; place-items:center; transition:background .2s;
+    }
+    .m-close:hover { background:rgba(0,0,0,.65); }
+    .m-hero {
+      position:relative; padding:70px 24px 40px; text-align:center;
+      background:var(--m-hero-bg); border-bottom:3px solid var(--m-accent,#c9a24b);
+      overflow:hidden;
+    }
+    .m-hero::after{ content:""; position:absolute; inset:0; background:var(--m-hero-tint, linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.5))); z-index:0; }
+    .m-hero > * { position:relative; z-index:1; }
+    .m-nfc { display:inline-flex; align-items:center; gap:7px; font-size:.72rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; padding:6px 13px; border-radius:999px; background:rgba(255,255,255,.14); backdrop-filter:blur(4px); margin-bottom:16px; }
+    .m-hero h1 { font-family:var(--m-title,'Playfair Display',serif); font-size:clamp(2rem,7vw,3.2rem); font-weight:700; letter-spacing:var(--m-title-spacing,0); line-height:1.05; }
+    .m-hero .m-sub { margin-top:10px; font-size:1rem; opacity:.85; max-width:460px; margin-left:auto; margin-right:auto; }
+    .m-hero .m-meta { margin-top:16px; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; font-size:.8rem; opacity:.8; }
+    .m-hero .m-meta span { display:inline-flex; align-items:center; gap:6px; }
+
+    .m-tabs { position:sticky; top:0; z-index:5; display:flex; gap:8px; overflow-x:auto; padding:14px 18px; background:var(--m-bg-2, rgba(0,0,0,.25)); backdrop-filter:blur(10px); border-bottom:1px solid rgba(255,255,255,.08); scrollbar-width:none; }
+    .m-tabs::-webkit-scrollbar{ display:none; }
+    .m-tab { white-space:nowrap; padding:8px 16px; border-radius:999px; font-size:.85rem; font-weight:600; cursor:pointer; border:1px solid transparent; background:rgba(255,255,255,.06); color:var(--m-fg); opacity:.7; transition:all .2s; }
+    .m-tab.active { background:var(--m-accent,#c9a24b); color:var(--m-accent-fg,#1a1206); opacity:1; }
+
+    .m-content { max-width:720px; margin:0 auto; padding:32px 22px 100px; }
+    .m-section { margin-bottom:42px; scroll-margin-top:80px; }
+    .m-section h2 { font-family:var(--m-title,'Playfair Display',serif); font-size:1.5rem; margin-bottom:4px; display:flex; align-items:center; gap:10px; }
+    .m-section .sec-line { height:2px; background:linear-gradient(90deg,var(--m-accent,#c9a24b),transparent); margin:12px 0 20px; border-radius:2px; }
+    .m-item { display:flex; gap:16px; padding:16px 0; border-bottom:1px dashed rgba(255,255,255,.1); }
+    .m-item:last-child{ border-bottom:none; }
+    .m-item .mi-main { flex:1; }
+    .m-item .mi-name { font-weight:700; font-size:1.02rem; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .m-item .mi-desc { font-size:.86rem; opacity:.7; margin-top:3px; }
+    .m-item .mi-tags { margin-top:7px; display:flex; gap:6px; flex-wrap:wrap; }
+    .m-tag { font-size:.65rem; font-weight:600; padding:3px 8px; border-radius:6px; background:rgba(255,255,255,.09); opacity:.9; }
+    .m-tag.veg { background:rgba(52,211,153,.16); color:#7ff0c4; }
+    .m-tag.spicy { background:rgba(248,113,113,.16); color:#ffb0b0; }
+    .m-tag.star { background:var(--m-accent,#c9a24b); color:var(--m-accent-fg,#1a1206); }
+    .m-item .mi-price { font-weight:800; font-size:1.02rem; color:var(--m-accent-bright,var(--m-accent,#c9a24b)); white-space:nowrap; }
+
+    .m-actionbar { position:fixed; bottom:0; left:0; right:0; z-index:8; display:flex; gap:10px; padding:14px 18px calc(14px + env(safe-area-inset-bottom)); background:var(--m-bg-2, rgba(0,0,0,.55)); backdrop-filter:blur(12px); border-top:1px solid rgba(255,255,255,.1); }
+    .m-actionbar .btn { flex:1; justify-content:center; }
+    .m-btn-a { background:var(--m-accent,#c9a24b); color:var(--m-accent-fg,#1a1206); }
+    .m-btn-b { background:rgba(255,255,255,.1); color:var(--m-fg); border:1px solid rgba(255,255,255,.15); }
+    .m-content .m-note { text-align:center; font-size:.8rem; opacity:.55; margin-top:20px; }
+
+    .toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px); z-index:120; background:#fff; color:#111; padding:12px 22px; border-radius:999px; font-weight:600; font-size:.9rem; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:all .3s; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+    .demo-banner { text-align:center; font-size:.72rem; padding:7px; background:rgba(0,0,0,.3); opacity:.7; letter-spacing:.05em; }
+  </style>
+</head>
+<body>
+
+  <!-- ================= NAV ================= -->
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <div class="logo"><span class="mark">📶</span> TapMenu</div>
+      <nav class="nav-links">
+        <a href="#styles">Styles de menu</a>
+        <a href="#how">Comment ça marche</a>
+        <a href="#features">Avantages</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <a href="#contact" class="btn btn-primary">Demander une démo</a>
+    </div>
+  </header>
+
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="pill">📶 Menu digital sans contact</span>
+        <h1>Le menu de vos tables<br/>en un simple <span class="grad">tap NFC</span>.</h1>
+        <p class="lead">Une puce NFC discrète sur chaque table. Le client l'approche de son téléphone et votre menu s'ouvre instantanément — sans application, sans QR code à cadrer. Choisissez le style de votre restaurant ci-dessous et voyez le résultat.</p>
+        <div class="hero-cta">
+          <a href="#styles" class="btn btn-primary">Voir les exemples de menus →</a>
+          <a href="#how" class="btn btn-ghost">Comment ça marche</a>
+        </div>
+        <div class="hero-stats">
+          <div class="s"><b>0 appli</b><span>à télécharger</span></div>
+          <div class="s"><b>&lt; 2 s</b><span>menu affiché</span></div>
+          <div class="s"><b>∞</b><span>mises à jour gratuites</span></div>
+        </div>
+      </div>
+
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="ps-top">
+              <span class="nfc-badge">📶 Table 12</span>
+              <h4>Trattoria Bella</h4>
+            </div>
+            <div class="ps-body">
+              <div class="ps-row"><div><div class="n">Burrata di Puglia</div><div class="d">Tomates confites, basilic</div></div><div class="p">14€</div></div>
+              <div class="ps-row"><div><div class="n">Tagliatelle al Tartufo</div><div class="d">Crème, truffe noire</div></div><div class="p">22€</div></div>
+              <div class="ps-row"><div><div class="n">Pizza Regina</div><div class="d">Mozzarella, jambon, champignons</div></div><div class="p">16€</div></div>
+              <div class="ps-row"><div><div class="n">Tiramisù maison</div><div class="d">Mascarpone, café</div></div><div class="p">9€</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="float-tap">
+          <span class="dot">📶</span>
+          <div><b>Tap détecté</b><span>Menu ouvert</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CUISINE STYLES ================= -->
+  <section id="styles">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">Choisissez votre univers</div>
+        <h2>Un exemple de menu pour chaque type de restaurant</h2>
+        <p>Cliquez sur un style : vous verrez exactement ce que vos clients découvriront après avoir tapé la puce NFC de leur table.</p>
+      </div>
+      <div class="cuisine-grid" id="cuisineGrid"><!-- injected by JS --></div>
+    </div>
+  </section>
+
+  <!-- ================= HOW IT WORKS ================= -->
+  <section id="how" style="background:var(--bg-2);">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">Simple pour tous</div>
+        <h2>Comment ça marche</h2>
+        <p>Trois étapes, aucune installation côté client.</p>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="num">1</div><h3>On équipe vos tables</h3><p>Nous posons une puce NFC élégante (ou un support design) sur chaque table, reliée à votre menu personnalisé.</p></div>
+        <div class="step"><div class="num">2</div><h3>Le client tape</h3><p>Il approche son téléphone de la puce. Le menu s'ouvre dans le navigateur — pas d'appli, pas de QR code à viser dans le noir.</p></div>
+        <div class="step"><div class="num">3</div><h3>Vous gérez tout</h3><p>Prix, plats, photos, ruptures de stock : vous modifiez votre menu en temps réel depuis un simple tableau de bord.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FEATURES ================= -->
+  <section id="features">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">Pourquoi TapMenu</div>
+        <h2>Pensé pour les restaurateurs</h2>
+      </div>
+      <div class="feat-grid">
+        <div class="feat"><div class="ico">⚡</div><h4>Mises à jour instantanées</h4><p>Changez un prix ou retirez un plat épuisé en un clic. Fini les cartes à réimprimer.</p></div>
+        <div class="feat"><div class="ico">🌍</div><h4>Multilingue</h4><p>Menu traduit automatiquement pour vos clients touristes : FR, EN, ES, DE, 中文…</p></div>
+        <div class="feat"><div class="ico">📸</div><h4>Photos qui vendent</h4><p>Chaque plat avec une belle photo augmente le panier moyen et facilite le choix.</p></div>
+        <div class="feat"><div class="ico">♿</div><h4>Allergènes & régimes</h4><p>Filtres végé, vegan, sans gluten, halal, et affichage clair des allergènes.</p></div>
+        <div class="feat"><div class="ico">📊</div><h4>Statistiques</h4><p>Voyez les plats les plus consultés et adaptez votre carte à la demande réelle.</p></div>
+        <div class="feat"><div class="ico">💳</div><h4>Options de paiement</h4><p>Appel du serveur, addition, pourboire ou paiement à table — activables à la carte.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CTA ================= -->
+  <section id="contact">
+    <div class="wrap">
+      <div class="cta-band">
+        <h2>Envie d'équiper votre restaurant ?</h2>
+        <p>Recevez une démo personnalisée à votre enseigne et un devis en 24 h. Sans engagement.</p>
+        <a href="mailto:contact@tapmenu.fr?subject=Demande%20de%20démo%20TapMenu" class="btn btn-primary">Demander ma démo gratuite →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer>
+    <div class="wrap foot-inner">
+      <div class="logo"><span class="mark">📶</span> TapMenu</div>
+      <div>© <span id="year"></span> TapMenu — Le menu sans contact pour vos tables.</div>
+    </div>
+  </footer>
+
+  <!-- ================= MENU OVERLAY ================= -->
+  <div class="menu-overlay" id="menuOverlay">
+    <button class="m-close" id="menuClose" aria-label="Fermer">✕</button>
+    <div class="menu-doc" id="menuDoc"><!-- injected --></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    /* ============================================================
+       DATA — one entry per restaurant style.
+       Each has a theme (colors/fonts) + a full sample menu.
+       ============================================================ */
+    const CUISINES = [
+      {
+        id:'italien', name:'Italien', emoji:'🍝', tagline:'Trattoria, pizzeria, cucina',
+        cardBg:'linear-gradient(135deg,#2e7d32,#c62828)',
+        restaurant:'Trattoria Bella',
+        sub:'Cucina italiana · Depuis 1987',
+        meta:['📍 Table 12','⭐ 4,8','🕐 12h – 23h'],
+        theme:{ bg:'#14100c', bg2:'rgba(20,15,10,.6)', fg:'#f3ead9', accent:'#2e7d32', accentBright:'#8bc34a', accentFg:'#0d1f0a',
+                heroBg:'linear-gradient(135deg,#1b5e20,#2e7d32)', title:"'Playfair Display',serif" },
+        sections:[
+          {name:'Antipasti', icon:'🫒', items:[
+            {n:'Burrata di Puglia', d:'Burrata crémeuse, tomates confites, basilic frais, huile d\'olive extra vierge', p:'14€', tags:['veg','star']},
+            {n:'Vitello Tonnato', d:'Fines tranches de veau, sauce au thon et câpres', p:'13€'},
+            {n:'Antipasto della Casa', d:'Assortiment de charcuteries, olives, légumes grillés', p:'16€'},
+          ]},
+          {name:'Primi — Pasta', icon:'🍝', items:[
+            {n:'Tagliatelle al Tartufo', d:'Tagliatelle fraîches, crème, truffe noire râpée', p:'22€', tags:['star']},
+            {n:'Spaghetti alle Vongole', d:'Palourdes, ail, persil, vin blanc, piment', p:'19€', tags:['spicy']},
+            {n:'Lasagne della Nonna', d:'Bœuf mijoté, béchamel, parmesan, cuisson 4 h', p:'17€'},
+            {n:'Risotto ai Funghi', d:'Riz carnaroli, cèpes, mascarpone, parmesan', p:'18€', tags:['veg']},
+          ]},
+          {name:'Pizze', icon:'🍕', items:[
+            {n:'Margherita D.O.P.', d:'San Marzano, mozzarella di bufala, basilic', p:'13€', tags:['veg']},
+            {n:'Regina', d:'Mozzarella, jambon cuit, champignons frais', p:'16€'},
+            {n:'Diavola', d:'Tomate, mozzarella, salami piquant, huile pimentée', p:'15€', tags:['spicy']},
+          ]},
+          {name:'Dolci', icon:'🍰', items:[
+            {n:'Tiramisù della Casa', d:'Mascarpone, café espresso, cacao amer', p:'9€', tags:['star']},
+            {n:'Panna Cotta', d:'Vanille de Madagascar, coulis de fruits rouges', p:'8€', tags:['veg']},
+          ]},
+        ],
+      },
+      {
+        id:'asiatique', name:'Asiatique', emoji:'🥢', tagline:'Wok, nouilles, dim sum',
+        cardBg:'linear-gradient(135deg,#b71c1c,#f57f17)',
+        restaurant:'Golden Wok',
+        sub:'Saveurs d\'Asie · Cantonais & Thaï',
+        meta:['📍 Table 7','⭐ 4,7','🕐 11h30 – 22h30'],
+        theme:{ bg:'#160d0d', bg2:'rgba(22,13,13,.6)', fg:'#f7ecdf', accent:'#e53935', accentBright:'#ffb300', accentFg:'#1c0505',
+                heroBg:'linear-gradient(135deg,#8e0000,#c62828)', title:"'Poppins',sans-serif" },
+        sections:[
+          {name:'Entrées & Dim Sum', icon:'🥟', items:[
+            {n:'Raviolis vapeur (x6)', d:'Porc & crevettes, sauce soja-gingembre', p:'8€', tags:['star']},
+            {n:'Nems croustillants (x4)', d:'Poulet, vermicelles, menthe fraîche', p:'7€'},
+            {n:'Soupe Tom Yum', d:'Crevettes, citronnelle, galanga, piment', p:'9€', tags:['spicy']},
+            {n:'Edamame', d:'Fèves de soja, fleur de sel', p:'5€', tags:['veg']},
+          ]},
+          {name:'Woks & Nouilles', icon:'🍜', items:[
+            {n:'Pad Thaï au poulet', d:'Nouilles de riz, cacahuètes, tamarin, citron vert', p:'15€', tags:['star']},
+            {n:'Bœuf sauté aux oignons', d:'Wok de bœuf, poivrons, sauce huître', p:'16€'},
+            {n:'Nouilles sautées légumes', d:'Wok de saison, tofu, sauce soja', p:'13€', tags:['veg']},
+            {n:'Curry vert thaï', d:'Poulet, lait de coco, aubergines, basilic thaï', p:'16€', tags:['spicy']},
+          ]},
+          {name:'Riz & Spécialités', icon:'🍚', items:[
+            {n:'Canard laqué', d:'Demi-canard, crêpes, concombre, sauce hoisin', p:'24€', tags:['star']},
+            {n:'Riz cantonais', d:'Riz sauté, œuf, jambon, petits pois', p:'11€'},
+          ]},
+          {name:'Desserts', icon:'🍧', items:[
+            {n:'Perles de coco', d:'Boules de riz gluant, noix de coco', p:'6€', tags:['veg']},
+            {n:'Beignets de banane', d:'Banane frite, miel, sésame', p:'7€', tags:['veg']},
+          ]},
+        ],
+      },
+      {
+        id:'brasserie', name:'Bar / Brasserie', emoji:'🍺', tagline:'Bistrot, bières, cocktails',
+        cardBg:'linear-gradient(135deg,#4e342e,#d4a017)',
+        restaurant:'Le Comptoir',
+        sub:'Bar · Brasserie · Depuis 1932',
+        meta:['📍 Table 4','⭐ 4,6','🕐 8h – 2h'],
+        theme:{ bg:'#100d0a', bg2:'rgba(16,13,10,.6)', fg:'#efe6d6', accent:'#c9a24b', accentBright:'#e7c878', accentFg:'#1a1206',
+                heroBg:'linear-gradient(135deg,#3e2723,#5d4037)', title:"'Playfair Display',serif" },
+        sections:[
+          {name:'À grignoter', icon:'🥨', items:[
+            {n:'Planche mixte', d:'Charcuterie, fromages affinés, cornichons, pain', p:'16€', tags:['star']},
+            {n:'Frites maison', d:'Pommes de terre fraîches, sauce du chef', p:'6€', tags:['veg']},
+            {n:'Œuf mayo', d:'Le grand classique du zinc', p:'5€', tags:['veg']},
+          ]},
+          {name:'Les Classiques', icon:'🍽️', items:[
+            {n:'Croque-Monsieur', d:'Jambon, emmental, béchamel, salade', p:'12€'},
+            {n:'Steak-frites', d:'Bavette, sauce au poivre, frites maison', p:'19€', tags:['star']},
+            {n:'Burger du Comptoir', d:'Bœuf charolais, cheddar, oignons confits', p:'17€'},
+            {n:'Salade César', d:'Poulet grillé, parmesan, croûtons', p:'14€'},
+          ]},
+          {name:'Bières pression', icon:'🍺', items:[
+            {n:'Blonde de la maison', d:'25cl / 50cl', p:'4€ / 7€', tags:['star']},
+            {n:'IPA artisanale', d:'Houblonnée, amère, 6,5°', p:'5€ / 8€'},
+            {n:'Blanche', d:'Légère, notes d\'agrumes', p:'4,5€ / 7,5€'},
+          ]},
+          {name:'Cocktails', icon:'🍸', items:[
+            {n:'Spritz Aperol', d:'Aperol, prosecco, eau pétillante, orange', p:'9€', tags:['star']},
+            {n:'Mojito', d:'Rhum, menthe fraîche, citron vert, sucre de canne', p:'10€'},
+            {n:'Vin au verre', d:'Rouge, blanc ou rosé — sélection du jour', p:'6€'},
+          ]},
+        ],
+      },
+      {
+        id:'africain', name:'Africain', emoji:'🍲', tagline:'Mafé, yassa, thieboudienne',
+        cardBg:'linear-gradient(135deg,#e65100,#2e7d32)',
+        restaurant:'Le Baobab',
+        sub:'Cuisine d\'Afrique de l\'Ouest',
+        meta:['📍 Table 9','⭐ 4,9','🕐 12h – 23h'],
+        theme:{ bg:'#150f08', bg2:'rgba(21,15,8,.6)', fg:'#f6ead6', accent:'#e65100', accentBright:'#ffb74d', accentFg:'#1c0c00',
+                heroBg:'linear-gradient(135deg,#bf360c,#e65100)', title:"'Poppins',sans-serif" },
+        sections:[
+          {name:'Entrées', icon:'🥘', items:[
+            {n:'Accras de morue', d:'Beignets de poisson épicés, sauce piment', p:'8€', tags:['spicy']},
+            {n:'Pastels (x4)', d:'Chaussons frits au thon et à la menthe', p:'7€', tags:['star']},
+            {n:'Salade d\'avocat', d:'Avocat, crevettes, sauce citron-gingembre', p:'9€'},
+          ]},
+          {name:'Plats', icon:'🍲', items:[
+            {n:'Thiéboudiène', d:'Riz au poisson, légumes mijotés — le plat national sénégalais', p:'18€', tags:['star']},
+            {n:'Poulet Yassa', d:'Poulet mariné au citron et oignons confits, riz', p:'16€'},
+            {n:'Mafé de bœuf', d:'Bœuf mijoté à la sauce d\'arachide, riz blanc', p:'17€', tags:['star']},
+            {n:'Attiéké poisson braisé', d:'Semoule de manioc, poisson grillé, sauce tomate', p:'18€', tags:['spicy']},
+            {n:'Alloco', d:'Bananes plantains frites, sauce pimentée', p:'8€', tags:['veg','spicy']},
+          ]},
+          {name:'Desserts & Boissons', icon:'🥭', items:[
+            {n:'Thiakry', d:'Couscous de mil, lait fermenté sucré, vanille', p:'6€', tags:['veg']},
+            {n:'Bissap maison', d:'Infusion glacée d\'hibiscus, menthe', p:'4€', tags:['veg','star']},
+            {n:'Jus de gingembre', d:'Frais, épicé, fait maison', p:'4€', tags:['veg']},
+          ]},
+        ],
+      },
+      {
+        id:'indien', name:'Indien', emoji:'🍛', tagline:'Curry, tandoori, naan',
+        cardBg:'linear-gradient(135deg,#ff6f00,#6a1b9a)',
+        restaurant:'Maharaja',
+        sub:'Cuisine indienne authentique',
+        meta:['📍 Table 3','⭐ 4,8','🕐 12h – 14h30 · 19h – 23h'],
+        theme:{ bg:'#130b13', bg2:'rgba(19,11,19,.6)', fg:'#f6e9dd', accent:'#ff8f00', accentBright:'#ffca28', accentFg:'#1a0c00',
+                heroBg:'linear-gradient(135deg,#4a148c,#ff6f00)', title:"'Playfair Display',serif" },
+        sections:[
+          {name:'Entrées', icon:'🧅', items:[
+            {n:'Samoussas (x3)', d:'Chaussons croustillants aux légumes épicés', p:'6€', tags:['veg']},
+            {n:'Pakoras', d:'Beignets d\'oignon et pois chiche', p:'6€', tags:['veg','spicy']},
+            {n:'Poulet Tikka', d:'Morceaux marinés au yaourt et épices, tandoor', p:'9€', tags:['star']},
+          ]},
+          {name:'Curries', icon:'🍛', items:[
+            {n:'Butter Chicken', d:'Poulet, sauce tomate crémeuse au beurre, fenugrec', p:'16€', tags:['star']},
+            {n:'Agneau Rogan Josh', d:'Agneau mijoté, épices du Cachemire', p:'18€', tags:['spicy']},
+            {n:'Dal Makhani', d:'Lentilles noires mijotées, crème, beurre', p:'13€', tags:['veg']},
+            {n:'Palak Paneer', d:'Fromage frais, épinards, épices douces', p:'14€', tags:['veg']},
+            {n:'Vindaloo de porc', d:'Curry très relevé de Goa, vinaigre, piment', p:'17€', tags:['spicy']},
+          ]},
+          {name:'Tandoori & Pains', icon:'🔥', items:[
+            {n:'Poulet Tandoori', d:'Demi-poulet mariné, cuit au four d\'argile', p:'17€', tags:['star']},
+            {n:'Naan au fromage', d:'Pain indien fourré, cuit au tandoor', p:'4€', tags:['veg']},
+            {n:'Riz Biryani', d:'Riz basmati parfumé, safran, légumes', p:'12€', tags:['veg']},
+          ]},
+          {name:'Desserts', icon:'🍮', items:[
+            {n:'Gulab Jamun', d:'Beignets au lait, sirop de rose et cardamome', p:'6€', tags:['veg','star']},
+            {n:'Mangue Lassi', d:'Boisson au yaourt et à la mangue', p:'5€', tags:['veg']},
+          ]},
+        ],
+      },
+      {
+        id:'francais', name:'Gastronomie FR', emoji:'🥖', tagline:'Bistronomie française',
+        cardBg:'linear-gradient(135deg,#1a237e,#b71c1c)',
+        restaurant:'Chez Auguste',
+        sub:'Cuisine française · Bistronomique',
+        meta:['📍 Table 2','⭐ 4,9','🕐 19h – 22h30'],
+        theme:{ bg:'#0d0f16', bg2:'rgba(13,15,22,.6)', fg:'#eef0f5', accent:'#9e7d3b', accentBright:'#d4b25f', accentFg:'#15110a',
+                heroBg:'linear-gradient(135deg,#0d1440,#1a237e)', title:"'Playfair Display',serif" },
+        sections:[
+          {name:'Entrées', icon:'🥂', items:[
+            {n:'Foie gras mi-cuit', d:'Chutney de figues, pain brioché toasté', p:'19€', tags:['star']},
+            {n:'Œuf parfait 63°', d:'Crème de champignons, lard croustillant', p:'15€'},
+            {n:'Tartare de Saint-Jacques', d:'Agrumes, huile de noisette, aneth', p:'18€'},
+          ]},
+          {name:'Plats', icon:'🍷', items:[
+            {n:'Filet de bœuf Rossini', d:'Foie gras poêlé, sauce Périgueux, gratin dauphinois', p:'34€', tags:['star']},
+            {n:'Suprême de volaille', d:'Volaille fermière, morilles, vin jaune', p:'27€'},
+            {n:'Dos de cabillaud', d:'Beurre blanc, légumes de saison glacés', p:'26€'},
+            {n:'Risotto aux truffes', d:'Carnaroli, parmesan 24 mois, truffe fraîche', p:'24€', tags:['veg']},
+          ]},
+          {name:'Fromages & Desserts', icon:'🧀', items:[
+            {n:'Plateau de fromages affinés', d:'Sélection du maître fromager', p:'14€', tags:['veg']},
+            {n:'Soufflé au Grand Marnier', d:'Minute, cœur coulant', p:'13€', tags:['star']},
+            {n:'Tarte Tatin', d:'Pommes caramélisées, crème fraîche d\'Isigny', p:'11€', tags:['veg']},
+          ]},
+        ],
+      },
+      {
+        id:'japonais', name:'Japonais', emoji:'🍣', tagline:'Sushi, ramen, izakaya',
+        cardBg:'linear-gradient(135deg,#b71c1c,#212121)',
+        restaurant:'Sakura',
+        sub:'Sushi & Cuisine japonaise',
+        meta:['📍 Table 6','⭐ 4,8','🕐 12h – 22h'],
+        theme:{ bg:'#0e0e10', bg2:'rgba(14,14,16,.6)', fg:'#f2f0ee', accent:'#c62828', accentBright:'#ef5350', accentFg:'#fff',
+                heroBg:'linear-gradient(135deg,#1a1a1a,#b71c1c)', title:"'Poppins',sans-serif" },
+        sections:[
+          {name:'Entrées', icon:'🥢', items:[
+            {n:'Edamame', d:'Fèves de soja, sel', p:'5€', tags:['veg']},
+            {n:'Gyoza (x5)', d:'Raviolis grillés au porc et légumes', p:'7€', tags:['star']},
+            {n:'Soupe miso', d:'Tofu, wakamé, oignon vert', p:'4€', tags:['veg']},
+            {n:'Salade de chou wakamé', d:'Algues, sésame, vinaigre de riz', p:'6€', tags:['veg']},
+          ]},
+          {name:'Sushi & Sashimi', icon:'🍣', items:[
+            {n:'Assortiment Sakura (12 pièces)', d:'Sushi, maki et sashimi du chef', p:'22€', tags:['star']},
+            {n:'California Roll (x6)', d:'Surimi, avocat, concombre, sésame', p:'8€'},
+            {n:'Sashimi saumon (x6)', d:'Saumon frais tranché', p:'12€'},
+            {n:'Maki avocat (x6)', d:'Avocat, riz vinaigré, nori', p:'6€', tags:['veg']},
+          ]},
+          {name:'Ramen & Chauds', icon:'🍜', items:[
+            {n:'Ramen Tonkotsu', d:'Bouillon de porc, chashu, œuf mollet, nouilles', p:'15€', tags:['star']},
+            {n:'Yakitori poulet (x3)', d:'Brochettes grillées, sauce teriyaki', p:'9€'},
+            {n:'Tempura crevettes', d:'Crevettes en beignet léger, sauce', p:'12€'},
+          ]},
+          {name:'Desserts', icon:'🍡', items:[
+            {n:'Mochi glacé (x3)', d:'Thé matcha, mangue, sésame noir', p:'7€', tags:['veg','star']},
+            {n:'Dorayaki', d:'Pancake fourré à la pâte de haricot rouge', p:'6€', tags:['veg']},
+          ]},
+        ],
+      },
+      {
+        id:'oriental', name:'Libanais / Oriental', emoji:'🧆', tagline:'Mezze, grillades, houmous',
+        cardBg:'linear-gradient(135deg,#00695c,#c9a227)',
+        restaurant:'Beyrouth',
+        sub:'Mezze & Grillades libanaises',
+        meta:['📍 Table 8','⭐ 4,7','🕐 12h – 23h'],
+        theme:{ bg:'#0c1310', bg2:'rgba(12,19,16,.6)', fg:'#f0ecdf', accent:'#0f8a7c', accentBright:'#4db6ac', accentFg:'#04120f',
+                heroBg:'linear-gradient(135deg,#004d40,#00695c)', title:"'Playfair Display',serif" },
+        sections:[
+          {name:'Mezze froids', icon:'🫓', items:[
+            {n:'Houmous', d:'Purée de pois chiche, tahini, huile d\'olive', p:'7€', tags:['veg','star']},
+            {n:'Moutabal', d:'Caviar d\'aubergine fumé, tahini', p:'7€', tags:['veg']},
+            {n:'Taboulé libanais', d:'Persil, menthe, boulgour, tomate, citron', p:'7€', tags:['veg']},
+            {n:'Feuilles de vigne (x5)', d:'Riz, herbes, citron', p:'8€', tags:['veg']},
+          ]},
+          {name:'Mezze chauds', icon:'🧆', items:[
+            {n:'Falafels (x5)', d:'Beignets de pois chiche, sauce tahini', p:'8€', tags:['veg','star']},
+            {n:'Kebbé (x3)', d:'Boulettes de boulgour farcies à la viande', p:'9€'},
+            {n:'Halloumi grillé', d:'Fromage grillé, miel, thym', p:'9€', tags:['veg']},
+          ]},
+          {name:'Grillades', icon:'🔥', items:[
+            {n:'Chich Taouk', d:'Brochettes de poulet mariné, ail, riz, salade', p:'17€', tags:['star']},
+            {n:'Kafta d\'agneau', d:'Brochettes hachées épicées, boulgour', p:'18€'},
+            {n:'Assortiment de grillades', d:'Poulet, agneau, kafta, pour 2', p:'34€', tags:['star']},
+          ]},
+          {name:'Desserts', icon:'🍯', items:[
+            {n:'Baklava (x3)', d:'Pâte filo, pistache, miel', p:'6€', tags:['veg','star']},
+            {n:'Mouhalabieh', d:'Crème de lait à la fleur d\'oranger', p:'5€', tags:['veg']},
+          ]},
+        ],
+      },
+      {
+        id:'mexicain', name:'Mexicain', emoji:'🌮', tagline:'Tacos, burritos, guacamole',
+        cardBg:'linear-gradient(135deg,#2e7d32,#e53935)',
+        restaurant:'El Sombrero',
+        sub:'Cantina mexicaine',
+        meta:['📍 Table 5','⭐ 4,6','🕐 12h – minuit'],
+        theme:{ bg:'#12110a', bg2:'rgba(18,17,10,.6)', fg:'#f5efdc', accent:'#e53935', accentBright:'#ffca28', accentFg:'#fff',
+                heroBg:'linear-gradient(135deg,#1b5e20,#e53935)', title:"'Poppins',sans-serif" },
+        sections:[
+          {name:'Para empezar', icon:'🥑', items:[
+            {n:'Guacamole & totopos', d:'Avocat écrasé, citron vert, coriandre, chips maison', p:'9€', tags:['veg','star']},
+            {n:'Nachos supremos', d:'Cheddar fondu, jalapeños, crème, haricots', p:'11€', tags:['spicy']},
+            {n:'Quesadilla', d:'Tortilla, fromage fondu, poulet ou légumes', p:'10€'},
+          ]},
+          {name:'Tacos & Burritos', icon:'🌮', items:[
+            {n:'Tacos al Pastor (x3)', d:'Porc mariné, ananas, oignon, coriandre', p:'14€', tags:['star']},
+            {n:'Burrito Grande', d:'Bœuf, riz, haricots, fromage, guacamole', p:'15€'},
+            {n:'Tacos de légumes (x3)', d:'Légumes grillés, haricots noirs, avocat', p:'12€', tags:['veg']},
+            {n:'Chili con Carne', d:'Bœuf haché, haricots rouges, épices, riz', p:'14€', tags:['spicy']},
+          ]},
+          {name:'Boissons', icon:'🍹', items:[
+            {n:'Margarita', d:'Tequila, triple sec, citron vert', p:'10€', tags:['star']},
+            {n:'Corona', d:'Bière mexicaine, quartier de citron', p:'5€'},
+            {n:'Agua de Jamaica', d:'Infusion d\'hibiscus glacée, sans alcool', p:'4€', tags:['veg']},
+          ]},
+          {name:'Postres', icon:'🍮', items:[
+            {n:'Churros', d:'Beignets, sucre cannelle, sauce chocolat', p:'7€', tags:['veg','star']},
+            {n:'Flan mexicain', d:'Crème caramel à la vanille', p:'6€', tags:['veg']},
+          ]},
+        ],
+      },
+      {
+        id:'burger', name:'Burger / Street', emoji:'🍔', tagline:'Smash, frites, milkshakes',
+        cardBg:'linear-gradient(135deg,#f57f17,#c62828)',
+        restaurant:'Smash & Co',
+        sub:'Burgers & Street Food',
+        meta:['📍 Table 11','⭐ 4,7','🕐 11h30 – 23h'],
+        theme:{ bg:'#111112', bg2:'rgba(17,17,18,.6)', fg:'#f4f2ec', accent:'#ff6d00', accentBright:'#ffab40', accentFg:'#1a0d00',
+                heroBg:'linear-gradient(135deg,#bf360c,#f57f17)', title:"'Bebas Neue',sans-serif", titleSpacing:'.03em' },
+        sections:[
+          {name:'Les Burgers', icon:'🍔', items:[
+            {n:'Le Smash Classic', d:'2 steaks smashés, cheddar, oignons, sauce maison', p:'13€', tags:['star']},
+            {n:'Le Bacon BBQ', d:'Bœuf, bacon croustillant, cheddar, sauce BBQ, oignons frits', p:'15€'},
+            {n:'Le Chicken Crispy', d:'Poulet pané croustillant, coleslaw, sauce ranch', p:'14€'},
+            {n:'Le Veggie', d:'Steak végétal, avocat, roquette, tomate', p:'13€', tags:['veg']},
+            {n:'Le Spicy', d:'Bœuf, jalapeños, pepper jack, sauce feu', p:'14€', tags:['spicy']},
+          ]},
+          {name:'À côté', icon:'🍟', items:[
+            {n:'Frites maison', d:'Coupées à la main, fleur de sel', p:'5€', tags:['veg','star']},
+            {n:'Frites cheddar-bacon', d:'Cheddar fondu, éclats de bacon', p:'8€'},
+            {n:'Onion rings (x6)', d:'Beignets d\'oignon, sauce ranch', p:'6€', tags:['veg']},
+            {n:'Tenders de poulet (x4)', d:'Poulet pané, sauce au choix', p:'8€'},
+          ]},
+          {name:'Milkshakes & Boissons', icon:'🥤', items:[
+            {n:'Milkshake Oreo', d:'Glace vanille, Oreo, chantilly', p:'7€', tags:['veg','star']},
+            {n:'Milkshake caramel beurre salé', d:'Onctueux, chantilly, éclats de caramel', p:'7€', tags:['veg']},
+            {n:'Limonade artisanale', d:'Citron pressé, menthe', p:'4€', tags:['veg']},
+          ]},
+        ],
+      },
+      {
+        id:'vegan', name:'Végé / Vegan', emoji:'🥗', tagline:'Bowls, bio, healthy',
+        cardBg:'linear-gradient(135deg,#2e7d32,#9ccc65)',
+        restaurant:'Green Garden',
+        sub:'Cuisine végétale · Bio & de saison',
+        meta:['📍 Table 10','⭐ 4,8','🕐 11h30 – 21h'],
+        theme:{ bg:'#0c1310', bg2:'rgba(12,19,16,.6)', fg:'#eef3e9', accent:'#43a047', accentBright:'#9ccc65', accentFg:'#0b1a09',
+                heroBg:'linear-gradient(135deg,#1b5e20,#43a047)', title:"'Poppins',sans-serif" },
+        sections:[
+          {name:'Entrées', icon:'🥬', items:[
+            {n:'Houmous de betterave', d:'Pois chiche, betterave rôtie, graines, pain pita', p:'8€', tags:['veg','star']},
+            {n:'Velouté de saison', d:'Légumes bio du maraîcher, huile de courge', p:'7€', tags:['veg']},
+            {n:'Rouleaux de printemps', d:'Tofu mariné, mangue, menthe, sauce cacahuète', p:'8€', tags:['veg']},
+          ]},
+          {name:'Buddha Bowls', icon:'🥗', items:[
+            {n:'Bowl Rainbow', d:'Quinoa, avocat, patate douce, edamame, tahini', p:'15€', tags:['veg','star']},
+            {n:'Bowl Falafel', d:'Falafels maison, houmous, chou rouge, boulgour', p:'14€', tags:['veg']},
+            {n:'Curry de légumes', d:'Lait de coco, patate douce, pois chiche, riz complet', p:'14€', tags:['veg','spicy']},
+            {n:'Dahl de lentilles corail', d:'Lentilles, épices douces, coriandre, riz basmati', p:'13€', tags:['veg']},
+          ]},
+          {name:'Desserts & Jus', icon:'🍓', items:[
+            {n:'Cheesecake vegan', d:'Base noix de cajou, coulis de fruits rouges', p:'8€', tags:['veg','star']},
+            {n:'Energy balls (x3)', d:'Dattes, cacao cru, noix', p:'5€', tags:['veg']},
+            {n:'Jus vert pressé', d:'Épinard, pomme, concombre, gingembre', p:'6€', tags:['veg']},
+          ]},
+        ],
+      },
+      {
+        id:'brunch', name:'Café / Brunch', emoji:'🥐', tagline:'Coffee shop, pancakes',
+        cardBg:'linear-gradient(135deg,#8d6e63,#ffb300)',
+        restaurant:'Sunday Coffee',
+        sub:'Coffee Shop & Brunch',
+        meta:['📍 Table 1','⭐ 4,9','🕐 8h – 17h'],
+        theme:{ bg:'#12100d', bg2:'rgba(18,16,13,.6)', fg:'#f3ece1', accent:'#a97449', accentBright:'#e0a96d', accentFg:'#1a1108',
+                heroBg:'linear-gradient(135deg,#5d4037,#8d6e63)', title:"'Playfair Display',serif" },
+        sections:[
+          {name:'Cafés & Boissons', icon:'☕', items:[
+            {n:'Cappuccino', d:'Espresso, lait micro-moussé, art latte', p:'4€', tags:['star']},
+            {n:'Flat White', d:'Double ristretto, lait velouté', p:'4,5€'},
+            {n:'Chai Latte', d:'Thé épicé, lait moussé, cannelle', p:'5€', tags:['veg']},
+            {n:'Matcha Latte', d:'Thé matcha cérémonial, lait d\'avoine', p:'5,5€', tags:['veg']},
+          ]},
+          {name:'Le Brunch', icon:'🍳', items:[
+            {n:'Formule Brunch complet', d:'Boisson chaude, jus, œufs, avocado toast, viennoiserie, fruits', p:'24€', tags:['star']},
+            {n:'Avocado Toast', d:'Pain au levain, avocat, œuf poché, graines, piment', p:'12€', tags:['veg']},
+            {n:'Œufs Benedict', d:'Muffin, œufs pochés, saumon fumé, hollandaise', p:'14€'},
+            {n:'Shakshuka', d:'Œufs pochés, sauce tomate épicée, feta, pain', p:'13€', tags:['veg','spicy']},
+          ]},
+          {name:'Sucré', icon:'🥞', items:[
+            {n:'Pancakes stack', d:'Pile de pancakes, sirop d\'érable, fruits rouges', p:'11€', tags:['veg','star']},
+            {n:'Açaï Bowl', d:'Açaï, granola, banane, fruits frais, coco', p:'12€', tags:['veg']},
+            {n:'Cookie maison', d:'Chocolat, cœur fondant', p:'3,5€', tags:['veg']},
+          ]},
+        ],
+      },
+    ];
+
+    /* ============================================================
+       RENDER cuisine cards
+       ============================================================ */
+    const grid = document.getElementById('cuisineGrid');
+    CUISINES.forEach(c => {
+      const card = document.createElement('div');
+      card.className = 'cuisine-card';
+      card.innerHTML = `
+        <div class="cc-bg" style="background:${c.cardBg}"></div>
+        <div class="cc-emoji">${c.emoji}</div>
+        <div class="cc-body">
+          <h3>${c.name}</h3>
+          <p>${c.tagline}</p>
+          <span class="cc-open">Voir le menu →</span>
+        </div>`;
+      card.addEventListener('click', () => openMenu(c.id));
+      grid.appendChild(card);
+    });
+
+    /* ============================================================
+       MENU OVERLAY
+       ============================================================ */
+    const overlay = document.getElementById('menuOverlay');
+    const doc = document.getElementById('menuDoc');
+    const toastEl = document.getElementById('toast');
+
+    function esc(s){ return String(s); }
+
+    function openMenu(id){
+      const c = CUISINES.find(x => x.id === id);
+      if(!c) return;
+      const t = c.theme;
+      // apply theme vars to overlay
+      overlay.style.setProperty('--m-bg', t.bg);
+      overlay.style.setProperty('--m-bg-2', t.bg2);
+      overlay.style.setProperty('--m-fg', t.fg);
+      overlay.style.setProperty('--m-accent', t.accent);
+      overlay.style.setProperty('--m-accent-bright', t.accentBright);
+      overlay.style.setProperty('--m-accent-fg', t.accentFg);
+      overlay.style.setProperty('--m-hero-bg', t.heroBg);
+      overlay.style.setProperty('--m-title', t.title);
+      overlay.style.setProperty('--m-font', "'Inter',sans-serif");
+      overlay.style.setProperty('--m-title-spacing', t.titleSpacing || '0');
+
+      const tabs = c.sections.map((s,i) =>
+        `<button class="m-tab ${i===0?'active':''}" data-target="sec-${c.id}-${i}">${s.name}</button>`
+      ).join('');
+
+      const sections = c.sections.map((s,i) => `
+        <div class="m-section" id="sec-${c.id}-${i}">
+          <h2>${s.icon} ${s.name}</h2>
+          <div class="sec-line"></div>
+          ${s.items.map(it => `
+            <div class="m-item">
+              <div class="mi-main">
+                <div class="mi-name">${esc(it.n)}</div>
+                <div class="mi-desc">${esc(it.d)}</div>
+                ${it.tags && it.tags.length ? `<div class="mi-tags">${it.tags.map(tag => tagHtml(tag)).join('')}</div>` : ''}
+              </div>
+              <div class="mi-price">${esc(it.p)}</div>
+            </div>`).join('')}
+        </div>`).join('');
+
+      doc.innerHTML = `
+        <div class="m-hero">
+          <span class="m-nfc">📶 Menu ouvert via NFC</span>
+          <h1>${esc(c.restaurant)}</h1>
+          <div class="m-sub">${esc(c.sub)}</div>
+          <div class="m-meta">${c.meta.map(m=>`<span>${esc(m)}</span>`).join('')}</div>
+        </div>
+        <div class="m-tabs">${tabs}</div>
+        <div class="m-content">
+          ${sections}
+          <p class="m-note">Ceci est un exemple de menu TapMenu pour un restaurant ${c.name.toLowerCase()}.<br/>Votre menu sera personnalisé à votre enseigne, vos plats et vos prix.</p>
+        </div>
+        <div class="m-actionbar">
+          <button class="btn m-btn-b" data-act="serveur">🔔 Appeler le serveur</button>
+          <button class="btn m-btn-a" data-act="addition">🧾 Demander l'addition</button>
+        </div>`;
+
+      // tab scroll behaviour
+      doc.querySelectorAll('.m-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          doc.querySelectorAll('.m-tab').forEach(x=>x.classList.remove('active'));
+          tab.classList.add('active');
+          const el = document.getElementById(tab.dataset.target);
+          if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+        });
+      });
+      // action buttons (demo)
+      doc.querySelectorAll('[data-act]').forEach(b => {
+        b.addEventListener('click', () => {
+          const msg = b.dataset.act === 'serveur' ? 'Un serveur arrive à votre table 👋' : 'Votre addition est en préparation 🧾';
+          showToast(msg);
+        });
+      });
+
+      overlay.classList.add('open');
+      overlay.scrollTop = 0;
+      document.body.style.overflow = 'hidden';
+      location.hash = 'menu-' + c.id;
+    }
+
+    function tagHtml(tag){
+      const map = {
+        veg:   {cls:'veg',   label:'🌱 Végé'},
+        spicy: {cls:'spicy', label:'🌶️ Épicé'},
+        star:  {cls:'star',  label:'⭐ Signature'},
+      };
+      const m = map[tag];
+      return m ? `<span class="m-tag ${m.cls}">${m.label}</span>` : '';
+    }
+
+    function closeMenu(){
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+      if(location.hash.startsWith('#menu-')) history.replaceState(null,'',location.pathname + location.search);
+    }
+    document.getElementById('menuClose').addEventListener('click', closeMenu);
+    document.addEventListener('keydown', e => { if(e.key === 'Escape' && overlay.classList.contains('open')) closeMenu(); });
+
+    let toastTimer;
+    function showToast(msg){
+      toastEl.textContent = msg;
+      toastEl.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=>toastEl.classList.remove('show'), 2600);
+    }
+
+    // deep-link: open a menu directly via #menu-<id>
+    if(location.hash.startsWith('#menu-')){
+      const id = location.hash.replace('#menu-','');
+      if(CUISINES.some(c=>c.id===id)) openMenu(id);
+    }
+  </script>
+</body>
+</html>
