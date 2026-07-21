@@ -258,6 +258,64 @@
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
     @media (max-width:480px){ .mi-thumb{ width:66px; height:66px; flex-basis:66px; } }
+
+    /* ============================================================
+       PER-CUISINE MENU LAYOUTS — each restaurant type looks different
+       ============================================================ */
+
+    /* --- ELEGANT (Italien) : liste raffinée, photos rondes, serif italique --- */
+    .layout-elegant .m-section h2 { justify-content:center; font-style:italic; }
+    .layout-elegant .m-section .sec-line { background:none; height:auto; text-align:center; margin:6px 0 22px; }
+    .layout-elegant .m-section .sec-line::before { content:"❦"; color:var(--m-accent); font-size:1.2rem; }
+    .layout-elegant .m-item { align-items:center; }
+    .layout-elegant .mi-thumb { border-radius:50%; width:74px; height:74px; flex-basis:74px; }
+    .layout-elegant .mi-desc { font-style:italic; }
+
+    /* --- GRID (Asiatique, Mexicain, Burger) : cartes photo en grille --- */
+    .layout-grid .m-items { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+    .layout-grid .m-item { flex-direction:column; align-items:stretch; gap:0; padding:0; border:1px solid rgba(255,255,255,.1); border-radius:16px; overflow:hidden; background:rgba(255,255,255,.04); }
+    .layout-grid .mi-thumb { width:100%; height:140px; flex-basis:auto; border-radius:0; box-shadow:none; }
+    .layout-grid .mi-main { padding:12px 14px 4px; }
+    .layout-grid .mi-price { padding:0 14px 14px; align-self:flex-start; }
+    @media (max-width:520px){ .layout-grid .m-items{ grid-template-columns:1fr; } .layout-grid .mi-thumb{ height:170px; } }
+
+    /* --- ZEN (Japonais, Gastro FR) : minimal, aéré, fines lignes --- */
+    .layout-zen .m-content { max-width:640px; }
+    .layout-zen .m-section { margin-bottom:54px; }
+    .layout-zen .m-section h2 { justify-content:center; font-weight:500; letter-spacing:.02em; font-size:1.3rem; }
+    .layout-zen .m-section .sec-line { width:38px; margin:14px auto 28px; opacity:.65; }
+    .layout-zen .m-item { gap:18px; padding:20px 0; border-bottom:1px solid rgba(255,255,255,.07); }
+    .layout-zen .mi-thumb { width:58px; height:58px; flex-basis:58px; border-radius:8px; box-shadow:none; }
+    .layout-zen .mi-name { font-weight:600; }
+
+    /* --- ORNATE (Indien, Libanais) : cadres et séparateurs décoratifs --- */
+    .layout-ornate .m-section { border:1px solid var(--m-accent); border-radius:14px; padding:18px 16px; background:rgba(255,255,255,.02); }
+    .layout-ornate .m-section h2 { justify-content:center; }
+    .layout-ornate .m-section .sec-line { background:none; height:auto; text-align:center; margin:6px 0 18px; letter-spacing:.4em; }
+    .layout-ornate .m-section .sec-line::before { content:"◆ ◆ ◆"; color:var(--m-accent); font-size:.6rem; }
+    .layout-ornate .mi-thumb { border-radius:50%; border:2px solid var(--m-accent); }
+
+    /* --- FRESH (Vegan, Brunch) : thème CLAIR, cartes arrondies --- */
+    .layout-fresh { --m-bg:#f7f4ec; --m-fg:#2b3126; --m-bg-2:rgba(255,255,255,.9); }
+    .layout-fresh .m-item { background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:16px; padding:12px; margin-bottom:12px; box-shadow:0 4px 14px rgba(0,0,0,.05); align-items:center; }
+    .layout-fresh .m-tabs { border-bottom-color:rgba(0,0,0,.08); }
+    .layout-fresh .m-tab { background:rgba(0,0,0,.05); color:#2b3126; }
+    .layout-fresh .mi-thumb { border-radius:12px; }
+    .layout-fresh .m-tag { background:rgba(0,0,0,.06); color:#2b3126; }
+    .layout-fresh .m-actionbar { border-top-color:rgba(0,0,0,.08); }
+    .layout-fresh .m-btn-b { background:rgba(0,0,0,.06); color:#2b3126; border-color:rgba(0,0,0,.12); }
+
+    /* --- WARM (Africain) : titres en bandeau coloré, motifs --- */
+    .layout-warm .m-section h2 { background:var(--m-accent); color:var(--m-accent-fg); padding:8px 14px; border-radius:8px; }
+    .layout-warm .m-section .sec-line { background:repeating-linear-gradient(90deg,var(--m-accent) 0 12px, transparent 12px 22px); height:4px; opacity:.7; }
+    .layout-warm .mi-thumb { border-radius:10px; }
+
+    /* --- BISTRO (Bar / Brasserie) : ardoise, serif italique --- */
+    .layout-bistro { --m-bg:#14160f; }
+    .layout-bistro .m-section h2 { font-family:'Playfair Display',serif; font-style:italic; border-bottom:2px solid rgba(255,255,255,.16); padding-bottom:8px; }
+    .layout-bistro .m-section .sec-line { display:none; }
+    .layout-bistro .mi-thumb { border-radius:6px; filter:saturate(.9); }
+    .layout-bistro .mi-price { font-family:'Playfair Display',serif; }
   </style>
 </head>
 <body>
@@ -410,7 +468,7 @@
        ============================================================ */
     const CUISINES = [
       {
-        id:'italien', name:'Italien', emoji:'🍝', tagline:'Trattoria, pizzeria, cucina',
+        id:'italien', name:'Italien', emoji:'🍝', tagline:'Trattoria, pizzeria, cucina', style:'elegant',
         cardBg:'linear-gradient(135deg,#2e7d32,#c62828)', photo:'italian,pasta',
         restaurant:'Trattoria Bella', sub:'Cucina italiana · Depuis 1987',
         meta:['📍 Table 12','⭐ 4,8','🕐 12h – 23h'],
@@ -440,7 +498,7 @@
         ],
       },
       {
-        id:'asiatique', name:'Asiatique', emoji:'🥢', tagline:'Wok, nouilles, dim sum',
+        id:'asiatique', name:'Asiatique', emoji:'🥢', tagline:'Wok, nouilles, dim sum', style:'grid',
         cardBg:'linear-gradient(135deg,#b71c1c,#f57f17)', photo:'asian,food',
         restaurant:'Golden Wok', sub:'Saveurs d\'Asie · Cantonais & Thaï',
         meta:['📍 Table 7','⭐ 4,7','🕐 11h30 – 22h30'],
@@ -470,7 +528,7 @@
         ],
       },
       {
-        id:'brasserie', name:'Bar / Brasserie', emoji:'🍺', tagline:'Bistrot, bières, cocktails',
+        id:'brasserie', name:'Bar / Brasserie', emoji:'🍺', tagline:'Bistrot, bières, cocktails', style:'bistro',
         cardBg:'linear-gradient(135deg,#4e342e,#d4a017)', photo:'bistro,beer',
         restaurant:'Le Comptoir', sub:'Bar · Brasserie · Depuis 1932',
         meta:['📍 Table 4','⭐ 4,6','🕐 8h – 2h'],
@@ -501,7 +559,7 @@
         ],
       },
       {
-        id:'africain', name:'Africain', emoji:'🍲', tagline:'Mafé, yassa, thieboudienne',
+        id:'africain', name:'Africain', emoji:'🍲', tagline:'Mafé, yassa, thieboudienne', style:'warm',
         cardBg:'linear-gradient(135deg,#e65100,#2e7d32)', photo:'african,food',
         restaurant:'Le Baobab', sub:'Cuisine d\'Afrique de l\'Ouest',
         meta:['📍 Table 9','⭐ 4,9','🕐 12h – 23h'],
@@ -528,7 +586,7 @@
         ],
       },
       {
-        id:'indien', name:'Indien', emoji:'🍛', tagline:'Curry, tandoori, naan',
+        id:'indien', name:'Indien', emoji:'🍛', tagline:'Curry, tandoori, naan', style:'ornate',
         cardBg:'linear-gradient(135deg,#ff6f00,#6a1b9a)', photo:'indian,curry',
         restaurant:'Maharaja', sub:'Cuisine indienne authentique',
         meta:['📍 Table 3','⭐ 4,8','🕐 12h – 14h30 · 19h – 23h'],
@@ -559,7 +617,7 @@
         ],
       },
       {
-        id:'francais', name:'Gastronomie FR', emoji:'🥖', tagline:'Bistronomie française',
+        id:'francais', name:'Gastronomie FR', emoji:'🥖', tagline:'Bistronomie française', style:'zen',
         cardBg:'linear-gradient(135deg,#1a237e,#b71c1c)', photo:'gourmet,french,food',
         restaurant:'Chez Auguste', sub:'Cuisine française · Bistronomique',
         meta:['📍 Table 2','⭐ 4,9','🕐 19h – 22h30'],
@@ -585,7 +643,7 @@
         ],
       },
       {
-        id:'japonais', name:'Japonais', emoji:'🍣', tagline:'Sushi, ramen, izakaya',
+        id:'japonais', name:'Japonais', emoji:'🍣', tagline:'Sushi, ramen, izakaya', style:'zen',
         cardBg:'linear-gradient(135deg,#b71c1c,#212121)', photo:'sushi',
         restaurant:'Sakura', sub:'Sushi & Cuisine japonaise',
         meta:['📍 Table 6','⭐ 4,8','🕐 12h – 22h'],
@@ -616,7 +674,7 @@
         ],
       },
       {
-        id:'oriental', name:'Libanais / Oriental', emoji:'🧆', tagline:'Mezze, grillades, houmous',
+        id:'oriental', name:'Libanais / Oriental', emoji:'🧆', tagline:'Mezze, grillades, houmous', style:'ornate',
         cardBg:'linear-gradient(135deg,#00695c,#c9a227)', photo:'mezze,lebanese',
         restaurant:'Beyrouth', sub:'Mezze & Grillades libanaises',
         meta:['📍 Table 8','⭐ 4,7','🕐 12h – 23h'],
@@ -646,7 +704,7 @@
         ],
       },
       {
-        id:'mexicain', name:'Mexicain', emoji:'🌮', tagline:'Tacos, burritos, guacamole',
+        id:'mexicain', name:'Mexicain', emoji:'🌮', tagline:'Tacos, burritos, guacamole', style:'grid',
         cardBg:'linear-gradient(135deg,#2e7d32,#e53935)', photo:'mexican,tacos',
         restaurant:'El Sombrero', sub:'Cantina mexicaine',
         meta:['📍 Table 5','⭐ 4,6','🕐 12h – minuit'],
@@ -676,7 +734,7 @@
         ],
       },
       {
-        id:'burger', name:'Burger / Street', emoji:'🍔', tagline:'Smash, frites, milkshakes',
+        id:'burger', name:'Burger / Street', emoji:'🍔', tagline:'Smash, frites, milkshakes', style:'grid',
         cardBg:'linear-gradient(135deg,#f57f17,#c62828)', photo:'burger,fries',
         restaurant:'Smash & Co', sub:'Burgers & Street Food',
         meta:['📍 Table 11','⭐ 4,7','🕐 11h30 – 23h'],
@@ -704,7 +762,7 @@
         ],
       },
       {
-        id:'vegan', name:'Végé / Vegan', emoji:'🥗', tagline:'Bowls, bio, healthy',
+        id:'vegan', name:'Végé / Vegan', emoji:'🥗', tagline:'Bowls, bio, healthy', style:'fresh',
         cardBg:'linear-gradient(135deg,#2e7d32,#9ccc65)', photo:'vegan,bowl',
         restaurant:'Green Garden', sub:'Cuisine végétale · Bio & de saison',
         meta:['📍 Table 10','⭐ 4,8','🕐 11h30 – 21h'],
@@ -730,7 +788,7 @@
         ],
       },
       {
-        id:'brunch', name:'Café / Brunch', emoji:'🥐', tagline:'Coffee shop, pancakes',
+        id:'brunch', name:'Café / Brunch', emoji:'🥐', tagline:'Coffee shop, pancakes', style:'fresh',
         cardBg:'linear-gradient(135deg,#8d6e63,#ffb300)', photo:'brunch,coffee',
         restaurant:'Sunday Coffee', sub:'Coffee Shop & Brunch',
         meta:['📍 Table 1','⭐ 4,9','🕐 8h – 17h'],
@@ -791,6 +849,7 @@
       const c = CUISINES.find(x => x.id === id);
       if(!c) return;
       const t = c.theme;
+      doc.className = 'menu-doc layout-' + (c.style || 'elegant');
       overlay.style.setProperty('--m-bg', t.bg);
       overlay.style.setProperty('--m-bg-2', t.bg2);
       overlay.style.setProperty('--m-fg', t.fg);
@@ -810,6 +869,7 @@
         <div class="m-section" id="sec-${c.id}-${i}">
           <h2>${s.icon} ${s.name}</h2>
           <div class="sec-line"></div>
+          <div class="m-items">
           ${s.items.map(it => `
             <div class="m-item">
               <div class="mi-thumb" style="background:${c.cardBg}">
@@ -823,6 +883,7 @@
               </div>
               <div class="mi-price">${esc(it.p)}</div>
             </div>`).join('')}
+          </div>
         </div>`).join('');
 
       doc.innerHTML = `
